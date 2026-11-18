@@ -92,11 +92,15 @@ void MidiLogger::setLogToFile(bool enabled, const juce::File& filePath)
         logToFile = enabled;
         if (enabled)
         {
-            static std::once_flag fallbackWarningFlag;
-            std::call_once(fallbackWarningFlag, [&shouldEmitFallbackWarning]()
+            // Explicit path = diagnostic/support location; do not walk project root.
+            if (filePath.getFullPathName().isEmpty())
             {
-                shouldEmitFallbackWarning = ProjectPaths::isUsingFallbackRoot();
-            });
+                static std::once_flag fallbackWarningFlag;
+                std::call_once(fallbackWarningFlag, [&shouldEmitFallbackWarning]()
+                {
+                    shouldEmitFallbackWarning = ProjectPaths::isUsingFallbackRoot();
+                });
+            }
 
             logFile = determineLogFilePath(filePath);
             ensureLogDirectoryExists(logFile);

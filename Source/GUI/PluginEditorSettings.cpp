@@ -113,6 +113,17 @@ void PluginEditor::restoreSettingsPolicyCombosFromState(SettingsPanel& panel)
                                PluginIDs::Settings::DeleteWarningPolicy::kDefault,
                                normalizeDeleteWarningPolicy),
         juce::dontSendNotification);
+
+    panel.getDiagnosticLoggingCombo().setSelectedId(
+        readNormalizedProperty(state,
+                               PluginIDs::Settings::kDiagnosticLogging,
+                               PluginIDs::Settings::DiagnosticLogging::kDefault,
+                               [](int raw)
+                               {
+                                   using namespace PluginIDs::Settings::DiagnosticLogging;
+                                   return (raw == kOn) ? kOn : kOff;
+                               }),
+        juce::dontSendNotification);
 }
 
 void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
@@ -402,6 +413,7 @@ void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
     wireSettingsEpromAndLatency(panel);
     wireSettingsAppearanceCombos(panel);
     wireSettingsContextualHelpCombo(panel);
+    wireSettingsDiagnosticLogging(panel);
     wireSettingsGettingStartedControls(panel);
     wireSettingsPolicyCombos(panel);
     wireSettingsInitAndMasterActions(panel);

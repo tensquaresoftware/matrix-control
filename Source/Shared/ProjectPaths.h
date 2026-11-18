@@ -13,6 +13,9 @@ namespace ProjectPaths
 
     juce::File getProjectRoot();
     juce::File getLogsDirectory(LogCategory category);
+    // Application Support Logs/ root for Release diagnostic logging (no repo walk).
+    juce::File getDiagnosticLogsRoot();
+    juce::File getDiagnosticLogsDirectory(LogCategory category);
     // Per-user product root shared with PropertiesFile stores (Standalone + Device Connection + Init):
     // macOS ~/Library/Application Support/Ten Square Software/Matrix-Control/, Windows %APPDATA%/…,
     // Linux ~/Ten Square Software/Matrix-Control/. Independent of getProjectRoot() repo discovery.

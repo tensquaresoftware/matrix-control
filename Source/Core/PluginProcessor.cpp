@@ -89,6 +89,9 @@ PluginProcessor::PluginProcessor()
 
 PluginProcessor::~PluginProcessor()
 {
+    if (diagnosticLoggingEnabled_)
+        setDiagnosticLoggingEnabled(false);
+
     midiDeviceListConnection_.reset();
     deferredMidiPortSyncTimer_.reset();
     apvts.state.removeListener(this);
@@ -216,7 +219,7 @@ void PluginProcessor::startMidiThread()
 
 void PluginProcessor::releaseResources()
 {
-    if (shouldUseDevelopmentLogging())
+    if (shouldUseDevelopmentLogging() && ! diagnosticLoggingEnabled_)
     {
         disableApvtsLogging();
         closeLogFileForSession();

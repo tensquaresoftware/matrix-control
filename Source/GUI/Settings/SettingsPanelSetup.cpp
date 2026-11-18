@@ -142,6 +142,20 @@ void SettingsPanel::setupPatchMutatorSection(TSS::ISkin& skin)
     addAndMakeVisible(*defragHistoryButton_);
 }
 
+
+void SettingsPanel::setupSupportSection(TSS::ISkin& skin)
+{
+    diagnosticLoggingLabel_ =
+        makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kDiagnosticLoggingLabel);
+    diagnosticLoggingCombo_ = makeCombo(skin, kComboWidth_);
+    openLogFolderButton_ =
+        makeButton(skin, kComboWidth_, PluginDisplayNames::Settings::kOpenLogFolderButton);
+
+    addAndMakeVisible(*diagnosticLoggingLabel_);
+    addAndMakeVisible(*diagnosticLoggingCombo_);
+    addAndMakeVisible(*openLogFolderButton_);
+}
+
 void SettingsPanel::setupMasterSection(TSS::ISkin& skin)
 {
     masterUtilityLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kUtilityLabel);
@@ -217,6 +231,10 @@ void SettingsPanel::populateComboItems()
     deleteWarningCombo_->addItem(PluginDisplayNames::Settings::kNeverWarn,
                                  PluginIDs::Settings::DeleteWarningPolicy::kNeverWarn);
 
+    using namespace PluginIDs::Settings::DiagnosticLogging;
+    diagnosticLoggingCombo_->addItem(PluginDisplayNames::Settings::kOff, kOff);
+    diagnosticLoggingCombo_->addItem(PluginDisplayNames::Settings::kOn, kOn);
+
     using namespace PluginIDs::Settings::PresenceCheck;
     presenceCheckCombo_->addItem(PluginDisplayNames::Settings::kPresenceCheckOnceOnConnect,
                                  kOnceOnConnect);
@@ -239,6 +257,7 @@ void SettingsPanel::applyComboPopupLooks(TSS::ISkin& skin)
     computerPatchesCombo_->setPopupMenuLook(popupLook);
     unsavedStateCombo_->setPopupMenuLook(popupLook);
     deleteWarningCombo_->setPopupMenuLook(popupLook);
+    diagnosticLoggingCombo_->setPopupMenuLook(popupLook);
 }
 
 void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
@@ -291,6 +310,10 @@ void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
     masterInitTemplateLabel_->setLook(labelLook);
     masterSaveAsInitButton_->setLook(buttonLook);
     masterDeleteInitButton_->setLook(buttonLook);
+
+    diagnosticLoggingLabel_->setLook(labelLook);
+    diagnosticLoggingCombo_->setLook(comboLook);
+    openLogFolderButton_->setLook(buttonLook);
 
     applyComboPopupLooks(skin);
 }
@@ -358,4 +381,66 @@ void SettingsPanel::setGettingStartedSectionVisible(bool visible)
     setupWizardLabel_->setVisible(visible);
     gettingStartedAutoOpenCombo_->setVisible(visible);
     runSetupAgainButton_->setVisible(visible);
+}
+
+void SettingsPanel::setSupportSectionVisible(bool visible)
+{
+    diagnosticLoggingLabel_->setVisible(visible);
+    diagnosticLoggingCombo_->setVisible(visible);
+    openLogFolderButton_->setVisible(visible);
+}
+
+void SettingsPanel::setMidiAndDeviceSectionVisible(bool showMidiAndDevice, bool showLatency)
+{
+    deviceLabel_->setVisible(showMidiAndDevice);
+    if (deviceValueField_ != nullptr)
+        deviceValueField_->setVisible(showMidiAndDevice);
+    presenceCheckLabel_->setVisible(showMidiAndDevice);
+    presenceCheckCombo_->setVisible(showMidiAndDevice);
+    hardwareLatencyLabel_->setVisible(showLatency);
+    hardwareLatencySlider_->setVisible(showLatency);
+    epromTypeLabel_->setVisible(showMidiAndDevice);
+    epromTypeCombo_->setVisible(showMidiAndDevice);
+}
+
+void SettingsPanel::setPatchSectionVisible(bool visible)
+{
+    matrix1000PatchesLabel_->setVisible(visible);
+    matrix1000PatchesCombo_->setVisible(visible);
+    computerPatchesLabel_->setVisible(visible);
+    computerPatchesCombo_->setVisible(visible);
+    unsavedStateLabel_->setVisible(visible);
+    unsavedStateCombo_->setVisible(visible);
+    patchInitTemplateLabel_->setVisible(visible);
+    patchSaveAsInitButton_->setVisible(visible);
+    patchDeleteInitButton_->setVisible(visible);
+}
+
+void SettingsPanel::setPatchMutatorSectionVisible(bool visible)
+{
+    deleteWarningLabel_->setVisible(visible);
+    deleteWarningCombo_->setVisible(visible);
+    defragHistoryLabel_->setVisible(visible);
+    defragHistoryButton_->setVisible(visible);
+}
+
+void SettingsPanel::setMasterSectionVisible(bool visible)
+{
+    masterUtilityLabel_->setVisible(visible);
+    masterLoadButton_->setVisible(visible);
+    masterSaveAsButton_->setVisible(visible);
+    masterInitButton_->setVisible(visible);
+    masterInitTemplateLabel_->setVisible(visible);
+    masterSaveAsInitButton_->setVisible(visible);
+    masterDeleteInitButton_->setVisible(visible);
+}
+
+void SettingsPanel::layoutSupportSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
+{
+    layoutLabeledControlRow(bounds,
+                            metrics,
+                            LabeledControlRowArgs{ diagnosticLoggingLabel_.get(),
+                                                   diagnosticLoggingCombo_.get(),
+                                                   metrics.comboWidth });
+    layoutButtonOnlyRow(bounds, metrics, *openLogFolderButton_, metrics.comboWidth);
 }

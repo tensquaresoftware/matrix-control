@@ -83,6 +83,8 @@ public:
     TSS::Button& getRunSetupAgainButton() { return *runSetupAgainButton_; }
     TSS::ComboBox& getUnsavedStateCombo() { return *unsavedStateCombo_; }
     TSS::ComboBox& getDeleteWarningCombo() { return *deleteWarningCombo_; }
+    TSS::ComboBox& getDiagnosticLoggingCombo() { return *diagnosticLoggingCombo_; }
+    TSS::Button& getOpenLogFolderButton() { return *openLogFolderButton_; }
 
     TSS::Button& getPatchSaveAsInitButton() { return *patchSaveAsInitButton_; }
     TSS::Button& getPatchDeleteInitButton() { return *patchDeleteInitButton_; }
@@ -130,6 +132,7 @@ private:
     void setupPatchSection(TSS::ISkin& skin);
     void setupPatchMutatorSection(TSS::ISkin& skin);
     void setupMasterSection(TSS::ISkin& skin);
+    void setupSupportSection(TSS::ISkin& skin);
     void populateComboItems();
     void populateAppearanceComboItems();
     void applyComboPopupLooks(TSS::ISkin& skin);
@@ -142,6 +145,11 @@ private:
     void updatePageVisibility();
     void setInterfaceSectionVisible(bool visible);
     void setGettingStartedSectionVisible(bool visible);
+    void setSupportSectionVisible(bool visible);
+    void setMidiAndDeviceSectionVisible(bool showMidiAndDevice, bool showLatency);
+    void setPatchSectionVisible(bool visible);
+    void setPatchMutatorSectionVisible(bool visible);
+    void setMasterSectionVisible(bool visible);
     void layoutContent(juce::Rectangle<int> bounds);
     void layoutInterfaceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutGettingStartedSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
@@ -150,6 +158,7 @@ private:
     void layoutPatchSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutPatchMutatorSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutMasterSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
+    void layoutSupportSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutLabeledControlRow(juce::Rectangle<int>& bounds,
                                  const RowLayoutMetrics& metrics,
                                  const LabeledControlRowArgs& args);
@@ -251,6 +260,10 @@ private:
     std::unique_ptr<TSS::Label> masterInitTemplateLabel_;
     std::unique_ptr<TSS::Button> masterSaveAsInitButton_;
     std::unique_ptr<TSS::Button> masterDeleteInitButton_;
+
+    std::unique_ptr<TSS::Label> diagnosticLoggingLabel_;
+    std::unique_ptr<TSS::ComboBox> diagnosticLoggingCombo_;
+    std::unique_ptr<TSS::Button> openLogFolderButton_;
 
     std::unique_ptr<SettingsMidiPage> midiPage_;
     std::unique_ptr<SettingsAudioPage> audioPage_;

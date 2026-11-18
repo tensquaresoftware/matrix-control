@@ -223,6 +223,20 @@ juce::File ProjectPaths::getLogsDirectory(LogCategory category)
         .getChildFile(subfolder);
 }
 
+juce::File ProjectPaths::getDiagnosticLogsRoot()
+{
+    return getApplicationDataDirectory().getChildFile(kLogsFolderName);
+}
+
+juce::File ProjectPaths::getDiagnosticLogsDirectory(LogCategory category)
+{
+    const juce::String subfolder = category == LogCategory::kMidi
+        ? kMidiLogsFolderName
+        : kApvtsLogsFolderName;
+
+    return getDiagnosticLogsRoot().getChildFile(subfolder);
+}
+
 juce::File ProjectPaths::getApplicationDataDirectory()
 {
     return getFallbackRoot();

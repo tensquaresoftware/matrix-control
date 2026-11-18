@@ -19,9 +19,9 @@ def test_release_presets_keep_skin_designer_off():
     ]
     assert release_presets, "expected at least one Release configure preset"
     for preset in release_presets:
-        flag = preset["cacheVariables"].get("MATRIX_BUILD_SKIN_DESIGNER")
+        flag = preset["cacheVariables"].get("MC_BUILD_SKIN_DESIGNER")
         assert flag == "OFF", (
-            f"{preset['name']} must set MATRIX_BUILD_SKIN_DESIGNER=OFF, got {flag!r}"
+            f"{preset['name']} must set MC_BUILD_SKIN_DESIGNER=OFF, got {flag!r}"
         )
 
 
@@ -33,19 +33,19 @@ def test_debug_presets_enable_skin_designer():
     ]
     assert debug_presets
     for preset in debug_presets:
-        flag = preset["cacheVariables"].get("MATRIX_BUILD_SKIN_DESIGNER")
+        flag = preset["cacheVariables"].get("MC_BUILD_SKIN_DESIGNER")
         assert flag == "ON", (
-            f"{preset['name']} must set MATRIX_BUILD_SKIN_DESIGNER=ON, got {flag!r}"
+            f"{preset['name']} must set MC_BUILD_SKIN_DESIGNER=ON, got {flag!r}"
         )
 
 
 def test_packaging_script_exists_and_gates_cmake():
     assert PACKAGING_SCRIPT.is_file()
     text = PACKAGING_SCRIPT.read_text(encoding="utf-8")
-    assert "MATRIX_BUILD_SKIN_DESIGNER=OFF" in text
+    assert "MC_BUILD_SKIN_DESIGNER=OFF" in text
     assert "Matrix-Control_SkinDesigner" in text
     cmake = CMAKE_LISTS.read_text(encoding="utf-8")
-    assert "option(MATRIX_BUILD_SKIN_DESIGNER" in cmake
+    assert "option(MC_BUILD_SKIN_DESIGNER" in cmake
     assert "MATRIX_SKIN_DESIGNER_RECEIVER" in cmake
     # Receiver define must not be the only shared-target flag: DEV_LAYER for apply helpers.
     assert "MATRIX_SKIN_DESIGNER_DEV_LAYER" in cmake

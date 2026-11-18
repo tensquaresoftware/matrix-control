@@ -165,6 +165,9 @@ public:
     float getHardwareLatencyMs() const;
     int getGuiScaleId() const;
     void setGuiScaleId(int scaleId);
+    void setDiagnosticLoggingEnabled(bool enabled);
+    void revealDiagnosticLogsFolder();
+    bool isDiagnosticLoggingEnabled() const noexcept;
     int getSkinVariantId() const;
     void setSkinVariantId(int skinVariantId);
     void syncHardwareLatencyFromState();
@@ -421,6 +424,9 @@ private:
     void enableApvtsLogging();
     void disableApvtsLogging();
     void ensureDevelopmentLoggingStarted();
+    void initializeDiagnosticLoggingProperty();
+    void applyDiagnosticLoggingFromState();
+    bool shouldEmitApvtsLogs() const;
 
     juce::String getThreadNameForLogging() const;
     static juce::String simplifyThreadNameForLogging(const juce::String& threadName);
@@ -555,6 +561,7 @@ private:
     bool suppressMutatorHistorySelectionDebounce_ { false };
     juce::uint32 editorialResyncGranularMidiQuietUntilMs_ { 0 };
     bool developmentLoggingStarted_ { false };
+    bool diagnosticLoggingEnabled_ { false };
     std::unique_ptr<DeferredMidiPortSyncTimer> deferredMidiPortSyncTimer_;
     juce::MidiDeviceListConnection midiDeviceListConnection_;
     

@@ -3451,3 +3451,15 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-host-parameter-names.md`
   summary: Patch Mutator Int `hostName` values are outside `ApvtsFactory::getAllIntParameters` / `ApvtsValidator` catalog (pre-existing APVTS layout absence).
   evidence: Edge Case Hunter; hors scope for this chantier; uniqueness test appends Mutator manually.
+
+## Deferred from: spec-diagnostic-logging-support.md (2026-11-18)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-diagnostic-logging-support.md`
+  summary: MidiLogger/ApvtsLogger remain process-wide singletons — multi-instance diagnostic ON/OFF can close or replace another instance's files.
+  evidence: Review Edge/Blind; refcount shared logger out of v1 scope; pre-existing singleton pattern.
+- source_spec: `_bmad-output/implementation-artifacts/spec-diagnostic-logging-support.md`
+  summary: No Matrix-Control_Tests coverage that constructs PluginProcessor and asserts diagnostic on/off end-to-end (processor not linked into tests).
+  evidence: Verification-gap; probe file test covers MidiLogger path only.
+- source_spec: `_bmad-output/implementation-artifacts/spec-diagnostic-logging-support.md`
+  summary: MidiLogger file I/O from MIDI consumer paths remains non-RT-safe when logging is enabled.
+  evidence: Pre-existing call sites; SUPPORT toggle does not introduce new audio-thread logging.

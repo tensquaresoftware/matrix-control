@@ -326,6 +326,7 @@ void PluginProcessor::initializeSettingsPolicyProperties()
     initializeUnsavedStatePolicyProperty();
     initializeContextualHelpProperty();
     initializeInfoMessageProperty();
+    initializeDiagnosticLoggingProperty();
     initializeDeleteWarningPolicyProperty();
     initializeMatrix1000PatchesNamesModeProperty();
     initializeEpromTypeProperties();
@@ -343,6 +344,7 @@ void PluginProcessor::finishConstructionSetup()
     initializeHardwareLatencyProperty();
     initializeComputerPatchesFolderProperty();
     initializeSettingsPolicyProperties();
+    applyDiagnosticLoggingFromState();
     seedDeviceConnectionDefaultsFromMachine();
 
     initializePatchNameProperty();

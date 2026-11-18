@@ -24,6 +24,7 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
     setupPatchSection(skin);
     setupPatchMutatorSection(skin);
     setupMasterSection(skin);
+    setupSupportSection(skin);
     populateComboItems();
     applyComboPopupLooks(skin);
 
@@ -256,6 +257,9 @@ void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
         case kMaster:
             layoutMasterSection(bounds, metrics);
             break;
+        case kSupport:
+            layoutSupportSection(bounds, metrics);
+            break;
         case kUserInterface:
         default:
             layoutInterfaceSection(bounds, metrics);
@@ -328,50 +332,23 @@ void SettingsPanel::updatePageVisibility()
     const bool showPatch = activeTabId_ == kPatch;
     const bool showMutator = activeTabId_ == kPatchMutator;
     const bool showMaster = activeTabId_ == kMaster;
+    const bool showSupport = activeTabId_ == kSupport;
     const bool showLatency = showMidiAndDevice
                              && SettingsShellMetrics::deviceShowsHardwareLatency(isPluginMode_);
 
     setGettingStartedSectionVisible(showGettingStarted);
     setInterfaceSectionVisible(showUi);
-
-    deviceLabel_->setVisible(showMidiAndDevice);
-    if (deviceValueField_ != nullptr)
-        deviceValueField_->setVisible(showMidiAndDevice);
-    presenceCheckLabel_->setVisible(showMidiAndDevice);
-    presenceCheckCombo_->setVisible(showMidiAndDevice);
-    hardwareLatencyLabel_->setVisible(showLatency);
-    hardwareLatencySlider_->setVisible(showLatency);
-    epromTypeLabel_->setVisible(showMidiAndDevice);
-    epromTypeCombo_->setVisible(showMidiAndDevice);
+    setSupportSectionVisible(showSupport);
+    setMidiAndDeviceSectionVisible(showMidiAndDevice, showLatency);
+    setPatchSectionVisible(showPatch);
+    setPatchMutatorSectionVisible(showMutator);
+    setMasterSectionVisible(showMaster);
 
     if (midiPage_ != nullptr)
         midiPage_->setVisible(showMidiPage);
 
     if (audioPage_ != nullptr)
         audioPage_->setVisible(showAudio);
-
-    matrix1000PatchesLabel_->setVisible(showPatch);
-    matrix1000PatchesCombo_->setVisible(showPatch);
-    computerPatchesLabel_->setVisible(showPatch);
-    computerPatchesCombo_->setVisible(showPatch);
-    unsavedStateLabel_->setVisible(showPatch);
-    unsavedStateCombo_->setVisible(showPatch);
-    patchInitTemplateLabel_->setVisible(showPatch);
-    patchSaveAsInitButton_->setVisible(showPatch);
-    patchDeleteInitButton_->setVisible(showPatch);
-
-    deleteWarningLabel_->setVisible(showMutator);
-    deleteWarningCombo_->setVisible(showMutator);
-    defragHistoryLabel_->setVisible(showMutator);
-    defragHistoryButton_->setVisible(showMutator);
-
-    masterUtilityLabel_->setVisible(showMaster);
-    masterLoadButton_->setVisible(showMaster);
-    masterSaveAsButton_->setVisible(showMaster);
-    masterInitButton_->setVisible(showMaster);
-    masterInitTemplateLabel_->setVisible(showMaster);
-    masterSaveAsInitButton_->setVisible(showMaster);
-    masterDeleteInitButton_->setVisible(showMaster);
 
     syncDeviceAnimationTimer();
 }
