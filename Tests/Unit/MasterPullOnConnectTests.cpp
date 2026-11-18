@@ -91,7 +91,7 @@ struct QuietMasterApplyHarness
             {
                 unisonId = d.parameterId;
                 layout.add(std::make_unique<juce::AudioParameterChoice>(
-                    juce::ParameterID(d.parameterId, 1), d.displayName, d.choices, d.defaultIndex));
+                    juce::ParameterID(d.parameterId, 1), d.hostName, d.choices, d.defaultIndex));
             }
         }
         for (const auto& d : intDescs)
@@ -100,7 +100,7 @@ struct QuietMasterApplyHarness
             {
                 masterTuneId = d.parameterId;
                 layout.add(std::make_unique<juce::AudioParameterInt>(
-                    juce::ParameterID(d.parameterId, 1), d.displayName,
+                    juce::ParameterID(d.parameterId, 1), d.hostName,
                     d.minValue, d.maxValue, d.defaultValue));
             }
         }

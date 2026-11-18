@@ -269,6 +269,7 @@ set(PLUGIN_SOURCES
     Source/Shared/Definitions/PluginDescriptors.cpp
     Source/Shared/Definitions/PluginDescriptorsMasterEdit.cpp
     Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
+    Source/Shared/Definitions/PluginDescriptorsPatchEditVcfVca.cpp
     Source/Shared/Definitions/PluginDescriptorsPatchEditFmRamp.cpp
     Source/Shared/Definitions/PluginDescriptorsPatchEditEnvelopes.cpp
     Source/Shared/Definitions/PluginDescriptorsPatchEditEnvelope3.cpp
@@ -552,6 +553,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/ComboboxPatchSendDebouncerTests.cpp
         Tests/Unit/ClipboardPasteEnabledResolverTests.cpp
         Tests/Unit/ApvtsMasterMapperTests.cpp
+        Tests/Unit/HostParameterNameUniquenessTests.cpp
         Tests/Unit/UnisonKeyboardModePolicyTests.cpp
         Tests/Unit/MidiChannelMasterCodecTests.cpp
         Tests/Unit/DeviceMemoryLimitsTests.cpp
@@ -899,6 +901,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Shared/Definitions/PluginDescriptorsMasterEdit.cpp
         Source/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
+        Source/Shared/Definitions/PluginDescriptorsPatchEditVcfVca.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEditFmRamp.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEditEnvelopes.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEditEnvelope3.cpp
@@ -952,6 +955,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Loggers/MidiLoggerFormatting.cpp
         Source/Shared/Definitions/PluginDescriptors.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
+        Source/Shared/Definitions/PluginDescriptorsPatchEditVcfVca.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEditFmRamp.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEditEnvelopes.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEditEnvelope3.cpp

@@ -2260,4 +2260,241 @@ namespace PluginDisplayNames
             }
         }
     } 
+
+    // =================================================================================================================
+    // Host parameter names (unique DAW / APVTS leaf names; UI keeps ParameterWidgets short labels)
+    // SSOT list: _bmad-output/implementation-artifacts/inventory-host-parameter-names-draft.md
+    // =================================================================================================================
+
+    namespace HostParameterNames
+    {
+        namespace MasterEditSection
+        {
+            namespace MidiModule
+            {
+                constexpr const char* kChannel = "MIDI Channel";
+                constexpr const char* kControllers = "MIDI Controllers";
+                constexpr const char* kLever2Select = "MIDI Lever 2 Select";
+                constexpr const char* kLever3Select = "MIDI Lever 3 Select";
+                constexpr const char* kMidiEcho = "MIDI Echo";
+                constexpr const char* kPatchChanges = "MIDI Patch Changes";
+                constexpr const char* kPedal1Select = "MIDI Pedal 1 Select";
+                constexpr const char* kPedal2Select = "MIDI Pedal 2 Select";
+            }
+
+            namespace MiscModule
+            {
+                constexpr const char* kBankLockEnable = "Misc Bank Lock";
+                constexpr const char* kBendRange = "Misc Bend Range (+/-)";
+                constexpr const char* kMasterTranspose = "Misc Master Transpose";
+                constexpr const char* kMasterTune = "Misc Master Tune";
+                constexpr const char* kMemoryProtectEnable = "Misc Memory Protect";
+                constexpr const char* kUnisonDetune = "Misc Unison Detune";
+                constexpr const char* kUnisonEnable = "Misc Unison";
+                constexpr const char* kVolumeInvertEnable = "Misc Volume Invert";
+            }
+
+            namespace VibratoModule
+            {
+                constexpr const char* kAmpModAmount = "Vibrato Amplitude Modulation Amount";
+                constexpr const char* kAmpModSource = "Vibrato Amplitude Modulation Source";
+                constexpr const char* kAmplitude = "Vibrato Amplitude";
+                constexpr const char* kSpeed = "Vibrato Speed";
+                constexpr const char* kSpeedModAmount = "Vibrato Speed Modulation Amount";
+                constexpr const char* kSpeedModSource = "Vibrato Speed Modulation Source";
+                constexpr const char* kWaveform = "Vibrato Waveform";
+            }
+
+        }
+
+        namespace MatrixModulationSection
+        {
+            namespace ModulationBus
+            {
+                constexpr const char* kBus0Amount = "Bus 0 Amount";
+                constexpr const char* kBus0Destination = "Bus 0 Destination";
+                constexpr const char* kBus0Source = "Bus 0 Source";
+                constexpr const char* kBus1Amount = "Bus 1 Amount";
+                constexpr const char* kBus1Destination = "Bus 1 Destination";
+                constexpr const char* kBus1Source = "Bus 1 Source";
+                constexpr const char* kBus2Amount = "Bus 2 Amount";
+                constexpr const char* kBus2Destination = "Bus 2 Destination";
+                constexpr const char* kBus2Source = "Bus 2 Source";
+                constexpr const char* kBus3Amount = "Bus 3 Amount";
+                constexpr const char* kBus3Destination = "Bus 3 Destination";
+                constexpr const char* kBus3Source = "Bus 3 Source";
+                constexpr const char* kBus4Amount = "Bus 4 Amount";
+                constexpr const char* kBus4Destination = "Bus 4 Destination";
+                constexpr const char* kBus4Source = "Bus 4 Source";
+                constexpr const char* kBus5Amount = "Bus 5 Amount";
+                constexpr const char* kBus5Destination = "Bus 5 Destination";
+                constexpr const char* kBus5Source = "Bus 5 Source";
+                constexpr const char* kBus6Amount = "Bus 6 Amount";
+                constexpr const char* kBus6Destination = "Bus 6 Destination";
+                constexpr const char* kBus6Source = "Bus 6 Source";
+                constexpr const char* kBus7Amount = "Bus 7 Amount";
+                constexpr const char* kBus7Destination = "Bus 7 Destination";
+                constexpr const char* kBus7Source = "Bus 7 Source";
+                constexpr const char* kBus8Amount = "Bus 8 Amount";
+                constexpr const char* kBus8Destination = "Bus 8 Destination";
+                constexpr const char* kBus8Source = "Bus 8 Source";
+                constexpr const char* kBus9Amount = "Bus 9 Amount";
+                constexpr const char* kBus9Destination = "Bus 9 Destination";
+                constexpr const char* kBus9Source = "Bus 9 Source";
+            }
+
+        }
+
+        namespace PatchEditSection
+        {
+            namespace Dco1Module
+            {
+                constexpr const char* kFrequency = "DCO 1 Frequency";
+                constexpr const char* kFrequencyModByLfo1 = "DCO 1 Frequency < LFO 1";
+                constexpr const char* kKeyClick = "DCO 1 Key Click";
+                constexpr const char* kKeyboardPortamento = "DCO 1 Keyboard/Portamento";
+                constexpr const char* kLevers = "DCO 1 Levers";
+                constexpr const char* kPulseWidth = "DCO 1 Pulse Width";
+                constexpr const char* kPulseWidthModByLfo2 = "DCO 1 Pulse Width < LFO 2";
+                constexpr const char* kSync = "DCO 1 Sync";
+                constexpr const char* kWaveSelect = "DCO 1 Wave Select";
+                constexpr const char* kWaveShape = "DCO 1 Wave Shape";
+            }
+
+            namespace Dco2Module
+            {
+                constexpr const char* kDetune = "DCO 2 Detune";
+                constexpr const char* kFrequency = "DCO 2 Frequency";
+                constexpr const char* kFrequencyModByLfo1 = "DCO 2 Frequency < LFO 1";
+                constexpr const char* kKeyClick = "DCO 2 Key Click";
+                constexpr const char* kKeyboardPortamento = "DCO 2 Keyboard/Portamento";
+                constexpr const char* kLevers = "DCO 2 Levers";
+                constexpr const char* kPulseWidth = "DCO 2 Pulse Width";
+                constexpr const char* kPulseWidthModByLfo2 = "DCO 2 Pulse Width < LFO 2";
+                constexpr const char* kWaveSelect = "DCO 2 Wave Select";
+                constexpr const char* kWaveShape = "DCO 2 Wave Shape";
+            }
+
+            namespace Envelope1Module
+            {
+                constexpr const char* kAmplitude = "ENV 1 Amplitude";
+                constexpr const char* kAmplitudeModByVelocity = "ENV 1 Amplitude < Velocity";
+                constexpr const char* kAttack = "ENV 1 Attack";
+                constexpr const char* kDecay = "ENV 1 Decay";
+                constexpr const char* kDelay = "ENV 1 Delay";
+                constexpr const char* kEnvelopeMode = "ENV 1 Envelope Mode";
+                constexpr const char* kLfo1Trigger = "ENV 1 LFO 1 Trigger";
+                constexpr const char* kRelease = "ENV 1 Release";
+                constexpr const char* kSustain = "ENV 1 Sustain";
+                constexpr const char* kTriggerMode = "ENV 1 Trigger Mode";
+            }
+
+            namespace Envelope2Module
+            {
+                constexpr const char* kAmplitude = "ENV 2 Amplitude";
+                constexpr const char* kAmplitudeModByVelocity = "ENV 2 Amplitude < Velocity";
+                constexpr const char* kAttack = "ENV 2 Attack";
+                constexpr const char* kDecay = "ENV 2 Decay";
+                constexpr const char* kDelay = "ENV 2 Delay";
+                constexpr const char* kEnvelopeMode = "ENV 2 Envelope Mode";
+                constexpr const char* kLfo1Trigger = "ENV 2 LFO 1 Trigger";
+                constexpr const char* kRelease = "ENV 2 Release";
+                constexpr const char* kSustain = "ENV 2 Sustain";
+                constexpr const char* kTriggerMode = "ENV 2 Trigger Mode";
+            }
+
+            namespace Envelope3Module
+            {
+                constexpr const char* kAmplitude = "ENV 3 Amplitude";
+                constexpr const char* kAmplitudeModByVelocity = "ENV 3 Amplitude < Velocity";
+                constexpr const char* kAttack = "ENV 3 Attack";
+                constexpr const char* kDecay = "ENV 3 Decay";
+                constexpr const char* kDelay = "ENV 3 Delay";
+                constexpr const char* kEnvelopeMode = "ENV 3 Envelope Mode";
+                constexpr const char* kLfo1Trigger = "ENV 3 LFO 1 Trigger";
+                constexpr const char* kRelease = "ENV 3 Release";
+                constexpr const char* kSustain = "ENV 3 Sustain";
+                constexpr const char* kTriggerMode = "ENV 3 Trigger Mode";
+            }
+
+            namespace FmTrackModule
+            {
+                constexpr const char* kFmAmount = "FM/Track VCF FM Amount";
+                constexpr const char* kFmModByEnv3 = "FM/Track FM < ENV 3";
+                constexpr const char* kFmModByPressure = "FM/Track FM < Pressure";
+                constexpr const char* kTrackInput = "FM/Track Track Input";
+                constexpr const char* kTrackPoint1 = "FM/Track Track Point 1";
+                constexpr const char* kTrackPoint2 = "FM/Track Track Point 2";
+                constexpr const char* kTrackPoint3 = "FM/Track Track Point 3";
+                constexpr const char* kTrackPoint4 = "FM/Track Track Point 4";
+                constexpr const char* kTrackPoint5 = "FM/Track Track Point 5";
+            }
+
+            namespace Lfo1Module
+            {
+                constexpr const char* kAmplitude = "LFO 1 Amplitude";
+                constexpr const char* kAmplitudeModByRamp1 = "LFO 1 Amplitude < Ramp 1";
+                constexpr const char* kLag = "LFO 1 Lag";
+                constexpr const char* kRetriggerPoint = "LFO 1 Retrigger Point";
+                constexpr const char* kSampleInput = "LFO 1 Sample Input";
+                constexpr const char* kSpeed = "LFO 1 Speed";
+                constexpr const char* kSpeedModByPressure = "LFO 1 Speed < Pressure";
+                constexpr const char* kTriggerMode = "LFO 1 Trigger Mode";
+                constexpr const char* kWaveform = "LFO 1 Waveform";
+            }
+
+            namespace Lfo2Module
+            {
+                constexpr const char* kAmplitude = "LFO 2 Amplitude";
+                constexpr const char* kAmplitudeModByRamp2 = "LFO 2 Amplitude < Ramp 2";
+                constexpr const char* kLag = "LFO 2 Lag";
+                constexpr const char* kRetriggerPoint = "LFO 2 Retrigger Point";
+                constexpr const char* kSampleInput = "LFO 2 Sample Input";
+                constexpr const char* kSpeed = "LFO 2 Speed";
+                constexpr const char* kSpeedModByKeyboard = "LFO 2 Speed < Keyboard";
+                constexpr const char* kTriggerMode = "LFO 2 Trigger Mode";
+                constexpr const char* kWaveform = "LFO 2 Waveform";
+            }
+
+            namespace RampPortamentoModule
+            {
+                constexpr const char* kPortamentoKeyboardMode = "Ramp/Portamento Keyboard Mode";
+                constexpr const char* kPortamentoLegato = "Ramp/Portamento Legato Portamento";
+                constexpr const char* kPortamentoModByVelocity = "Ramp/Portamento Portamento < Velocity";
+                constexpr const char* kPortamentoMode = "Ramp/Portamento Portamento Mode";
+                constexpr const char* kPortamentoRate = "Ramp/Portamento Portamento Rate";
+                constexpr const char* kRamp1Rate = "Ramp/Portamento Ramp 1 Rate";
+                constexpr const char* kRamp1Trigger = "Ramp/Portamento Ramp 1 Trigger";
+                constexpr const char* kRamp2Rate = "Ramp/Portamento Ramp 2 Rate";
+                constexpr const char* kRamp2Trigger = "Ramp/Portamento Ramp 2 Trigger";
+            }
+
+            namespace VcfVcaModule
+            {
+                constexpr const char* kBalance = "VCF/VCA DCO 2 | DCO 1 Mix";
+                constexpr const char* kFrequency = "VCF/VCA Frequency";
+                constexpr const char* kFrequencyModByEnv1 = "VCF/VCA Frequency < ENV 1";
+                constexpr const char* kFrequencyModByPressure = "VCF/VCA Frequency < Pressure";
+                constexpr const char* kKeyboardPortamento = "VCF/VCA Keyboard/Portamento";
+                constexpr const char* kLevers = "VCF/VCA Levers";
+                constexpr const char* kResonance = "VCF/VCA Resonance";
+                constexpr const char* kVca1ModByVelocity = "VCF/VCA VCA 1 < Velocity";
+                constexpr const char* kVca1Volume = "VCF/VCA VCA 1 Volume";
+                constexpr const char* kVca2ModByEnv2 = "VCF/VCA VCA 2 < ENV 2";
+            }
+
+        }
+
+        namespace PatchManagerSection
+        {
+            namespace PatchMutatorModule
+            {
+                constexpr const char* kAmount = "Patch Mutator Amount";
+                constexpr const char* kRandom = "Patch Mutator Random";
+            }
+
+        }
+
+    }
+
 }

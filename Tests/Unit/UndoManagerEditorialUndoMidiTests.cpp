@@ -37,7 +37,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout makeBus012SourceLayout()
         const auto& sourceDesc = kModulationBusChoiceParameters[static_cast<size_t>(bus)][0];
         layout.add(std::make_unique<juce::AudioParameterChoice>(
             juce::ParameterID(sourceDesc.parameterId, 1),
-            sourceDesc.displayName,
+            sourceDesc.hostName,
             sourceDesc.choices,
             sourceDesc.defaultIndex));
     }

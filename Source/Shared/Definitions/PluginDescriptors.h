@@ -59,6 +59,7 @@ namespace PluginDescriptors
     {
         juce::String parameterId;
         juce::String displayName;
+        juce::String hostName; // Unique host/APVTS leaf; UI uses displayName
         juce::String parentGroupId;
         int minValue;
         int maxValue;
@@ -71,6 +72,7 @@ namespace PluginDescriptors
     {
         juce::String parameterId;
         juce::String displayName;
+        juce::String hostName; // Unique host/APVTS leaf; UI uses displayName
         juce::String parentGroupId;
         juce::StringArray choices;
         int defaultIndex;

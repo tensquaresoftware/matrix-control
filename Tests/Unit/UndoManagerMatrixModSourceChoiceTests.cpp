@@ -22,7 +22,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout makeBus0SourceLayout()
 
     layout.add(std::make_unique<juce::AudioParameterChoice>(
         juce::ParameterID(sourceDesc.parameterId, 1),
-        sourceDesc.displayName,
+        sourceDesc.hostName,
         sourceDesc.choices,
         sourceDesc.defaultIndex));
 
@@ -40,7 +40,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout makeBus012SourceLayout()
         const auto& sourceDesc = kModulationBusChoiceParameters[static_cast<size_t>(bus)][0];
         layout.add(std::make_unique<juce::AudioParameterChoice>(
             juce::ParameterID(sourceDesc.parameterId, 1),
-            sourceDesc.displayName,
+            sourceDesc.hostName,
             sourceDesc.choices,
             sourceDesc.defaultIndex));
     }
@@ -56,7 +56,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout makeBus0AmountLayout()
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     layout.add(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(amountDesc.parameterId, 1),
-        amountDesc.displayName,
+        amountDesc.hostName,
         amountDesc.minValue,
         amountDesc.maxValue,
         amountDesc.defaultValue));

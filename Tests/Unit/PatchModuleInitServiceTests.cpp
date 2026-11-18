@@ -138,14 +138,14 @@ private:
         for (const auto& d : PluginDescriptors::PatchEditSection::Dco1Module::kIntParameters)
         {
             layout.add(std::make_unique<juce::AudioParameterInt>(
-                juce::ParameterID(d.parameterId, 1), d.displayName,
+                juce::ParameterID(d.parameterId, 1), d.hostName,
                 d.minValue, d.maxValue, d.defaultValue));
         }
 
         for (const auto& d : PluginDescriptors::PatchEditSection::Dco2Module::kIntParameters)
         {
             layout.add(std::make_unique<juce::AudioParameterInt>(
-                juce::ParameterID(d.parameterId, 1), d.displayName,
+                juce::ParameterID(d.parameterId, 1), d.hostName,
                 d.minValue, d.maxValue, d.defaultValue));
         }
 

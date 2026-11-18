@@ -76,13 +76,13 @@ private:
     {
         juce::AudioProcessorValueTreeState::ParameterLayout layout;
         layout.add(std::make_unique<juce::AudioParameterInt>(
-            juce::ParameterID(d1.parameterId, 1), d1.displayName,
+            juce::ParameterID(d1.parameterId, 1), d1.hostName,
             d1.minValue, d1.maxValue, d1.defaultValue));
         layout.add(std::make_unique<juce::AudioParameterInt>(
-            juce::ParameterID(d2.parameterId, 1), d2.displayName,
+            juce::ParameterID(d2.parameterId, 1), d2.hostName,
             d2.minValue, d2.maxValue, d2.defaultValue));
         layout.add(std::make_unique<juce::AudioParameterChoice>(
-            juce::ParameterID(c1.parameterId, 1), c1.displayName,
+            juce::ParameterID(c1.parameterId, 1), c1.hostName,
             c1.choices, c1.defaultIndex));
         return layout;
     }
@@ -122,7 +122,7 @@ private:
         juce::AudioProcessorValueTreeState::ParameterLayout layout;
         for (const auto& d : descs)
             layout.add(std::make_unique<juce::AudioParameterInt>(
-                juce::ParameterID(d.parameterId, 1), d.displayName,
+                juce::ParameterID(d.parameterId, 1), d.hostName,
                 d.minValue, d.maxValue, d.defaultValue));
         return layout;
     }
@@ -214,7 +214,7 @@ private:
         const auto& channel = choiceDescs[0];
         juce::AudioProcessorValueTreeState::ParameterLayout layout;
         layout.add(std::make_unique<juce::AudioParameterChoice>(
-            juce::ParameterID(channel.parameterId, 1), channel.displayName,
+            juce::ParameterID(channel.parameterId, 1), channel.hostName,
             channel.choices, channel.defaultIndex));
 
         TestAudioProcessorMaster proc(std::move(layout));
@@ -268,7 +268,7 @@ private:
 
         juce::AudioProcessorValueTreeState::ParameterLayout layout;
         layout.add(std::make_unique<juce::AudioParameterChoice>(
-            juce::ParameterID(unison->parameterId, 1), unison->displayName,
+            juce::ParameterID(unison->parameterId, 1), unison->hostName,
             unison->choices, unison->defaultIndex));
 
         TestAudioProcessorMaster proc(std::move(layout));

@@ -33,7 +33,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout makeDco1FrequencyLayout()
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     layout.add(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(frequencyDesc->parameterId, 1),
-        frequencyDesc->displayName,
+        frequencyDesc->hostName,
         frequencyDesc->minValue,
         frequencyDesc->maxValue,
         frequencyDesc->defaultValue));

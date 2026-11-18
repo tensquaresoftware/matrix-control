@@ -40,6 +40,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kDelay,
             .displayName = PluginDisplayNames::PatchEditSection::Envelope3Module::ParameterWidgets::kDelay,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Envelope3Module::kDelay,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope3Module::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -50,6 +51,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kAttack,
             .displayName = PluginDisplayNames::PatchEditSection::Envelope3Module::ParameterWidgets::kAttack,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Envelope3Module::kAttack,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope3Module::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -60,6 +62,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kDecay,
             .displayName = PluginDisplayNames::PatchEditSection::Envelope3Module::ParameterWidgets::kDecay,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Envelope3Module::kDecay,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope3Module::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -70,6 +73,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kSustain,
             .displayName = PluginDisplayNames::PatchEditSection::Envelope3Module::ParameterWidgets::kSustain,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Envelope3Module::kSustain,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope3Module::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -80,6 +84,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kRelease,
             .displayName = PluginDisplayNames::PatchEditSection::Envelope3Module::ParameterWidgets::kRelease,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Envelope3Module::kRelease,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope3Module::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -90,6 +95,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kAmplitude,
             .displayName = PluginDisplayNames::PatchEditSection::Envelope3Module::ParameterWidgets::kAmplitude,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Envelope3Module::kAmplitude,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope3Module::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -100,6 +106,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kAmplitudeModByVelocity,
             .displayName = PluginDisplayNames::PatchEditSection::Envelope3Module::ParameterWidgets::kAmplitudeModByVelocity,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Envelope3Module::kAmplitudeModByVelocity,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope3Module::kGroupId,
             .minValue = -63,
             .maxValue = 63,
@@ -114,6 +121,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kTriggerMode,
             .displayName = PluginDisplayNames::PatchEditSection::Envelope3Module::ParameterWidgets::kTriggerMode,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Envelope3Module::kTriggerMode,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope3Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::TriggerMode::kStrig,
@@ -131,6 +139,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kEnvelopeMode,
             .displayName = PluginDisplayNames::PatchEditSection::Envelope3Module::ParameterWidgets::kEnvelopeMode,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Envelope3Module::kEnvelopeMode,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope3Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::EnvelopeMode::kNormal,
@@ -144,6 +153,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kLfo1Trigger,
             .displayName = PluginDisplayNames::PatchEditSection::Envelope3Module::ParameterWidgets::kLfo1Trigger,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Envelope3Module::kLfo1Trigger,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope3Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::Lfo1Trigger::kNormal,

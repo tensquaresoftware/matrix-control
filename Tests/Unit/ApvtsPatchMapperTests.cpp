@@ -49,6 +49,58 @@ public:
     void setStateInformation(const void*, int) override {}
 };
 
+namespace
+{
+    struct SuppressListener final : juce::ValueTree::Listener
+    {
+        SuppressListener(juce::AudioProcessorValueTreeState& apvtsIn,
+                         const juce::String& watchedId,
+                         bool& suppressIn,
+                         int& dispatchCountIn)
+            : apvts(apvtsIn)
+            , watchedParameterId(watchedId)
+            , suppress(suppressIn)
+            , dispatchCount(dispatchCountIn)
+        {
+            apvts.state.addListener(this);
+        }
+
+        ~SuppressListener() override { apvts.state.removeListener(this); }
+
+        void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) override
+        {
+            juce::String parameterId = property.toString();
+            if (parameterId == ApvtsTypes::kValue)
+            {
+                const juce::var idProperty = tree.getProperty("id");
+                if (idProperty.isString())
+                    parameterId = idProperty.toString();
+            }
+
+            if (parameterId != watchedParameterId)
+                return;
+
+            if (!suppress)
+                ++dispatchCount;
+        }
+
+        juce::AudioProcessorValueTreeState& apvts;
+        juce::String watchedParameterId;
+        bool& suppress;
+        int& dispatchCount;
+    };
+
+    juce::AudioProcessorValueTreeState::ParameterLayout makeSingleIntLayout(
+        const PluginDescriptors::IntParameterDescriptor& desc)
+    {
+        juce::AudioProcessorValueTreeState::ParameterLayout layout;
+        layout.add(std::make_unique<juce::AudioParameterInt>(
+            juce::ParameterID(desc.parameterId, 1), desc.hostName,
+            desc.minValue, desc.maxValue, desc.defaultValue));
+        return layout;
+    }
+}
+
 class ApvtsPatchMapperTests : public juce::UnitTest
 {
 public:
@@ -73,13 +125,13 @@ private:
     {
         juce::AudioProcessorValueTreeState::ParameterLayout layout;
         layout.add(std::make_unique<juce::AudioParameterInt>(
-            juce::ParameterID(d1.parameterId, 1), d1.displayName,
+            juce::ParameterID(d1.parameterId, 1), d1.hostName,
             d1.minValue, d1.maxValue, d1.defaultValue));
         layout.add(std::make_unique<juce::AudioParameterInt>(
-            juce::ParameterID(d2.parameterId, 1), d2.displayName,
+            juce::ParameterID(d2.parameterId, 1), d2.hostName,
             d2.minValue, d2.maxValue, d2.defaultValue));
         layout.add(std::make_unique<juce::AudioParameterChoice>(
-            juce::ParameterID(c1.parameterId, 1), c1.displayName,
+            juce::ParameterID(c1.parameterId, 1), c1.hostName,
             c1.choices, c1.defaultIndex));
         return layout;
     }
@@ -119,7 +171,7 @@ private:
         juce::AudioProcessorValueTreeState::ParameterLayout layout;
         for (const auto& d : descs)
             layout.add(std::make_unique<juce::AudioParameterInt>(
-                juce::ParameterID(d.parameterId, 1), d.displayName,
+                juce::ParameterID(d.parameterId, 1), d.hostName,
                 d.minValue, d.maxValue, d.defaultValue));
         return layout;
     }
@@ -182,13 +234,13 @@ private:
 
         juce::AudioProcessorValueTreeState::ParameterLayout layout;
         layout.add(std::make_unique<juce::AudioParameterInt>(
-            juce::ParameterID(amountDesc.parameterId, 1), amountDesc.displayName,
+            juce::ParameterID(amountDesc.parameterId, 1), amountDesc.hostName,
             amountDesc.minValue, amountDesc.maxValue, amountDesc.defaultValue));
         layout.add(std::make_unique<juce::AudioParameterChoice>(
-            juce::ParameterID(sourceDesc.parameterId, 1), sourceDesc.displayName,
+            juce::ParameterID(sourceDesc.parameterId, 1), sourceDesc.hostName,
             sourceDesc.choices, sourceDesc.defaultIndex));
         layout.add(std::make_unique<juce::AudioParameterChoice>(
-            juce::ParameterID(destinationDesc.parameterId, 1), destinationDesc.displayName,
+            juce::ParameterID(destinationDesc.parameterId, 1), destinationDesc.hostName,
             destinationDesc.choices, destinationDesc.defaultIndex));
 
         TestAudioProcessor proc(std::move(layout));
@@ -215,12 +267,7 @@ private:
         const auto intDescs = Core::ApvtsPatchMapper::buildIntDescriptors();
         const auto& freq = intDescs[0];
 
-        juce::AudioProcessorValueTreeState::ParameterLayout layout;
-        layout.add(std::make_unique<juce::AudioParameterInt>(
-            juce::ParameterID(freq.parameterId, 1), freq.displayName,
-            freq.minValue, freq.maxValue, freq.defaultValue));
-
-        TestAudioProcessor proc(std::move(layout));
+        TestAudioProcessor proc(makeSingleIntLayout(freq));
         Core::PatchModel model;
         Core::ApvtsPatchMapper mapper(proc.apvts, model);
 
@@ -228,46 +275,6 @@ private:
 
         int dispatchCount = 0;
         bool suppressPatchParameterSysEx = false;
-
-        struct SuppressListener final : juce::ValueTree::Listener
-        {
-            SuppressListener(juce::AudioProcessorValueTreeState& apvtsIn,
-                             const juce::String& watchedId,
-                             bool& suppressIn,
-                             int& dispatchCountIn)
-                : apvts(apvtsIn)
-                , watchedParameterId(watchedId)
-                , suppress(suppressIn)
-                , dispatchCount(dispatchCountIn)
-            {
-                apvts.state.addListener(this);
-            }
-
-            ~SuppressListener() override { apvts.state.removeListener(this); }
-
-            void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) override
-            {
-                juce::String parameterId = property.toString();
-                if (parameterId == ApvtsTypes::kValue)
-                {
-                    const juce::var idProperty = tree.getProperty("id");
-                    if (idProperty.isString())
-                        parameterId = idProperty.toString();
-                }
-
-                if (parameterId != watchedParameterId)
-                    return;
-
-                if (!suppress)
-                    ++dispatchCount;
-            }
-
-            juce::AudioProcessorValueTreeState& apvts;
-            juce::String watchedParameterId;
-            bool& suppress;
-            int& dispatchCount;
-        };
-
         SuppressListener listener(proc.apvts, freq.parameterId, suppressPatchParameterSysEx, dispatchCount);
 
         suppressPatchParameterSysEx = true;

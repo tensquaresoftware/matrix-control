@@ -57,6 +57,7 @@ juce::StringArray ApvtsValidator::validateParameters()
         checkParameterIdUniqueness(param.parameterId, seenParamIds, errors);
         checkIntParameterParentGroupExists(param, errors);
         checkIntParameterDisplayNameNotEmpty(param, errors);
+        checkIntParameterHostNameNotEmpty(param, errors);
         checkIntParameterValueRange(param, errors);
     }
 
@@ -65,6 +66,7 @@ juce::StringArray ApvtsValidator::validateParameters()
         checkParameterIdUniqueness(param.parameterId, seenParamIds, errors);
         checkChoiceParameterParentGroupExists(param, errors);
         checkChoiceParameterDisplayNameNotEmpty(param, errors);
+        checkChoiceParameterHostNameNotEmpty(param, errors);
         checkChoiceParameterChoicesNotEmpty(param, errors);
         checkChoiceParameterDefaultIndexValid(param, errors);
     }
@@ -130,9 +132,8 @@ void ApvtsValidator::checkWidgetIdUniqueness(
     juce::StringArray& errors)
 {
     if (seenWidgetIds.find(widget.widgetId) != seenWidgetIds.end())
-    {
-        errors.add("Duplicate widget ID: " + widget.widgetId);
-    }
+    errors.add("Duplicate widget ID: " + widget.widgetId);
+
     seenWidgetIds.insert(widget.widgetId);
 }
 
@@ -141,9 +142,8 @@ void ApvtsValidator::checkWidgetParentGroupExists(
     juce::StringArray& errors)
 {
     if (!groupExists(widget.parentGroupId))
-    {
-        errors.add("Standalone widget '" + widget.widgetId + "' references non-existent group: " + widget.parentGroupId);
-    }
+    errors.add("Standalone widget '" + widget.widgetId + "' references non-existent group: " + widget.parentGroupId);
+
 }
 
 void ApvtsValidator::checkGroupIdUniqueness(
@@ -152,9 +152,8 @@ void ApvtsValidator::checkGroupIdUniqueness(
     juce::StringArray& errors)
 {
     if (seenIds.find(group.groupId) != seenIds.end())
-    {
-        errors.add("Duplicate group ID: " + group.groupId);
-    }
+    errors.add("Duplicate group ID: " + group.groupId);
+
     seenIds.insert(group.groupId);
 }
 
@@ -180,9 +179,8 @@ void ApvtsValidator::checkGroupDisplayNameNotEmpty(
     juce::StringArray& errors)
 {
     if (group.displayName.isEmpty())
-    {
-        errors.add("Group '" + group.groupId + "' has empty display name");
-    }
+    errors.add("Group '" + group.groupId + "' has empty display name");
+
 }
 
 void ApvtsValidator::checkParameterIdUniqueness(
@@ -191,9 +189,8 @@ void ApvtsValidator::checkParameterIdUniqueness(
     juce::StringArray& errors)
 {
     if (seenParamIds.find(parameterId) != seenParamIds.end())
-    {
-        errors.add("Duplicate parameter ID: " + parameterId);
-    }
+    errors.add("Duplicate parameter ID: " + parameterId);
+
     seenParamIds.insert(parameterId);
 }
 
@@ -202,9 +199,8 @@ void ApvtsValidator::checkIntParameterParentGroupExists(
     juce::StringArray& errors)
 {
     if (!groupExists(param.parentGroupId))
-    {
-        errors.add("Int parameter '" + param.parameterId + "' references non-existent group: " + param.parentGroupId);
-    }
+    errors.add("Int parameter '" + param.parameterId + "' references non-existent group: " + param.parentGroupId);
+
 }
 
 void ApvtsValidator::checkIntParameterDisplayNameNotEmpty(
@@ -212,9 +208,16 @@ void ApvtsValidator::checkIntParameterDisplayNameNotEmpty(
     juce::StringArray& errors)
 {
     if (param.displayName.isEmpty())
-    {
-        errors.add("Int parameter '" + param.parameterId + "' has empty display name");
-    }
+    errors.add("Int parameter '" + param.parameterId + "' has empty display name");
+
+}
+
+void ApvtsValidator::checkIntParameterHostNameNotEmpty(
+    const PluginDescriptors::IntParameterDescriptor& param,
+    juce::StringArray& errors)
+{
+    if (param.hostName.isEmpty())
+        errors.add("Int parameter '" + param.parameterId + "' has empty host name");
 }
 
 void ApvtsValidator::checkIntParameterValueRange(
@@ -222,14 +225,12 @@ void ApvtsValidator::checkIntParameterValueRange(
     juce::StringArray& errors)
 {
     if (param.minValue > param.maxValue)
-    {
-        errors.add("Int parameter '" + param.parameterId + "' has minValue > maxValue");
-    }
+    errors.add("Int parameter '" + param.parameterId + "' has minValue > maxValue");
+
 
     if (param.defaultValue < param.minValue || param.defaultValue > param.maxValue)
-    {
-        errors.add("Int parameter '" + param.parameterId + "' has defaultValue outside [minValue, maxValue]");
-    }
+    errors.add("Int parameter '" + param.parameterId + "' has defaultValue outside [minValue, maxValue]");
+
 }
 
 void ApvtsValidator::checkChoiceParameterParentGroupExists(
@@ -237,9 +238,8 @@ void ApvtsValidator::checkChoiceParameterParentGroupExists(
     juce::StringArray& errors)
 {
     if (!groupExists(param.parentGroupId))
-    {
-        errors.add("Choice parameter '" + param.parameterId + "' references non-existent group: " + param.parentGroupId);
-    }
+    errors.add("Choice parameter '" + param.parameterId + "' references non-existent group: " + param.parentGroupId);
+
 }
 
 void ApvtsValidator::checkChoiceParameterDisplayNameNotEmpty(
@@ -247,9 +247,16 @@ void ApvtsValidator::checkChoiceParameterDisplayNameNotEmpty(
     juce::StringArray& errors)
 {
     if (param.displayName.isEmpty())
-    {
-        errors.add("Choice parameter '" + param.parameterId + "' has empty display name");
-    }
+    errors.add("Choice parameter '" + param.parameterId + "' has empty display name");
+
+}
+
+void ApvtsValidator::checkChoiceParameterHostNameNotEmpty(
+    const PluginDescriptors::ChoiceParameterDescriptor& param,
+    juce::StringArray& errors)
+{
+    if (param.hostName.isEmpty())
+        errors.add("Choice parameter '" + param.parameterId + "' has empty host name");
 }
 
 void ApvtsValidator::checkChoiceParameterChoicesNotEmpty(
@@ -257,9 +264,8 @@ void ApvtsValidator::checkChoiceParameterChoicesNotEmpty(
     juce::StringArray& errors)
 {
     if (param.choices.isEmpty())
-    {
-        errors.add("Choice parameter '" + param.parameterId + "' has empty choices list");
-    }
+    errors.add("Choice parameter '" + param.parameterId + "' has empty choices list");
+
 }
 
 void ApvtsValidator::checkChoiceParameterDefaultIndexValid(
