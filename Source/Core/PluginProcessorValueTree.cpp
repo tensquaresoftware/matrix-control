@@ -22,8 +22,9 @@
 #include "Core/Services/PatchMutator/PatchMutatorEngine.h"
 #include "Core/Util/ComboboxPatchSendDebouncer.h"
 #include "Loggers/ApvtsLogger.h"
-#include "Shared/ProjectPaths.h"
+#include "Loggers/LogSessionHeader.h"
 #include "Loggers/MidiLogger.h"
+#include "Shared/ProjectPaths.h"
 #include "MIDI/MidiManager.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
@@ -58,6 +59,7 @@ void PluginProcessor::enableFileLoggingForSession()
     if (diagnosticLoggingEnabled_)
         return;
 
+    LogSessionHeader::setReportingInstanceId(loggingInstanceId_);
     MidiLogger::getInstance().setLogLevel(MidiLogger::LogLevel::kDebug);
     MidiLogger::getInstance().setLogToConsole(true);
     MidiLogger::getInstance().setLogToFile(true);
@@ -76,6 +78,7 @@ void PluginProcessor::enableApvtsLogging()
     if (diagnosticLoggingEnabled_)
         return;
 
+    LogSessionHeader::setReportingInstanceId(loggingInstanceId_);
     ApvtsLogger::getInstance().setLogLevel(ApvtsLogger::LogLevel::kDebug);
     ApvtsLogger::getInstance().setLogToConsole(true);
     ApvtsLogger::getInstance().setLogToFile(true);

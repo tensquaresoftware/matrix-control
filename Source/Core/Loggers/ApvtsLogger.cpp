@@ -2,6 +2,8 @@
 
 #include "ApvtsLogger.h"
 
+#include "LogSessionHeader.h"
+
 #include "Shared/ProjectPaths.h"
 
 #include <juce_core/juce_core.h>
@@ -191,7 +193,6 @@ void ApvtsLogger::openNewLogFile()
 
 void ApvtsLogger::writeSessionStartedHeader()
 {
-    const juce::Time now = juce::Time::getCurrentTime();
     const juce::String separator = generateSeparatorLine();
     const juce::String headerText = "=== APVTS Log Session Started ";
     const int remainingChars = getEffectiveLineWidth() - headerText.length();
@@ -206,8 +207,7 @@ void ApvtsLogger::writeSessionStartedHeader()
         *fileStream << headerText.toRawUTF8() << "\n";
     }
 
-    *fileStream << "Date: " << now.toString(true, true, false, true).toRawUTF8() << "\n";
-    *fileStream << "Log file: " << logFile.getFileName().toRawUTF8() << "\n";
+    *fileStream << LogSessionHeader::buildMetadataBlock(logFile).toRawUTF8();
     *fileStream << separator.toRawUTF8() << "\n\n";
     fileStream->flush();
 }

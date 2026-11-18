@@ -3,6 +3,7 @@
 #include "PluginProcessorInternal.h"
 
 #include "Loggers/ApvtsLogger.h"
+#include "Loggers/LogSessionHeader.h"
 #include "Loggers/MidiLogger.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "Shared/ProjectPaths.h"
@@ -22,8 +23,10 @@ namespace
             + "-" + juce::String(now.getSeconds()).paddedLeft('0', 2);
     }
 
-    void enableDiagnosticFileLoggers()
+    void enableDiagnosticFileLoggers(std::uint32_t instanceId)
     {
+        LogSessionHeader::setReportingInstanceId(instanceId);
+
         const juce::File midiDir = ProjectPaths::getDiagnosticLogsDirectory(ProjectPaths::LogCategory::kMidi);
         const juce::File apvtsDir = ProjectPaths::getDiagnosticLogsDirectory(ProjectPaths::LogCategory::kApvts);
         midiDir.createDirectory();
@@ -75,7 +78,7 @@ void PluginProcessor::setDiagnosticLoggingEnabled(bool enabled)
 
     if (enabled)
     {
-        enableDiagnosticFileLoggers();
+        enableDiagnosticFileLoggers(loggingInstanceId_);
         diagnosticLoggingEnabled_ = MidiLogger::getInstance().isLoggingToFile()
                                     || ApvtsLogger::getInstance().isLoggingToFile();
         if (! diagnosticLoggingEnabled_)

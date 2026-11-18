@@ -2,6 +2,7 @@
 
 #include "MidiLogger.h"
 
+#include "LogSessionHeader.h"
 #include "Shared/ProjectPaths.h"
 
 #include <mutex>
@@ -176,7 +177,6 @@ void MidiLogger::openNewLogFile()
 
 void MidiLogger::writeSessionStartedHeader()
 {
-    const juce::Time now = juce::Time::getCurrentTime();
     const juce::String separator = generateSeparatorLine();
     const juce::String headerText = "=== MIDI Log Session Started ";
     const int remainingChars = getEffectiveLineWidth() - headerText.length();
@@ -191,8 +191,7 @@ void MidiLogger::writeSessionStartedHeader()
         *fileStream << headerText.toRawUTF8() << "\n";
     }
 
-    *fileStream << "Date: " << now.toString(true, true, false, true).toRawUTF8() << "\n";
-    *fileStream << "Log file: " << logFile.getFileName().toRawUTF8() << "\n";
+    *fileStream << LogSessionHeader::buildMetadataBlock(logFile).toRawUTF8();
     *fileStream << separator.toRawUTF8() << "\n\n";
     fileStream->flush();
 }

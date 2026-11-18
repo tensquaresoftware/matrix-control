@@ -354,6 +354,9 @@ set(PLUGIN_SOURCES
     Source/GUI/Skins/SkinColourAccessors.cpp
     Source/GUI/Skins/SkinZoneOverlay.cpp
     Source/GUI/Skins/Dev/DevSkinColourElementList.cpp
+    # Product Minimal variants (Skin::create) — not Skin-Designer-only
+    Source/GUI/Skins/Dev/DevSkinMinimalSeedBlack.cpp
+    Source/GUI/Skins/Dev/DevSkinMinimalSeedCream.cpp
     
     # GUI - Looks
     Source/GUI/Looks/LookBuilders.cpp
@@ -471,6 +474,7 @@ set(PLUGIN_SOURCES
     Source/Core/Loggers/MidiLoggerFormatting.cpp
     Source/Core/Loggers/ApvtsLogger.cpp
     Source/Core/Loggers/ApvtsLoggerFormatting.cpp
+    Source/Core/Loggers/LogSessionHeader.cpp
 )
 
 # ============================================================================
@@ -730,6 +734,7 @@ if(MC_BUILD_TESTS)
         Tests/Unit/MatrixModalCopyTests.cpp
         Tests/Unit/SettingsTabsShellTests.cpp
         Tests/Unit/DiagnosticLoggingSettingsTests.cpp
+        Tests/Unit/LogLayoutSampleFilesTests.cpp
         Tests/Unit/WindowsAsioDeviceTypeTests.cpp
         Tests/Unit/LinuxJackDeviceTypeTests.cpp
         Tests/Unit/DeviceConnectionMachineDefaultsTests.cpp
@@ -917,6 +922,9 @@ if(MC_BUILD_TESTS)
         Source/Core/MIDI/SysEx/SysExEncoder.cpp
         Source/Core/Loggers/MidiLogger.cpp
         Source/Core/Loggers/MidiLoggerFormatting.cpp
+        Source/Core/Loggers/ApvtsLogger.cpp
+        Source/Core/Loggers/ApvtsLoggerFormatting.cpp
+        Source/Core/Loggers/LogSessionHeader.cpp
         Source/Shared/Definitions/PluginDescriptors.cpp
         Source/Shared/Definitions/PluginDescriptorsMasterEdit.cpp
         Source/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
@@ -973,6 +981,7 @@ if(MC_BUILD_TESTS)
         Source/Core/MIDI/SysEx/SysExParser.cpp
         Source/Core/Loggers/MidiLogger.cpp
         Source/Core/Loggers/MidiLoggerFormatting.cpp
+        Source/Core/Loggers/LogSessionHeader.cpp
         Source/Shared/Definitions/PluginDescriptors.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEditVcfVca.cpp
@@ -984,6 +993,7 @@ if(MC_BUILD_TESTS)
         Source/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
         Source/Shared/Definitions/PluginHelpers.cpp
+        Source/Shared/Definitions/PluginVersion.cpp
         Source/Shared/ProjectPaths.cpp
     )
 
@@ -1084,8 +1094,6 @@ if(MC_BUILD_SKIN_DESIGNER)
         Source/GUI/Skins/Dev/DevSkinPaletteCatalog.cpp
         Source/GUI/Skins/Dev/DevSkinSsotSeed.cpp
         Source/GUI/Skins/Dev/DevSkinKindCodec.cpp
-        Source/GUI/Skins/Dev/DevSkinMinimalSeedBlack.cpp
-        Source/GUI/Skins/Dev/DevSkinMinimalSeedCream.cpp
         Source/GUI/Skins/Dev/DevSkinStandalonePaintState.cpp
     )
     target_compile_definitions(Matrix-Control PRIVATE

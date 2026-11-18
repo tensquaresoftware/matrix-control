@@ -3,6 +3,8 @@
 #include "PluginProcessor.h"
 #include "PluginProcessorInternal.h"
 
+#include "Loggers/LogSessionHeader.h"
+
 #include "Core/Actions/ActionDispatcher.h"
 #include "Core/Actions/ModuleActionHandler.h"
 #include "Core/Actions/MutatorActionHandler.h"
@@ -78,6 +80,7 @@ PluginProcessor::PluginProcessor()
     , clipboardService_{ std::make_unique<Core::ClipboardService>() }
     , dirtyPatchTracker_{ std::make_unique<Core::DirtyPatchTracker>() }
 {
+    loggingInstanceId_ = LogSessionHeader::allocateInstanceId();
     midiManager->setActiveNoteRegistry(activeNoteRegistry_.get());
     createSysExDispatchers();
     createInitAndFileServices();
@@ -162,13 +165,13 @@ void PluginProcessor::changeProgramName(int index, const juce::String& newName)
 
 void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
-    juce::ignoreUnused(samplesPerBlock);
     ensureAudioInputBusEnabled();
     syncAudioRuntimeFromState();
 
     audioPassthroughSampleRate_ = sampleRate > 0.0 ? sampleRate : 44100.0;
     refreshAudioPassthroughLayout(audioPassthroughSampleRate_);
     applyHardwareLatencyToHost();
+    LogSessionHeader::setAudioSnapshot(audioPassthroughSampleRate_, samplesPerBlock);
 
     if (shouldUseDevelopmentLogging())
         ensureDevelopmentLoggingStarted();

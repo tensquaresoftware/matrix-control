@@ -70,7 +70,7 @@ private:
     static constexpr const char* kLogFilenamePrefix = "apvts-log";
 
     static constexpr int kMinLogLineWidth = 60;
-    static constexpr int kLogLineWidth = 80;
+    static constexpr int kLogLineWidth = 120;
 
     static constexpr const char* kLogLevelNames[] = {
         "NONE", "ERROR", "WARNING", "INFO", "DEBUG", "VERBOSE"
@@ -124,6 +124,7 @@ private:
     juce::String wrapContinuationLine(const juce::String& message,
                                       int maxLineWidth,
                                       int& messageStart) const;
+    int getMessageColumnIndentWidth() const;
     juce::String buildParameterChangeContinuation(float oldValue,
                                                   float newValue,
                                                   const juce::String& source,
