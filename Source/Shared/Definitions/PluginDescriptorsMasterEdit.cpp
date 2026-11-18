@@ -29,6 +29,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kPedal1Select,
             .displayName = PluginDisplayNames::MasterEditSection::MidiModule::ParameterWidgets::kPedal1Select,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::MidiModule::kPedal1Select,
             .parentGroupId = PluginIDs::MasterEditSection::MidiModule::kGroupId,
             .minValue = 0,
             .maxValue = 121,
@@ -39,6 +40,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kPedal2Select,
             .displayName = PluginDisplayNames::MasterEditSection::MidiModule::ParameterWidgets::kPedal2Select,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::MidiModule::kPedal2Select,
             .parentGroupId = PluginIDs::MasterEditSection::MidiModule::kGroupId,
             .minValue = 0,
             .maxValue = 121,
@@ -49,6 +51,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kLever2Select,
             .displayName = PluginDisplayNames::MasterEditSection::MidiModule::ParameterWidgets::kLever2Select,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::MidiModule::kLever2Select,
             .parentGroupId = PluginIDs::MasterEditSection::MidiModule::kGroupId,
             .minValue = 0,
             .maxValue = 121,
@@ -59,6 +62,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kLever3Select,
             .displayName = PluginDisplayNames::MasterEditSection::MidiModule::ParameterWidgets::kLever3Select,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::MidiModule::kLever3Select,
             .parentGroupId = PluginIDs::MasterEditSection::MidiModule::kGroupId,
             .minValue = 0,
             .maxValue = 121,
@@ -73,6 +77,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kChannel,
             .displayName = PluginDisplayNames::MasterEditSection::MidiModule::ParameterWidgets::kChannel,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::MidiModule::kChannel,
             .parentGroupId = PluginIDs::MasterEditSection::MidiModule::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::MidiChannel::kOmni,
@@ -108,6 +113,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kMidiEcho,
             .displayName = PluginDisplayNames::MasterEditSection::MidiModule::ParameterWidgets::kMidiEcho,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::MidiModule::kMidiEcho,
             .parentGroupId = PluginIDs::MasterEditSection::MidiModule::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::OnOff::kOff,
@@ -119,6 +125,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kControllers,
             .displayName = PluginDisplayNames::MasterEditSection::MidiModule::ParameterWidgets::kControllers,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::MidiModule::kControllers,
             .parentGroupId = PluginIDs::MasterEditSection::MidiModule::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::OnOff::kOff,
@@ -130,6 +137,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kPatchChanges,
             .displayName = PluginDisplayNames::MasterEditSection::MidiModule::ParameterWidgets::kPatchChanges,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::MidiModule::kPatchChanges,
             .parentGroupId = PluginIDs::MasterEditSection::MidiModule::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::OnOff::kOff,
@@ -160,6 +168,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kSpeed,
             .displayName = PluginDisplayNames::MasterEditSection::VibratoModule::ParameterWidgets::kSpeed,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::VibratoModule::kSpeed,
             .parentGroupId = PluginIDs::MasterEditSection::VibratoModule::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -170,6 +179,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kSpeedModAmount,
             .displayName = PluginDisplayNames::MasterEditSection::VibratoModule::ParameterWidgets::kSpeedModAmount,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::VibratoModule::kSpeedModAmount,
             .parentGroupId = PluginIDs::MasterEditSection::VibratoModule::kGroupId,
             .minValue = -63,
             .maxValue = 63,
@@ -180,6 +190,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kAmplitude,
             .displayName = PluginDisplayNames::MasterEditSection::VibratoModule::ParameterWidgets::kAmplitude,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::VibratoModule::kAmplitude,
             .parentGroupId = PluginIDs::MasterEditSection::VibratoModule::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -190,6 +201,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kAmpModAmount,
             .displayName = PluginDisplayNames::MasterEditSection::VibratoModule::ParameterWidgets::kAmpModAmount,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::VibratoModule::kAmpModAmount,
             .parentGroupId = PluginIDs::MasterEditSection::VibratoModule::kGroupId,
             .minValue = -63,
             .maxValue = 63,
@@ -204,6 +216,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kSpeedModSource,
             .displayName = PluginDisplayNames::MasterEditSection::VibratoModule::ParameterWidgets::kSpeedModSource,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::VibratoModule::kSpeedModSource,
             .parentGroupId = PluginIDs::MasterEditSection::VibratoModule::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::OnOff::kOff,
@@ -215,6 +228,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kWaveform,
             .displayName = PluginDisplayNames::MasterEditSection::VibratoModule::ParameterWidgets::kWaveform,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::VibratoModule::kWaveform,
             .parentGroupId = PluginIDs::MasterEditSection::VibratoModule::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::LfoWaveform::kTriangle,
@@ -231,6 +245,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kAmpModSource,
             .displayName = PluginDisplayNames::MasterEditSection::VibratoModule::ParameterWidgets::kAmpModSource,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::VibratoModule::kAmpModSource,
             .parentGroupId = PluginIDs::MasterEditSection::VibratoModule::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::OnOff::kOff,
@@ -261,6 +276,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kMasterTune,
             .displayName = PluginDisplayNames::MasterEditSection::MiscModule::ParameterWidgets::kMasterTune,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::MiscModule::kMasterTune,
             .parentGroupId = PluginIDs::MasterEditSection::MiscModule::kGroupId,
             .minValue = -31,
             .maxValue = 31,
@@ -271,6 +287,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kMasterTranspose,
             .displayName = PluginDisplayNames::MasterEditSection::MiscModule::ParameterWidgets::kMasterTranspose,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::MiscModule::kMasterTranspose,
             .parentGroupId = PluginIDs::MasterEditSection::MiscModule::kGroupId,
             .minValue = -24,
             .maxValue = 24,
@@ -281,6 +298,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kBendRange,
             .displayName = PluginDisplayNames::MasterEditSection::MiscModule::ParameterWidgets::kBendRange,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::MiscModule::kBendRange,
             .parentGroupId = PluginIDs::MasterEditSection::MiscModule::kGroupId,
             .minValue = 0,
             .maxValue = 24,
@@ -292,6 +310,7 @@ namespace PluginDescriptors
             // APVTS + MIDI CC 94 only — not part of packed Master SysEx 0x03.
             .parameterId = PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune,
             .displayName = PluginDisplayNames::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::MiscModule::kUnisonDetune,
             .parentGroupId = PluginIDs::MasterEditSection::MiscModule::kGroupId,
             .minValue = 0,
             .maxValue = 127,
@@ -306,6 +325,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonEnable,
             .displayName = PluginDisplayNames::MasterEditSection::MiscModule::ParameterWidgets::kUnisonEnable,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::MiscModule::kUnisonEnable,
             .parentGroupId = PluginIDs::MasterEditSection::MiscModule::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::OnOff::kOff,
@@ -317,6 +337,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kVolumeInvertEnable,
             .displayName = PluginDisplayNames::MasterEditSection::MiscModule::ParameterWidgets::kVolumeInvertEnable,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::MiscModule::kVolumeInvertEnable,
             .parentGroupId = PluginIDs::MasterEditSection::MiscModule::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::OnOff::kOff,
@@ -328,6 +349,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kBankLockEnable,
             .displayName = PluginDisplayNames::MasterEditSection::MiscModule::ParameterWidgets::kBankLockEnable,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::MiscModule::kBankLockEnable,
             .parentGroupId = PluginIDs::MasterEditSection::MiscModule::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::OnOff::kOff,
@@ -339,6 +361,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kMemoryProtectEnable,
             .displayName = PluginDisplayNames::MasterEditSection::MiscModule::ParameterWidgets::kMemoryProtectEnable,
+            .hostName = PluginDisplayNames::HostParameterNames::MasterEditSection::MiscModule::kMemoryProtectEnable,
             .parentGroupId = PluginIDs::MasterEditSection::MiscModule::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::OnOff::kOff,

@@ -40,6 +40,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Lfo1Module::ParameterWidgets::kSpeed,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo1Module::ParameterWidgets::kSpeed,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Lfo1Module::kSpeed,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo1Module::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -50,6 +51,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Lfo1Module::ParameterWidgets::kSpeedModByPressure,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo1Module::ParameterWidgets::kSpeedModByPressure,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Lfo1Module::kSpeedModByPressure,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo1Module::kGroupId,
             .minValue = -63,
             .maxValue = 63,
@@ -60,6 +62,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Lfo1Module::ParameterWidgets::kRetriggerPoint,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo1Module::ParameterWidgets::kRetriggerPoint,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Lfo1Module::kRetriggerPoint,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo1Module::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -70,6 +73,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Lfo1Module::ParameterWidgets::kAmplitude,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo1Module::ParameterWidgets::kAmplitude,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Lfo1Module::kAmplitude,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo1Module::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -80,6 +84,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Lfo1Module::ParameterWidgets::kAmplitudeModByRamp1,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo1Module::ParameterWidgets::kAmplitudeModByRamp1,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Lfo1Module::kAmplitudeModByRamp1,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo1Module::kGroupId,
             .minValue = -63,
             .maxValue = 63,
@@ -94,6 +99,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Lfo1Module::ParameterWidgets::kWaveform,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo1Module::ParameterWidgets::kWaveform,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Lfo1Module::kWaveform,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo1Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::LfoWaveform::kTriangle,
@@ -110,6 +116,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Lfo1Module::ParameterWidgets::kTriggerMode,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo1Module::ParameterWidgets::kTriggerMode,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Lfo1Module::kTriggerMode,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo1Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::LfoTriggerMode::kOff,
@@ -123,6 +130,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Lfo1Module::ParameterWidgets::kLag,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo1Module::ParameterWidgets::kLag,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Lfo1Module::kLag,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo1Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::OnOff::kOff,
@@ -134,6 +142,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Lfo1Module::ParameterWidgets::kSampleInput,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo1Module::ParameterWidgets::kSampleInput,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Lfo1Module::kSampleInput,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo1Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::ModulationBus::Source::kNone,
@@ -195,6 +204,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kSpeed,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo2Module::ParameterWidgets::kSpeed,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Lfo2Module::kSpeed,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo2Module::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -205,6 +215,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kSpeedModByKeyboard,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo2Module::ParameterWidgets::kSpeedModByKeyboard,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Lfo2Module::kSpeedModByKeyboard,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo2Module::kGroupId,
             .minValue = -63,
             .maxValue = 63,
@@ -215,6 +226,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kRetriggerPoint,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo2Module::ParameterWidgets::kRetriggerPoint,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Lfo2Module::kRetriggerPoint,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo2Module::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -225,6 +237,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kAmplitude,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo2Module::ParameterWidgets::kAmplitude,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Lfo2Module::kAmplitude,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo2Module::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -235,6 +248,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kAmplitudeModByRamp2,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo2Module::ParameterWidgets::kAmplitudeModByRamp2,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Lfo2Module::kAmplitudeModByRamp2,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo2Module::kGroupId,
             .minValue = -63,
             .maxValue = 63,
@@ -249,6 +263,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kWaveform,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo2Module::ParameterWidgets::kWaveform,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Lfo2Module::kWaveform,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo2Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::LfoWaveform::kTriangle,
@@ -265,6 +280,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kTriggerMode,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo2Module::ParameterWidgets::kTriggerMode,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Lfo2Module::kTriggerMode,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo2Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::LfoTriggerMode::kOff,
@@ -278,6 +294,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kLag,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo2Module::ParameterWidgets::kLag,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Lfo2Module::kLag,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo2Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::OnOff::kOff,
@@ -289,6 +306,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kSampleInput,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo2Module::ParameterWidgets::kSampleInput,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Lfo2Module::kSampleInput,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo2Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::ModulationBus::Source::kNone,

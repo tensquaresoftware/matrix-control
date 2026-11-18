@@ -27,14 +27,14 @@ namespace
         for (const auto& d : Core::ApvtsMasterMapper::buildIntDescriptors())
         {
             layout.add(std::make_unique<juce::AudioParameterInt>(
-                juce::ParameterID(d.parameterId, 1), d.displayName,
+                juce::ParameterID(d.parameterId, 1), d.hostName,
                 d.minValue, d.maxValue, d.defaultValue));
         }
 
         for (const auto& d : Core::ApvtsMasterMapper::buildChoiceDescriptors())
         {
             layout.add(std::make_unique<juce::AudioParameterChoice>(
-                juce::ParameterID(d.parameterId, 1), d.displayName,
+                juce::ParameterID(d.parameterId, 1), d.hostName,
                 d.choices, d.defaultIndex));
         }
 

@@ -123,14 +123,14 @@ private:
         for (const auto& d : PluginDescriptors::PatchEditSection::Envelope1Module::kIntParameters)
         {
             layout.add(std::make_unique<juce::AudioParameterInt>(
-                juce::ParameterID(d.parameterId, 1), d.displayName,
+                juce::ParameterID(d.parameterId, 1), d.hostName,
                 d.minValue, d.maxValue, d.defaultValue));
         }
 
         for (const auto& d : PluginDescriptors::PatchEditSection::Envelope1Module::kChoiceParameters)
         {
             layout.add(std::make_unique<juce::AudioParameterChoice>(
-                juce::ParameterID(d.parameterId, 1), d.displayName,
+                juce::ParameterID(d.parameterId, 1), d.hostName,
                 d.choices, d.defaultIndex));
         }
 
@@ -149,15 +149,15 @@ private:
             const auto& choiceParams = kModulationBusChoiceParameters[static_cast<size_t>(bus)];
 
             layout.add(std::make_unique<juce::AudioParameterInt>(
-                juce::ParameterID(intParams[0].parameterId, 1), intParams[0].displayName,
+                juce::ParameterID(intParams[0].parameterId, 1), intParams[0].hostName,
                 intParams[0].minValue, intParams[0].maxValue, intParams[0].defaultValue));
 
             layout.add(std::make_unique<juce::AudioParameterChoice>(
-                juce::ParameterID(choiceParams[0].parameterId, 1), choiceParams[0].displayName,
+                juce::ParameterID(choiceParams[0].parameterId, 1), choiceParams[0].hostName,
                 choiceParams[0].choices, choiceParams[0].defaultIndex));
 
             layout.add(std::make_unique<juce::AudioParameterChoice>(
-                juce::ParameterID(choiceParams[1].parameterId, 1), choiceParams[1].displayName,
+                juce::ParameterID(choiceParams[1].parameterId, 1), choiceParams[1].hostName,
                 choiceParams[1].choices, choiceParams[1].defaultIndex));
         }
 

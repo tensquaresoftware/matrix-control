@@ -35,13 +35,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout makeTwoBusLayout(int busA, i
         const auto& destinationDesc = kModulationBusChoiceParameters[static_cast<size_t>(busIndex)][1];
 
         layout.add(std::make_unique<juce::AudioParameterInt>(
-            juce::ParameterID(amountDesc.parameterId, 1), amountDesc.displayName,
+            juce::ParameterID(amountDesc.parameterId, 1), amountDesc.hostName,
             amountDesc.minValue, amountDesc.maxValue, amountDesc.defaultValue));
         layout.add(std::make_unique<juce::AudioParameterChoice>(
-            juce::ParameterID(sourceDesc.parameterId, 1), sourceDesc.displayName,
+            juce::ParameterID(sourceDesc.parameterId, 1), sourceDesc.hostName,
             sourceDesc.choices, sourceDesc.defaultIndex));
         layout.add(std::make_unique<juce::AudioParameterChoice>(
-            juce::ParameterID(destinationDesc.parameterId, 1), destinationDesc.displayName,
+            juce::ParameterID(destinationDesc.parameterId, 1), destinationDesc.hostName,
             destinationDesc.choices, destinationDesc.defaultIndex));
     };
 

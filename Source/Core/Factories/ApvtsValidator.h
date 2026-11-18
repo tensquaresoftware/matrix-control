@@ -75,6 +75,10 @@ private:
         const PluginDescriptors::IntParameterDescriptor& param,
         juce::StringArray& errors);
 
+    static void checkIntParameterHostNameNotEmpty(
+        const PluginDescriptors::IntParameterDescriptor& param,
+        juce::StringArray& errors);
+
     static void checkIntParameterValueRange(
         const PluginDescriptors::IntParameterDescriptor& param,
         juce::StringArray& errors);
@@ -84,6 +88,10 @@ private:
         juce::StringArray& errors);
 
     static void checkChoiceParameterDisplayNameNotEmpty(
+        const PluginDescriptors::ChoiceParameterDescriptor& param,
+        juce::StringArray& errors);
+
+    static void checkChoiceParameterHostNameNotEmpty(
         const PluginDescriptors::ChoiceParameterDescriptor& param,
         juce::StringArray& errors);
 

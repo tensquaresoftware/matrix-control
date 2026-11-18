@@ -64,13 +64,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout makeDisplayGestureLayout()
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     layout.add(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(attackDesc->parameterId, 1),
-        attackDesc->displayName,
+        attackDesc->hostName,
         attackDesc->minValue,
         attackDesc->maxValue,
         attackDesc->defaultValue));
     layout.add(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(trackPointDesc->parameterId, 1),
-        trackPointDesc->displayName,
+        trackPointDesc->hostName,
         trackPointDesc->minValue,
         trackPointDesc->maxValue,
         trackPointDesc->defaultValue));

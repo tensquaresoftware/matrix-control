@@ -92,7 +92,7 @@ void ApvtsLayoutBuilder::addIntParameter(
 {
     auto param = std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(desc.parameterId, 1),
-        desc.displayName,
+        desc.hostName,
         desc.minValue,
         desc.maxValue,
         desc.defaultValue
@@ -106,7 +106,7 @@ void ApvtsLayoutBuilder::addChoiceParameter(
 {
     auto param = std::make_unique<juce::AudioParameterChoice>(
         juce::ParameterID(desc.parameterId, 1),
-        desc.displayName,
+        desc.hostName,
         desc.choices,
         desc.defaultIndex
     );

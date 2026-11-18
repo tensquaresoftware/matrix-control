@@ -163,7 +163,7 @@ inline juce::AudioProcessorValueTreeState::ParameterLayout makeLayoutFromDescrip
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     layout.add(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(descriptor.parameterId, 1),
-        descriptor.displayName,
+        descriptor.hostName,
         descriptor.minValue,
         descriptor.maxValue,
         descriptor.defaultValue));

@@ -103,7 +103,7 @@ namespace PluginDescriptors
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus0Int = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus0Amount,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus0Amount,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus0,
             .minValue = -63,
             .maxValue = 63,
@@ -115,7 +115,7 @@ namespace PluginDescriptors
         // Choice Parameters -------------------------------------------------------------------------------------------
         const std::vector<ChoiceParameterDescriptor> bus0Choice = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus0Source,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus0Source,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus0,
             .choices = kSourceChoices,
             .defaultIndex = 0,
@@ -123,7 +123,7 @@ namespace PluginDescriptors
             .sysExId = kNoSysExId
         }, {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus0Destination,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus0Destination,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus0,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
@@ -147,7 +147,7 @@ namespace PluginDescriptors
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus1Int = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus1Amount,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus1Amount,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus1,
             .minValue = -63,
             .maxValue = 63,
@@ -159,7 +159,7 @@ namespace PluginDescriptors
         // Choice Parameters -------------------------------------------------------------------------------------------
         const std::vector<ChoiceParameterDescriptor> bus1Choice = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus1Source,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus1Source,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus1,
             .choices = kSourceChoices,
             .defaultIndex = 0,
@@ -167,7 +167,7 @@ namespace PluginDescriptors
             .sysExId = kNoSysExId
         }, {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus1Destination,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus1Destination,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus1,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
@@ -191,7 +191,7 @@ namespace PluginDescriptors
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus2Int = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus2Amount,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus2Amount,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus2,
             .minValue = -63,
             .maxValue = 63,
@@ -203,7 +203,7 @@ namespace PluginDescriptors
         // Choice Parameters -------------------------------------------------------------------------------------------
         const std::vector<ChoiceParameterDescriptor> bus2Choice = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus2Source,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus2Source,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus2,
             .choices = kSourceChoices,
             .defaultIndex = 0,
@@ -211,7 +211,7 @@ namespace PluginDescriptors
             .sysExId = kNoSysExId
         }, {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus2Destination,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus2Destination,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus2,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
@@ -235,7 +235,7 @@ namespace PluginDescriptors
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus3Int = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus3Amount,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus3Amount,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus3,
             .minValue = -63,
             .maxValue = 63,
@@ -247,7 +247,7 @@ namespace PluginDescriptors
         // Choice Parameters -------------------------------------------------------------------------------------------
         const std::vector<ChoiceParameterDescriptor> bus3Choice = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus3Source,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus3Source,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus3,
             .choices = kSourceChoices,
             .defaultIndex = 0,
@@ -255,7 +255,7 @@ namespace PluginDescriptors
             .sysExId = kNoSysExId
         }, {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus3Destination,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus3Destination,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus3,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
@@ -279,7 +279,7 @@ namespace PluginDescriptors
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus4Int = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus4Amount,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus4Amount,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus4,
             .minValue = -63,
             .maxValue = 63,
@@ -291,7 +291,7 @@ namespace PluginDescriptors
         // Choice Parameters -------------------------------------------------------------------------------------------
         const std::vector<ChoiceParameterDescriptor> bus4Choice = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus4Source,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus4Source,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus4,
             .choices = kSourceChoices,
             .defaultIndex = 0,
@@ -299,7 +299,7 @@ namespace PluginDescriptors
             .sysExId = kNoSysExId
         }, {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus4Destination,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus4Destination,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus4,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
@@ -323,7 +323,7 @@ namespace PluginDescriptors
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus5Int = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus5Amount,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus5Amount,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus5,
             .minValue = -63,
             .maxValue = 63,
@@ -335,7 +335,7 @@ namespace PluginDescriptors
         // Choice Parameters -------------------------------------------------------------------------------------------
         const std::vector<ChoiceParameterDescriptor> bus5Choice = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus5Source,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus5Source,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus5,
             .choices = kSourceChoices,
             .defaultIndex = 0,
@@ -343,7 +343,7 @@ namespace PluginDescriptors
             .sysExId = kNoSysExId
         }, {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus5Destination,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus5Destination,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus5,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
@@ -367,7 +367,7 @@ namespace PluginDescriptors
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus6Int = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus6Amount,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus6Amount,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus6,
             .minValue = -63,
             .maxValue = 63,
@@ -379,7 +379,7 @@ namespace PluginDescriptors
         // Choice Parameters -------------------------------------------------------------------------------------------
         const std::vector<ChoiceParameterDescriptor> bus6Choice = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus6Source,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus6Source,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus6,
             .choices = kSourceChoices,
             .defaultIndex = 0,
@@ -387,7 +387,7 @@ namespace PluginDescriptors
             .sysExId = kNoSysExId
         }, {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus6Destination,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus6Destination,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus6,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
@@ -411,7 +411,7 @@ namespace PluginDescriptors
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus7Int = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus7Amount,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus7Amount,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus7,
             .minValue = -63,
             .maxValue = 63,
@@ -423,7 +423,7 @@ namespace PluginDescriptors
         // Choice Parameters -------------------------------------------------------------------------------------------
         const std::vector<ChoiceParameterDescriptor> bus7Choice = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus7Source,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus7Source,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus7,
             .choices = kSourceChoices,
             .defaultIndex = 0,
@@ -431,7 +431,7 @@ namespace PluginDescriptors
             .sysExId = kNoSysExId
         }, {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus7Destination,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus7Destination,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus7,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
@@ -455,7 +455,7 @@ namespace PluginDescriptors
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus8Int = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus8Amount,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus8Amount,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus8,
             .minValue = -63,
             .maxValue = 63,
@@ -467,7 +467,7 @@ namespace PluginDescriptors
         // Choice Parameters -------------------------------------------------------------------------------------------
         const std::vector<ChoiceParameterDescriptor> bus8Choice = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus8Source,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus8Source,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus8,
             .choices = kSourceChoices,
             .defaultIndex = 0,
@@ -475,7 +475,7 @@ namespace PluginDescriptors
             .sysExId = kNoSysExId
         }, {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus8Destination,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus8Destination,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus8,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
@@ -499,7 +499,7 @@ namespace PluginDescriptors
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus9Int = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus9Amount,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kAmount, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus9Amount,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus9,
             .minValue = -63,
             .maxValue = 63,
@@ -511,7 +511,7 @@ namespace PluginDescriptors
         // Choice Parameters -------------------------------------------------------------------------------------------
         const std::vector<ChoiceParameterDescriptor> bus9Choice = { {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus9Source,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kSource, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus9Source,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus9,
             .choices = kSourceChoices,
             .defaultIndex = 0,
@@ -519,7 +519,7 @@ namespace PluginDescriptors
             .sysExId = kNoSysExId
         }, {
             .parameterId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus9Destination,
-            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::kDestination, .hostName = PluginDisplayNames::HostParameterNames::MatrixModulationSection::ModulationBus::kBus9Destination,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus9,
             .choices = kDestinationChoices,
             .defaultIndex = 0,

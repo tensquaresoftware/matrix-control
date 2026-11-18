@@ -60,14 +60,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout makeEnvelopePasteLayout()
     for (const auto& d : PluginDescriptors::PatchEditSection::Envelope1Module::kIntParameters)
     {
         layout.add(std::make_unique<juce::AudioParameterInt>(
-            juce::ParameterID(d.parameterId, 1), d.displayName,
+            juce::ParameterID(d.parameterId, 1), d.hostName,
             d.minValue, d.maxValue, d.defaultValue));
     }
 
     for (const auto& d : PluginDescriptors::PatchEditSection::Envelope1Module::kChoiceParameters)
     {
         layout.add(std::make_unique<juce::AudioParameterChoice>(
-            juce::ParameterID(d.parameterId, 1), d.displayName,
+            juce::ParameterID(d.parameterId, 1), d.hostName,
             d.choices, d.defaultIndex));
     }
 
@@ -81,14 +81,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout makeDco1Layout()
     for (const auto& d : PluginDescriptors::PatchEditSection::Dco1Module::kIntParameters)
     {
         layout.add(std::make_unique<juce::AudioParameterInt>(
-            juce::ParameterID(d.parameterId, 1), d.displayName,
+            juce::ParameterID(d.parameterId, 1), d.hostName,
             d.minValue, d.maxValue, d.defaultValue));
     }
 
     for (const auto& d : PluginDescriptors::PatchEditSection::Dco1Module::kChoiceParameters)
     {
         layout.add(std::make_unique<juce::AudioParameterChoice>(
-            juce::ParameterID(d.parameterId, 1), d.displayName,
+            juce::ParameterID(d.parameterId, 1), d.hostName,
             d.choices, d.defaultIndex));
     }
 

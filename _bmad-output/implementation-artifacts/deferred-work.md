@@ -3427,3 +3427,17 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-logo-double-click-ui-scale-reset.md`
   summary: Logo `mouseUp` still arms the delayed popup for non-left buttons (no left-button filter unlike ComboBox).
   evidence: Blind Hunter; pre-existing before the VST3 open-path change; not introduced by restoring the double-click delay.
+
+## Deferred from: review of spec-host-parameter-names.md (2026-11-18)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-host-parameter-names.md`
+  summary: No automated check that parses the markdown inventory SSOT against `HostParameterNames` / descriptor `hostName` values (drift would not fail CI).
+  evidence: Blind Hunter; inventory↔code match was verified manually this run; a markdown/codegen pin would settle it.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-host-parameter-names.md`
+  summary: Host-name truncation / collision under short DAW `getName` limits (`<`, `|`, long prefixes) is untested.
+  evidence: Blind Hunter maybe-false; multi-DAW intent rejects Live-first truncation hacks; settle with host-specific limit samples if needed.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-host-parameter-names.md`
+  summary: Standing `CONVENTIONS.md` / project-context rule that every new Int/Choice needs `HostParameterNames` + `hostName` was not added.
+  evidence: Blind Hunter; spec Implementation Notes already record the formula; broader constitution update left for a docs pass.

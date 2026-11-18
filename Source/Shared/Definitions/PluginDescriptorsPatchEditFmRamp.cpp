@@ -28,6 +28,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kFmAmount,
             .displayName = PluginDisplayNames::PatchEditSection::FmTrackModule::ParameterWidgets::kFmAmount,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::FmTrackModule::kFmAmount,
             .parentGroupId = PluginIDs::PatchEditSection::FmTrackModule::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -38,6 +39,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kFmModByEnv3,
             .displayName = PluginDisplayNames::PatchEditSection::FmTrackModule::ParameterWidgets::kFmModByEnv3,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::FmTrackModule::kFmModByEnv3,
             .parentGroupId = PluginIDs::PatchEditSection::FmTrackModule::kGroupId,
             .minValue = -63,
             .maxValue = 63,
@@ -48,6 +50,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kFmModByPressure,
             .displayName = PluginDisplayNames::PatchEditSection::FmTrackModule::ParameterWidgets::kFmModByPressure,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::FmTrackModule::kFmModByPressure,
             .parentGroupId = PluginIDs::PatchEditSection::FmTrackModule::kGroupId,
             .minValue = -63,
             .maxValue = 63,
@@ -58,6 +61,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint1,
             .displayName = PluginDisplayNames::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint1,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::FmTrackModule::kTrackPoint1,
             .parentGroupId = PluginIDs::PatchEditSection::FmTrackModule::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -68,6 +72,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint2,
             .displayName = PluginDisplayNames::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint2,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::FmTrackModule::kTrackPoint2,
             .parentGroupId = PluginIDs::PatchEditSection::FmTrackModule::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -78,6 +83,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint3,
             .displayName = PluginDisplayNames::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint3,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::FmTrackModule::kTrackPoint3,
             .parentGroupId = PluginIDs::PatchEditSection::FmTrackModule::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -88,6 +94,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint4,
             .displayName = PluginDisplayNames::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint4,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::FmTrackModule::kTrackPoint4,
             .parentGroupId = PluginIDs::PatchEditSection::FmTrackModule::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -98,6 +105,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint5,
             .displayName = PluginDisplayNames::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint5,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::FmTrackModule::kTrackPoint5,
             .parentGroupId = PluginIDs::PatchEditSection::FmTrackModule::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -113,6 +121,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackInput,
             .displayName = PluginDisplayNames::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackInput,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::FmTrackModule::kTrackInput,
             .parentGroupId = PluginIDs::PatchEditSection::FmTrackModule::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::ModulationBus::Source::kNone,     PluginDisplayNames::ChoiceLists::ModulationBus::Source::kEnvelope1, PluginDisplayNames::ChoiceLists::ModulationBus::Source::kEnvelope2, PluginDisplayNames::ChoiceLists::ModulationBus::Source::kEnvelope3,
@@ -146,6 +155,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp1Rate,
             .displayName = PluginDisplayNames::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp1Rate,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::RampPortamentoModule::kRamp1Rate,
             .parentGroupId = PluginIDs::PatchEditSection::RampPortamentoModule::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -156,6 +166,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp2Rate,
             .displayName = PluginDisplayNames::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp2Rate,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::RampPortamentoModule::kRamp2Rate,
             .parentGroupId = PluginIDs::PatchEditSection::RampPortamentoModule::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -166,6 +177,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoRate,
             .displayName = PluginDisplayNames::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoRate,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::RampPortamentoModule::kPortamentoRate,
             .parentGroupId = PluginIDs::PatchEditSection::RampPortamentoModule::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -176,6 +188,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoModByVelocity,
             .displayName = PluginDisplayNames::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoModByVelocity,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::RampPortamentoModule::kPortamentoModByVelocity,
             .parentGroupId = PluginIDs::PatchEditSection::RampPortamentoModule::kGroupId,
             .minValue = -63,
             .maxValue = 63,
@@ -190,6 +203,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp1Trigger,
             .displayName = PluginDisplayNames::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp1Trigger,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::RampPortamentoModule::kRamp1Trigger,
             .parentGroupId = PluginIDs::PatchEditSection::RampPortamentoModule::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::RampTrigger::kStrig,
@@ -203,6 +217,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp2Trigger,
             .displayName = PluginDisplayNames::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp2Trigger,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::RampPortamentoModule::kRamp2Trigger,
             .parentGroupId = PluginIDs::PatchEditSection::RampPortamentoModule::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::RampTrigger::kStrig,
@@ -216,6 +231,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoMode,
             .displayName = PluginDisplayNames::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoMode,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::RampPortamentoModule::kPortamentoMode,
             .parentGroupId = PluginIDs::PatchEditSection::RampPortamentoModule::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::PortamentoMode::kLinear,
@@ -228,6 +244,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoLegato,
             .displayName = PluginDisplayNames::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoLegato,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::RampPortamentoModule::kPortamentoLegato,
             .parentGroupId = PluginIDs::PatchEditSection::RampPortamentoModule::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::OnOff::kOff,
@@ -239,6 +256,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoKeyboardMode,
             .displayName = PluginDisplayNames::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoKeyboardMode,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::RampPortamentoModule::kPortamentoKeyboardMode,
             .parentGroupId = PluginIDs::PatchEditSection::RampPortamentoModule::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::PortamentoKeyboardMode::kReasgn,

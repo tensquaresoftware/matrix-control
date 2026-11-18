@@ -363,6 +363,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kAmount,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kAmount,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchManagerSection::PatchMutatorModule::kAmount,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .minValue = 1,
             .maxValue = 100,
@@ -373,6 +374,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRandom,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRandom,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchManagerSection::PatchMutatorModule::kRandom,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .minValue = 1,
             .maxValue = 100,

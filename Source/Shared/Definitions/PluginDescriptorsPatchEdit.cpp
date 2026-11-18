@@ -41,6 +41,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kFrequency,
             .displayName = PluginDisplayNames::PatchEditSection::Dco1Module::ParameterWidgets::kFrequency,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco1Module::kFrequency,
             .parentGroupId = PluginIDs::PatchEditSection::Dco1Module::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -51,6 +52,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kFrequencyModByLfo1,
             .displayName = PluginDisplayNames::PatchEditSection::Dco1Module::ParameterWidgets::kFrequencyModByLfo1,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco1Module::kFrequencyModByLfo1,
             .parentGroupId = PluginIDs::PatchEditSection::Dco1Module::kGroupId,
             .minValue = -63,
             .maxValue = 63,
@@ -61,6 +63,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kPulseWidth,
             .displayName = PluginDisplayNames::PatchEditSection::Dco1Module::ParameterWidgets::kPulseWidth,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco1Module::kPulseWidth,
             .parentGroupId = PluginIDs::PatchEditSection::Dco1Module::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -71,6 +74,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kPulseWidthModByLfo2,
             .displayName = PluginDisplayNames::PatchEditSection::Dco1Module::ParameterWidgets::kPulseWidthModByLfo2,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco1Module::kPulseWidthModByLfo2,
             .parentGroupId = PluginIDs::PatchEditSection::Dco1Module::kGroupId,
             .minValue = -63,
             .maxValue = 63,
@@ -81,6 +85,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kWaveShape,
             .displayName = PluginDisplayNames::PatchEditSection::Dco1Module::ParameterWidgets::kWaveShape,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco1Module::kWaveShape,
             .parentGroupId = PluginIDs::PatchEditSection::Dco1Module::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -95,6 +100,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kSync,
             .displayName = PluginDisplayNames::PatchEditSection::Dco1Module::ParameterWidgets::kSync,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco1Module::kSync,
             .parentGroupId = PluginIDs::PatchEditSection::Dco1Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::Sync::kOff,
@@ -108,6 +114,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kWaveSelect,
             .displayName = PluginDisplayNames::PatchEditSection::Dco1Module::ParameterWidgets::kWaveSelect,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco1Module::kWaveSelect,
             .parentGroupId = PluginIDs::PatchEditSection::Dco1Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::WaveSelect::kOff,
@@ -121,6 +128,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kLevers,
             .displayName = PluginDisplayNames::PatchEditSection::Dco1Module::ParameterWidgets::kLevers,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco1Module::kLevers,
             .parentGroupId = PluginIDs::PatchEditSection::Dco1Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::Levers::kOff,
@@ -134,6 +142,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kKeyboardPortamento,
             .displayName = PluginDisplayNames::PatchEditSection::Dco1Module::ParameterWidgets::kKeyboardPortamento,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco1Module::kKeyboardPortamento,
             .parentGroupId = PluginIDs::PatchEditSection::Dco1Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::KeyboardPortamento::kKeyboard, PluginDisplayNames::ChoiceLists::KeyboardPortamento::kPortamento }),
@@ -144,6 +153,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kKeyClick,
             .displayName = PluginDisplayNames::PatchEditSection::Dco1Module::ParameterWidgets::kKeyClick,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco1Module::kKeyClick,
             .parentGroupId = PluginIDs::PatchEditSection::Dco1Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::OnOff::kOff,
@@ -186,6 +196,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kFrequency,
             .displayName = PluginDisplayNames::PatchEditSection::Dco2Module::ParameterWidgets::kFrequency,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco2Module::kFrequency,
             .parentGroupId = PluginIDs::PatchEditSection::Dco2Module::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -196,6 +207,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kFrequencyModByLfo1,
             .displayName = PluginDisplayNames::PatchEditSection::Dco2Module::ParameterWidgets::kFrequencyModByLfo1,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco2Module::kFrequencyModByLfo1,
             .parentGroupId = PluginIDs::PatchEditSection::Dco2Module::kGroupId,
             .minValue = -63,
             .maxValue = 63,
@@ -206,6 +218,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kDetune,
             .displayName = PluginDisplayNames::PatchEditSection::Dco2Module::ParameterWidgets::kDetune,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco2Module::kDetune,
             .parentGroupId = PluginIDs::PatchEditSection::Dco2Module::kGroupId,
             .minValue = -31,
             .maxValue = 31,
@@ -216,6 +229,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kPulseWidth,
             .displayName = PluginDisplayNames::PatchEditSection::Dco2Module::ParameterWidgets::kPulseWidth,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco2Module::kPulseWidth,
             .parentGroupId = PluginIDs::PatchEditSection::Dco2Module::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -226,6 +240,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kPulseWidthModByLfo2,
             .displayName = PluginDisplayNames::PatchEditSection::Dco2Module::ParameterWidgets::kPulseWidthModByLfo2,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco2Module::kPulseWidthModByLfo2,
             .parentGroupId = PluginIDs::PatchEditSection::Dco2Module::kGroupId,
             .minValue = -63,
             .maxValue = 63,
@@ -236,6 +251,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kWaveShape,
             .displayName = PluginDisplayNames::PatchEditSection::Dco2Module::ParameterWidgets::kWaveShape,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco2Module::kWaveShape,
             .parentGroupId = PluginIDs::PatchEditSection::Dco2Module::kGroupId,
             .minValue = 0,
             .maxValue = 63,
@@ -250,6 +266,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kWaveSelect,
             .displayName = PluginDisplayNames::PatchEditSection::Dco2Module::ParameterWidgets::kWaveSelect,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco2Module::kWaveSelect,
             .parentGroupId = PluginIDs::PatchEditSection::Dco2Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::WaveSelect::kOff,
@@ -264,6 +281,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kLevers,
             .displayName = PluginDisplayNames::PatchEditSection::Dco2Module::ParameterWidgets::kLevers,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco2Module::kLevers,
             .parentGroupId = PluginIDs::PatchEditSection::Dco2Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::Levers::kOff,
@@ -277,6 +295,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kKeyboardPortamento,
             .displayName = PluginDisplayNames::PatchEditSection::Dco2Module::ParameterWidgets::kKeyboardPortamento,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco2Module::kKeyboardPortamento,
             .parentGroupId = PluginIDs::PatchEditSection::Dco2Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::KeyboardPortamento::kOff, PluginDisplayNames::ChoiceLists::KeyboardPortamento::kPortamento, PluginDisplayNames::ChoiceLists::KeyboardPortamento::kKeyboard }),
@@ -287,6 +306,7 @@ namespace PluginDescriptors
         {
             .parameterId = PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kKeyClick,
             .displayName = PluginDisplayNames::PatchEditSection::Dco2Module::ParameterWidgets::kKeyClick,
+            .hostName = PluginDisplayNames::HostParameterNames::PatchEditSection::Dco2Module::kKeyClick,
             .parentGroupId = PluginIDs::PatchEditSection::Dco2Module::kGroupId,
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::OnOff::kOff,
@@ -294,132 +314,6 @@ namespace PluginDescriptors
             .defaultIndex = 0,
             .sysExOffset = 24,
             .sysExId = 19
-        }
-    };
-
-
-    // =================================================================================================================
-    // Patch Edit Section | VCF/VCA Module
-    // =================================================================================================================
-
-    // Standalone Widgets ----------------------------------------------------------------------------------------------
-    const std::vector<StandaloneWidgetDescriptor> PatchEditSection::VcfVcaModule::kStandaloneWidgets = {
-        {
-            .widgetId = PluginIDs::PatchEditSection::VcfVcaModule::StandaloneWidgets::kInit,
-            .displayName = PluginDisplayNames::PatchEditSection::VcfVcaModule::StandaloneWidgets::kInit,
-            .parentGroupId = PluginIDs::PatchEditSection::VcfVcaModule::kGroupId,
-            .widgetType = StandaloneWidgetType::kButton,
-        }
-    };
-
-    // Int Parameters --------------------------------------------------------------------------------------------------
-    const std::vector<IntParameterDescriptor> PatchEditSection::VcfVcaModule::kIntParameters = {
-        {
-            .parameterId = PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kBalance,
-            .displayName = PluginDisplayNames::PatchEditSection::VcfVcaModule::ParameterWidgets::kBalance,
-            .parentGroupId = PluginIDs::PatchEditSection::VcfVcaModule::kGroupId,
-            .minValue = 0,
-            .maxValue = 63,
-            .defaultValue = 31,
-            .sysExOffset = 20,
-            .sysExId = 20
-        },
-        {
-            .parameterId = PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kFrequency,
-            .displayName = PluginDisplayNames::PatchEditSection::VcfVcaModule::ParameterWidgets::kFrequency,
-            .parentGroupId = PluginIDs::PatchEditSection::VcfVcaModule::kGroupId,
-            .minValue = 0,
-            .maxValue = 127,
-            .defaultValue = 55,
-            .sysExOffset = 26,
-            .sysExId = 21
-        },
-        {
-            .parameterId = PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kFrequencyModByEnv1,
-            .displayName = PluginDisplayNames::PatchEditSection::VcfVcaModule::ParameterWidgets::kFrequencyModByEnv1,
-            .parentGroupId = PluginIDs::PatchEditSection::VcfVcaModule::kGroupId,
-            .minValue = -63,
-            .maxValue = 63,
-            .defaultValue = 42,
-            .sysExOffset = 90,
-            .sysExId = 22
-        },
-        {
-            .parameterId = PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kFrequencyModByPressure,
-            .displayName = PluginDisplayNames::PatchEditSection::VcfVcaModule::ParameterWidgets::kFrequencyModByPressure,
-            .parentGroupId = PluginIDs::PatchEditSection::VcfVcaModule::kGroupId,
-            .minValue = -63,
-            .maxValue = 63,
-            .defaultValue = 0,
-            .sysExOffset = 91,
-            .sysExId = 23
-        },
-        {
-            .parameterId = PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kResonance,
-            .displayName = PluginDisplayNames::PatchEditSection::VcfVcaModule::ParameterWidgets::kResonance,
-            .parentGroupId = PluginIDs::PatchEditSection::VcfVcaModule::kGroupId,
-            .minValue = 0,
-            .maxValue = 63,
-            .defaultValue = 0,
-            .sysExOffset = 27,
-            .sysExId = 24
-        },
-        {
-            .parameterId = PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kVca1Volume,
-            .displayName = PluginDisplayNames::PatchEditSection::VcfVcaModule::ParameterWidgets::kVca1Volume,
-            .parentGroupId = PluginIDs::PatchEditSection::VcfVcaModule::kGroupId,
-            .minValue = 0,
-            .maxValue = 63,
-            .defaultValue = 63,
-            .sysExOffset = 31,
-            .sysExId = 27
-        },
-        {
-            .parameterId = PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kVca1ModByVelocity,
-            .displayName = PluginDisplayNames::PatchEditSection::VcfVcaModule::ParameterWidgets::kVca1ModByVelocity,
-            .parentGroupId = PluginIDs::PatchEditSection::VcfVcaModule::kGroupId,
-            .minValue = -63,
-            .maxValue = 63,
-            .defaultValue = 0,
-            .sysExOffset = 92,
-            .sysExId = 28
-        },
-        {
-            .parameterId = PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kVca2ModByEnv2,
-            .displayName = PluginDisplayNames::PatchEditSection::VcfVcaModule::ParameterWidgets::kVca2ModByEnv2,
-            .parentGroupId = PluginIDs::PatchEditSection::VcfVcaModule::kGroupId,
-            .minValue = -63,
-            .maxValue = 63,
-            .defaultValue = 63,
-            .sysExOffset = 93,
-            .sysExId = 29
-        }
-    };
-
-    // Choice Parameters -----------------------------------------------------------------------------------------------
-    const std::vector<ChoiceParameterDescriptor> PatchEditSection::VcfVcaModule::kChoiceParameters = {
-        {
-            .parameterId = PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kLevers,
-            .displayName = PluginDisplayNames::PatchEditSection::VcfVcaModule::ParameterWidgets::kLevers,
-            .parentGroupId = PluginIDs::PatchEditSection::VcfVcaModule::kGroupId,
-            .choices = PluginHelpers::makeStringArray({
-                PluginDisplayNames::ChoiceLists::Levers::kOff,
-                PluginDisplayNames::ChoiceLists::Levers::kLever1Bend,
-                PluginDisplayNames::ChoiceLists::Levers::kLever2Vibrato,
-                PluginDisplayNames::ChoiceLists::Levers::kBoth }),
-            .defaultIndex = 0,
-            .sysExOffset = 28,
-            .sysExId = 25
-        },
-        {
-            .parameterId = PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kKeyboardPortamento,
-            .displayName = PluginDisplayNames::PatchEditSection::VcfVcaModule::ParameterWidgets::kKeyboardPortamento,
-            .parentGroupId = PluginIDs::PatchEditSection::VcfVcaModule::kGroupId,
-            .choices = PluginHelpers::makeStringArray({
-                PluginDisplayNames::ChoiceLists::KeyboardPortamento::kOff, PluginDisplayNames::ChoiceLists::KeyboardPortamento::kPortamento, PluginDisplayNames::ChoiceLists::KeyboardPortamento::kKeyboard }),
-            .defaultIndex = 2,
-            .sysExOffset = 29,
-            .sysExId = 26
         }
     };
 }

@@ -57,7 +57,7 @@ namespace
 
                     layout.add(std::make_unique<juce::AudioParameterInt>(
                         juce::ParameterID(d.parameterId, 1),
-                        d.displayName,
+                        d.hostName,
                         d.minValue,
                         d.maxValue,
                         d.defaultValue));
@@ -72,7 +72,7 @@ namespace
                     // Index 5 = CHANNEL 5.
                     layout.add(std::make_unique<juce::AudioParameterChoice>(
                         juce::ParameterID(d.parameterId, 1),
-                        d.displayName,
+                        d.hostName,
                         d.choices,
                         5));
                 }
