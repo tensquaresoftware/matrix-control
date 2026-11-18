@@ -18,8 +18,9 @@ namespace TSS
         PopupMenuOutsideDismissWatcher(const PopupMenuOutsideDismissWatcher&) = delete;
         PopupMenuOutsideDismissWatcher& operator=(const PopupMenuOutsideDismissWatcher&) = delete;
 
-        /** Call after enterModalState. Ignores the opening button-down until it is released. */
-        void arm();
+        /** Call after enterModalState. Ignores the opening button-down until it is released.
+            Optional grace ignores left rising edges for N ms after arm (post-show settle). */
+        void arm(int ignoreRisingEdgeMs = 0);
 
     private:
         void timerCallback() override;
@@ -30,6 +31,7 @@ namespace TSS
         bool waitingForOpenRelease_ = false;
         bool previousLeftDown_ = false;
         bool dismissing_ = false;
+        juce::uint32 ignoreRisingEdgesUntilMs_ = 0;
 
         static constexpr int kPollHz_ = 60;
     };

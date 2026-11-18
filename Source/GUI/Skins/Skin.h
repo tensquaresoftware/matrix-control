@@ -5,6 +5,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "ColourChartTones.h"
 #include "ISkin.h"
 #include "SkinColoursCommon.h"
 
@@ -13,6 +14,14 @@ namespace TSS
     class Skin : public ISkin
     {
     public:
+        /** Top-level logo families; TONES can later nest Dark/Light without a fourth family. */
+        enum class SkinFamily
+        {
+            Black,
+            Cream,
+            Tones
+        };
+
         enum class ColourVariant
         {
             Black,
@@ -20,7 +29,22 @@ namespace TSS
             BlackMinimal,
             Cream,
             CreamMinimal,
-            CreamChroma
+            CreamChroma,
+            TonesCherry,
+            TonesCoral,
+            TonesSaffron,
+            TonesOchre,
+            TonesGold,
+            TonesOlive,
+            TonesLime,
+            TonesEmerald,
+            TonesKigee,
+            TonesPetrol,
+            TonesAzur,
+            TonesMarine,
+            TonesPurple,
+            TonesIndigo,
+            TonesFuchsia
         };
 
         /** Getting Started Matrix monochrome chrome always uses BLACK/GREEN,
@@ -34,15 +58,37 @@ namespace TSS
             kBlackChroma = 3,
             kBlackMinimal = 4,
             kCreamMinimal = 5,
-            kCreamChroma = 6
+            kCreamChroma = 6,
+            kTonesCherry = 7,
+            kTonesCoral = 8,
+            kTonesSaffron = 9,
+            kTonesOchre = 10,
+            kTonesGold = 11,
+            kTonesOlive = 12,
+            kTonesLime = 13,
+            kTonesEmerald = 14,
+            kTonesKigee = 15,
+            kTonesPetrol = 16,
+            kTonesAzur = 17,
+            kTonesMarine = 18,
+            kTonesPurple = 19,
+            kTonesIndigo = 20,
+            kTonesFuchsia = 21
         };
 
         explicit Skin(ColourVariant variant);
         ~Skin() override = default;
 
         static std::unique_ptr<Skin> create(ColourVariant variant);
+        static SkinFamily familyOf(ColourVariant variant) noexcept;
+        static bool isTonesVariant(ColourVariant variant) noexcept;
+        static ColourVariant colourVariantFromItemId(int skinItemId) noexcept;
+        static int itemIdFromColourVariant(ColourVariant variant) noexcept;
+        static ColourVariant tonesVariantFromToneId(ColourChartTones::ToneId tone) noexcept;
+        static ColourChartTones::ToneId toneIdFromColourVariant(ColourVariant variant) noexcept;
 
         ColourVariant getColourVariant() const { return currentVariant_; }
+        SkinFamily getSkinFamily() const noexcept { return familyOf(currentVariant_); }
         size_t getMappedColourCount() const noexcept { return colours_.size(); }
 
         juce::Colour getColour(SkinObjectType object,

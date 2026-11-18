@@ -13,6 +13,7 @@
 #include "Core/Audio/StandaloneAudioInputRouter.h"
 #include "GUI/Helpers/EditorialUndoRedoShortcuts.h"
 #include "GUI/Helpers/EditorChromeShortcuts.h"
+#include "GUI/Skins/SkinCatalog.h"
 #include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/PatchEditDisplaysPanel.h"
 #include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditPanel.h"
 #include "GUI/Widgets/PatchNameDisplay.h"
@@ -280,6 +281,19 @@ bool PluginEditor::tryHandleEditorChromeKey(const juce::KeyPress& key)
             return false;
 
         applySkinFromItemId(skinVariantId, true);
+        return true;
+    }
+
+    if (const auto arrowCycle = TSS::classifySkinArrowCycleShortcut(key); arrowCycle.isValid())
+    {
+        if (isEditorialUndoBlockedByTextFocus())
+            return false;
+
+        const int currentId = pluginProcessor.getSkinVariantId();
+        const int nextId = arrowCycle.global
+                               ? TSS::SkinCatalog::cycleGlobal(currentId, arrowCycle.direction)
+                               : TSS::SkinCatalog::cycleFamily(currentId, arrowCycle.direction);
+        applySkinFromItemId(nextId, true);
         return true;
     }
 

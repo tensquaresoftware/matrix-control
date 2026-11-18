@@ -134,6 +134,7 @@ public:
     void runTest() override
     {
         testSliderArrowKeysIncrementWithoutAttachment();
+        testSliderYieldsCommandModifierArrows();
         testWidgetArrowKeysWithAttachmentUpdateSliderValue();
         testWidgetArrowSessionProducesSingleUndoTransaction();
         testUndoRestoresPreArrowSessionValue();
@@ -154,6 +155,40 @@ private:
         slider.setValue(10.0, juce::dontSendNotification);
         slider.focusGained(juce::Component::FocusChangeType::focusChangedByTabKey);
 
+        expect(slider.keyPressed(juce::KeyPress(juce::KeyPress::upKey)));
+        expectEquals(slider.getValue(), 11.0);
+    }
+
+    void testSliderYieldsCommandModifierArrows()
+    {
+        beginTest("TSS::Slider yields Cmd/Ctrl(+Shift)+arrows without nudging");
+
+        const auto frequencyDesc = findDco1FrequencyDescriptor();
+        jassert(frequencyDesc.has_value());
+
+        using juce::ModifierKeys;
+        const auto command = ModifierKeys::commandModifier;
+        const auto commandShift = command | ModifierKeys::shiftModifier;
+
+        TSS::SliderLook look;
+        TSS::Slider slider(100, 20, look, makeDco1FrequencySliderConfig(*frequencyDesc));
+        slider.setValue(10.0, juce::dontSendNotification);
+        slider.focusGained(juce::Component::FocusChangeType::focusChangedByTabKey);
+
+        const int arrowKeys[] = {
+            juce::KeyPress::upKey,
+            juce::KeyPress::downKey,
+            juce::KeyPress::leftKey,
+            juce::KeyPress::rightKey
+        };
+
+        for (const int arrowKey : arrowKeys)
+        {
+            expect(! slider.keyPressed(juce::KeyPress(arrowKey, command, 0)));
+            expect(! slider.keyPressed(juce::KeyPress(arrowKey, commandShift, 0)));
+        }
+
+        expectEquals(slider.getValue(), 10.0);
         expect(slider.keyPressed(juce::KeyPress(juce::KeyPress::upKey)));
         expectEquals(slider.getValue(), 11.0);
     }

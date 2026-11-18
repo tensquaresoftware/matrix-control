@@ -208,6 +208,9 @@ void HeaderPanel::showLogoPopup()
     if (skin_ == nullptr)
         return;
 
+    // Replace any existing logo menu (re-click / pending async open).
+    dismissOpenHeaderLogoPopupMenus();
+
     TSS::HeaderLogoPopupMenu::Config config;
     config.uiScale = uiScale_;
     config.currentSkinItemId = currentSkinItemId_;

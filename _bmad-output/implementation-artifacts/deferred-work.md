@@ -3391,3 +3391,30 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/3-per-skin-zone-map-pack-round-trip-and-mappings-jump.md`
   summary: Story 2 Design Notes still say object names are labels only after CAP-4 wiring landed.
   evidence: Blind Hunter + Acceptance Auditor (independent review); reconfirms Build defer — stale sibling-story hygiene.
+
+## Deferred from: review of spec-product-tones-skins-menu.md (2026-11-17)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-product-tones-skins-menu.md`
+  summary: No automated mount of HeaderLogoPopupMenu proving Skin column is three family rows with flyout membership (catalog array tests alone stay green if the menu wiring regresses).
+  evidence: Verification Gap; project tests conventionally avoid mounting the logo popup; manual family/chevron/flyout smoke remains the gate.
+
+## Deferred from: code review of spec-product-tones-skins-menu.md (2026-11-17)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-product-tones-skins-menu.md`
+  summary: Tall TONES family flyout can exceed parent window height (host Y-clamped to top; bottom rows unreachable in the menu). Accepted for V1; Cmd/Ctrl(+Shift)+arrows remain the fallback.
+  evidence: Code review decision 1→1 (accept for V1); no flyout scroll in this ship.
+- source_spec: `_bmad-output/implementation-artifacts/spec-product-tones-skins-menu.md`
+  summary: `getSkinVariantId` normalize-on-read is only pinned via `SkinVariants::normalize` unit tests; PluginProcessor getter is not linked in Matrix-Control_Tests.
+  evidence: Verification Gap; full processor harness out of current suite scope.
+- source_spec: `_bmad-output/implementation-artifacts/spec-product-tones-skins-menu.md`
+  summary: Settings / Getting Started call sites for `populateFlatSkinCombo` are not exercised; helper-only combo tests stay green if those surfaces stop calling it.
+  evidence: Verification Gap; same GUI-shell gap class as logo mount; manual smoke remains.
+
+## Deferred from: oneshot review of spec-logo-popup-vst3.md (2026-11-17)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-logo-popup-vst3.md`
+  summary: No automated coverage for main-panel-only clamp (`maxTopForMain` / `maxLeftForMain`), outside-dismiss grace rising-edge semantics, or a HeaderLogoPopupMenu mount.
+  evidence: Blind Hunter; Matrix-Control_Tests still does not mount the logo popup; manual VST3 short-editor smoke remains the gate.
+- source_spec: `_bmad-output/implementation-artifacts/spec-logo-popup-vst3.md`
+  summary: Tall TONES flyout may still clip at the parent bottom after main-panel Y clamp; keyboard skin cycle remains the in-product fallback (same V1 accept as TONES ship).
+  evidence: Blind Hunter restatement of existing TONES defer; no flyout scroll in this bugfix.

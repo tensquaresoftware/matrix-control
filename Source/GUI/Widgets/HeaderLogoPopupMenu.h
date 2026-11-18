@@ -8,6 +8,7 @@
 
 #include "GUI/Looks/WidgetLooks.h"
 #include "GUI/Layout/Design/DesignPanels.h"
+#include "GUI/Skins/Skin.h"
 
 namespace TSS
 {
@@ -36,6 +37,8 @@ namespace TSS
         ~HeaderLogoPopupMenu() override;
 
         void paint(juce::Graphics& g) override;
+        void resized() override;
+        bool hitTest(int x, int y) override;
         void mouseMove(const juce::MouseEvent& e) override;
         void mouseUp(const juce::MouseEvent& e) override;
         void mouseExit(const juce::MouseEvent& e) override;
@@ -50,7 +53,7 @@ namespace TSS
         enum class ItemKind
         {
             SectionHeader,
-            Skin,
+            SkinFamily,
             UiScale,
             Settings,
             About,
@@ -69,6 +72,48 @@ namespace TSS
             bool enabled = true;
         };
 
+        struct FamilyMember
+        {
+            int skinItemId = 0;
+            juce::String text;
+            juce::String shortcut;
+        };
+
+        class FamilyFlyout : public juce::Component
+        {
+        public:
+            FamilyFlyout(HeaderLogoPopupMenu& owner,
+                         Skin::SkinFamily family,
+                         std::vector<FamilyMember> members);
+
+            void paint(juce::Graphics& g) override;
+            void mouseMove(const juce::MouseEvent& e) override;
+            void mouseUp(const juce::MouseEvent& e) override;
+            void mouseExit(const juce::MouseEvent& e) override;
+            void mouseWheelMove(const juce::MouseEvent& e,
+                                const juce::MouseWheelDetails& wheel) override;
+
+            Skin::SkinFamily getFamily() const noexcept { return family_; }
+            int preferredWidth() const;
+            int preferredHeight() const;
+            void ignoreClicksForMs(int ms) noexcept;
+
+        private:
+            HeaderLogoPopupMenu& owner_;
+            Skin::SkinFamily family_;
+            std::vector<FamilyMember> members_;
+            int highlightedIndex_ = -1;
+            int scrollPixels_ = 0;
+            juce::uint32 ignoreClicksUntilMs_ = 0;
+
+            int contentHeightPx() const;
+            int maxScrollPixels() const;
+            juce::Rectangle<float> memberBounds(int index) const;
+            int memberIndexAt(int x, int y) const;
+            void updateHighlight(int index);
+            void setScrollPixels(int pixels);
+        };
+
         inline constexpr static float kBorderThicknessDesign_ = 1.0f;
         inline constexpr static float kHighlightGap_ = 1.0f;
         inline constexpr static int kColumnCount_ = 2;
@@ -80,6 +125,9 @@ namespace TSS
         int currentSkinItemId_ = 0;
         int currentUiScaleId_ = 0;
         int highlightedFlatIndex_ = -1;
+        int mainPopupWidth_ = 0;
+        int mainPopupHeight_ = 0;
+        juce::uint32 ignoreModalDismissUntilMs_ = 0;
 
         std::function<void(int skinItemId)> onSkinSelected_;
         std::function<void(int scaleId)> onUiScaleSelected_;
@@ -92,6 +140,7 @@ namespace TSS
         juce::Font cachedFont_;
         std::vector<MenuItem> items_;
         std::unique_ptr<PopupMenuOutsideDismissWatcher> outsideDismissWatcher_;
+        std::unique_ptr<FamilyFlyout> familyFlyout_;
 
         void buildItems();
         void appendUiScaleColumnItems();
@@ -107,10 +156,16 @@ namespace TSS
         int getFlatIndexAt(int x, int y) const;
         bool isSelectableItem(int flatIndex) const;
         bool isCurrentSelection(int flatIndex) const;
+        bool familyContainsCurrentSkin(Skin::SkinFamily family) const;
         void updateHighlightedItem(int flatIndex);
         void updateContextualHelpForItem(int flatIndex);
         const char* contextualHelpTextForItem(int flatIndex) const;
         void selectItem(int flatIndex);
+        void selectSkinItemId(int skinItemId);
+        void openFamilyFlyout(Skin::SkinFamily family);
+        void closeFamilyFlyout();
+        void layoutFamilyFlyout();
+        std::vector<FamilyMember> membersForFamily(Skin::SkinFamily family) const;
         void closePopup();
         struct ItemDrawMetrics
         {

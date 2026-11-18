@@ -14,10 +14,14 @@ public:
         rejectsCommandAltComma();
         matchesCommaWithNonZeroTextCharacter();
         matchesZoomKeysIncludingEqualsAndNumPad();
+        matchesLinuxSoftHyphenZoomOut();
         matchesZoomKeysWithNonZeroTextCharacter();
         matchesAzertyZeroKeyPeersAsUiScaleReset();
         matchesSkinDigitShortcuts();
+        matchesAzertySkinDigitPeersWithCommandShift();
         rejectsUnassignedSkinDigits();
+        matchesSkinArrowCycleShortcuts();
+        rejectsBareArrowsForSkinCycle();
         rejectsWhenTextWouldConflictWithPlainKeys();
         macShortcutLabelsUseUnicodeCodePoints();
     }
@@ -98,6 +102,30 @@ private:
                      static_cast<int>(TSS::EditorChromeShortcut::kUiScaleReset));
     }
 
+    void matchesLinuxSoftHyphenZoomOut()
+    {
+        beginTest("matchesLinuxSoftHyphenZoomOut");
+
+        using juce::ModifierKeys;
+        const auto command = ModifierKeys::commandModifier;
+        // Linux X11: KP_Subtract → XK_hyphen (U+00AD), optionally with textCharacter '-'.
+        constexpr int kSoftHyphen = 0x00ad;
+
+        expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
+                         juce::KeyPress(kSoftHyphen, command, 0))),
+                     static_cast<int>(TSS::EditorChromeShortcut::kUiScaleDecrease));
+        expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
+                         juce::KeyPress(kSoftHyphen, command, '-'))),
+                     static_cast<int>(TSS::EditorChromeShortcut::kUiScaleDecrease));
+        expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
+                         juce::KeyPress(juce::KeyPress::numberPadSubtract, command, '-'))),
+                     static_cast<int>(TSS::EditorChromeShortcut::kUiScaleDecrease));
+        expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
+                         juce::KeyPress(juce::KeyPress::numberPadSubtract, command,
+                                        static_cast<juce::juce_wchar>(kSoftHyphen)))),
+                     static_cast<int>(TSS::EditorChromeShortcut::kUiScaleDecrease));
+    }
+
     void matchesZoomKeysWithNonZeroTextCharacter()
     {
         beginTest("matchesZoomKeysWithNonZeroTextCharacter");
@@ -151,6 +179,12 @@ private:
                          juce::KeyPress(static_cast<int>(kGraveOUpper), command, kGraveO))),
                      static_cast<int>(TSS::EditorChromeShortcut::kUiScaleReset));
         expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
+                         juce::KeyPress(static_cast<int>(kGraveA), commandShift, 0))),
+                     static_cast<int>(TSS::EditorChromeShortcut::kUiScaleReset));
+        expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
+                         juce::KeyPress(static_cast<int>(kGraveAUpper), commandShift, kGraveA))),
+                     static_cast<int>(TSS::EditorChromeShortcut::kUiScaleReset));
+        expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
                          juce::KeyPress('0', commandShift, 0))),
                      static_cast<int>(TSS::EditorChromeShortcut::kUiScaleReset));
         expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
@@ -183,7 +217,39 @@ private:
         expectEquals(TSS::classifySkinVariantShortcut(
                          juce::KeyPress(static_cast<int>(kEAcuteUpper), command, kEAcute)),
                      kBlackChroma);
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('"', command, 0)), kBlackMinimal);
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('\'', command, 0)), kCream);
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('(', command, 0)), kCreamChroma);
+        constexpr juce::juce_wchar kSection = 0x00a7;
+        expectEquals(TSS::classifySkinVariantShortcut(
+                         juce::KeyPress(static_cast<int>(kSection), command, 0)),
+                     kCreamMinimal);
         expect(TSS::isEditorChromeShortcut(juce::KeyPress('1', command, 0)));
+    }
+
+    void matchesAzertySkinDigitPeersWithCommandShift()
+    {
+        beginTest("matchesAzertySkinDigitPeersWithCommandShift");
+
+        using juce::ModifierKeys;
+        const auto commandShift = ModifierKeys::commandModifier | ModifierKeys::shiftModifier;
+        constexpr juce::juce_wchar kEAcute = 0x00e9;
+        constexpr juce::juce_wchar kEAcuteUpper = 0x00c9;
+        constexpr juce::juce_wchar kSection = 0x00a7;
+
+        using namespace PluginIDs::Settings::SkinVariants;
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('&', commandShift, 0)), kBlack);
+        expectEquals(TSS::classifySkinVariantShortcut(
+                         juce::KeyPress(static_cast<int>(kEAcuteUpper), commandShift, kEAcute)),
+                     kBlackChroma);
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('"', commandShift, 0)),
+                     kBlackMinimal);
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('\'', commandShift, 0)), kCream);
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('(', commandShift, 0)),
+                     kCreamChroma);
+        expectEquals(TSS::classifySkinVariantShortcut(
+                         juce::KeyPress(static_cast<int>(kSection), commandShift, 0)),
+                     kCreamMinimal);
     }
 
     void rejectsUnassignedSkinDigits()
@@ -197,6 +263,48 @@ private:
         expect(TSS::isEditorChromeShortcut(juce::KeyPress('5', command, 0)));
         expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('7', command, 0)), 0);
         expect(! TSS::isAssignedSkinVariantShortcutDigit(7));
+    }
+
+    void matchesSkinArrowCycleShortcuts()
+    {
+        beginTest("matchesSkinArrowCycleShortcuts");
+
+        using juce::ModifierKeys;
+        const auto command = ModifierKeys::commandModifier;
+        const auto commandShift = command | ModifierKeys::shiftModifier;
+
+        const auto family = TSS::classifySkinArrowCycleShortcut(
+            juce::KeyPress(juce::KeyPress::downKey, command, 0));
+        expect(family.isValid());
+        expectEquals(family.direction, 1);
+        expect(! family.global);
+
+        const auto familyRight = TSS::classifySkinArrowCycleShortcut(
+            juce::KeyPress(juce::KeyPress::rightKey, command, 0));
+        expectEquals(familyRight.direction, 1);
+
+        const auto familyLeft = TSS::classifySkinArrowCycleShortcut(
+            juce::KeyPress(juce::KeyPress::leftKey, command, 0));
+        expectEquals(familyLeft.direction, -1);
+
+        const auto global = TSS::classifySkinArrowCycleShortcut(
+            juce::KeyPress(juce::KeyPress::upKey, commandShift, 0));
+        expect(global.isValid());
+        expectEquals(global.direction, -1);
+        expect(global.global);
+        expect(TSS::isEditorChromeShortcut(
+            juce::KeyPress(juce::KeyPress::leftKey, command, 0)));
+    }
+
+    void rejectsBareArrowsForSkinCycle()
+    {
+        beginTest("rejectsBareArrowsForSkinCycle");
+
+        expect(! TSS::classifySkinArrowCycleShortcut(
+                     juce::KeyPress(juce::KeyPress::downKey, 0, 0))
+                     .isValid());
+        expect(! TSS::isEditorChromeShortcut(
+            juce::KeyPress(juce::KeyPress::rightKey, juce::ModifierKeys::shiftModifier, 0)));
     }
 
     void rejectsWhenTextWouldConflictWithPlainKeys()

@@ -5,6 +5,7 @@
 
 #include "Core/Audio/HardwareLatency.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/SkinCatalog.h"
 #include "GUI/Skins/SkinValues.h"
 #include "GUI/Skins/ISkin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -175,13 +176,7 @@ void SettingsPanel::populateAppearanceComboItems()
     uiScaleCombo_->addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k175, k175);
     uiScaleCombo_->addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k200, k200);
 
-    using namespace PluginIDs::Settings::SkinVariants;
-    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlack, kBlack);
-    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackChroma, kBlackChroma);
-    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackMinimal, kBlackMinimal);
-    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCream, kCream);
-    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCreamChroma, kCreamChroma);
-    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCreamMinimal, kCreamMinimal);
+    TSS::SkinCatalog::populateFlatSkinCombo(*skinCombo_);
 }
 
 void SettingsPanel::populateComboItems()

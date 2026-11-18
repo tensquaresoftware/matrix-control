@@ -68,39 +68,41 @@ namespace TSS
                                            int digit,
                                            juce::ModifierKeys command)
         {
-            switch (digit)
+            // keyCode + optional textCharacter (0 = matchesAnyText only).
+            // 0→à/ò, 1→&, 2→é, 3→", 4→', 5→(, 6→§.
+            struct Peer { int keyCode; juce::juce_wchar textCharacter; };
+            static constexpr Peer kPeers[][4] = {
+                { { 0x00e0, 0 }, { 0x00c0, 0x00e0 }, { 0x00f2, 0 }, { 0x00d2, 0x00f2 } },
+                { { '&', 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
+                { { 0x00e9, 0 }, { 0x00c9, 0x00e9 }, { 0, 0 }, { 0, 0 } },
+                { { '"', 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
+                { { '\'', 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
+                { { '(', 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
+                { { 0x00a7, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }
+            };
+
+            if (digit < 0 || digit > 6)
+                return false;
+
+            for (const auto& peer : kPeers[digit])
             {
-                case 0:
-                {
-                    constexpr int kGraveA = 0x00e0; // à
-                    constexpr int kGraveAUpper = 0x00c0; // À
-                    constexpr int kGraveO = 0x00f2; // ò
-                    constexpr int kGraveOUpper = 0x00d2; // Ò
-                    return matchesAnyText(key, kGraveA, command)
-                        || matchesAnyText(key, kGraveAUpper, command)
-                        || matchesKey(key, kGraveAUpper, command, static_cast<juce::juce_wchar>(kGraveA))
-                        || matchesAnyText(key, kGraveO, command)
-                        || matchesAnyText(key, kGraveOUpper, command)
-                        || matchesKey(key, kGraveOUpper, command, static_cast<juce::juce_wchar>(kGraveO));
-                }
-                case 1:
-                    return matchesAnyText(key, '&', command);
-                case 2:
-                {
-                    constexpr int kEAcute = 0x00e9; // é
-                    constexpr int kEAcuteUpper = 0x00c9; // É
-                    return matchesAnyText(key, kEAcute, command)
-                        || matchesAnyText(key, kEAcuteUpper, command)
-                        || matchesKey(key, kEAcuteUpper, command, static_cast<juce::juce_wchar>(kEAcute));
-                }
-                default:
-                    return false;
+                if (peer.keyCode == 0)
+                    continue;
+
+                if (peer.textCharacter != 0
+                    && matchesKey(key, peer.keyCode, command, peer.textCharacter))
+                    return true;
+
+                if (matchesAnyText(key, peer.keyCode, command))
+                    return true;
             }
+
+            return false;
         }
 
         /**
             Matches Cmd/Ctrl (+ optional Shift) with main-row digit, numpad digit,
-            or AZERTY/ISO peers for the same physical key (0→à, 1→&, 2→é, …).
+            or AZERTY/ISO peers for the same physical key (0→à, 1→&, 2→é, 3→", 4→', 5→(, 6→§).
         */
         inline bool matchesDigitShortcut(const juce::KeyPress& key, int digit)
         {
@@ -117,24 +119,45 @@ namespace TSS
                 || matchesAnyText(key, asciiDigit, commandShift)
                 || matchesKey(key, numPad, command)
                 || matchesKey(key, numPad, commandShift)
-                || matchesAzertyDigitPeer(key, digit, command);
+                || matchesAzertyDigitPeer(key, digit, command)
+                || matchesAzertyDigitPeer(key, digit, commandShift);
         }
 
-        inline EditorChromeShortcut classifyUiScaleShortcut(const juce::KeyPress& key)
+        inline bool matchesUiScaleIncrease(const juce::KeyPress& key) noexcept
         {
             using juce::ModifierKeys;
             const auto command = ModifierKeys::commandModifier;
             const auto commandShift = command | ModifierKeys::shiftModifier;
 
-            if (matchesAnyText(key, '+', command)
+            return matchesAnyText(key, '+', command)
                 || matchesAnyText(key, '=', command)
                 || matchesAnyText(key, '+', commandShift)
                 || matchesAnyText(key, '=', commandShift)
-                || matchesKey(key, juce::KeyPress::numberPadAdd, command))
+                || matchesKey(key, juce::KeyPress::numberPadAdd, command);
+        }
+
+        /** Includes Linux X11 KP_Subtract → U+00AD soft-hyphen peers. */
+        inline bool matchesUiScaleDecrease(const juce::KeyPress& key) noexcept
+        {
+            using juce::ModifierKeys;
+            const auto command = ModifierKeys::commandModifier;
+            constexpr int kSoftHyphen = 0x00ad;
+
+            return matchesAnyText(key, '-', command)
+                || matchesAnyText(key, kSoftHyphen, command)
+                || matchesKey(key, kSoftHyphen, command, '-')
+                || matchesKey(key, juce::KeyPress::numberPadSubtract, command)
+                || matchesKey(key, juce::KeyPress::numberPadSubtract, command, '-')
+                || matchesKey(key, juce::KeyPress::numberPadSubtract, command,
+                              static_cast<juce::juce_wchar>(kSoftHyphen));
+        }
+
+        inline EditorChromeShortcut classifyUiScaleShortcut(const juce::KeyPress& key)
+        {
+            if (matchesUiScaleIncrease(key))
                 return EditorChromeShortcut::kUiScaleIncrease;
 
-            if (matchesAnyText(key, '-', command)
-                || matchesKey(key, juce::KeyPress::numberPadSubtract, command))
+            if (matchesUiScaleDecrease(key))
                 return EditorChromeShortcut::kUiScaleDecrease;
 
             if (matchesDigitShortcut(key, 0))
@@ -148,6 +171,7 @@ namespace TSS
         Matches platform chrome KeyPresses using keyCode + modifiers.
         Tolerates textCharacter == 0 (macOS clears it when Command is down).
         Accepts '=' and Shift+'=' / Shift+'+' as zoom-in peers of '+' (layouts without a dedicated + key).
+        Accepts U+00AD soft hyphen as zoom-out peer (Linux X11 KP_Subtract remap).
         UI Scale reset also accepts the physical main-row "0" key on AZERTY/ISO (à / ò) and Cmd/Ctrl+Shift+0.
         Skin selection uses Cmd/Ctrl+1..N in combo order (1=BLACK, 2=BLACK/CHROMA, 3=CREAM, …).
     */
@@ -160,7 +184,7 @@ namespace TSS
         return EditorChromeShortcutDetail::classifyUiScaleShortcut(key);
     }
 
-    /** Maps shortcut digit (combo order) to SkinVariants id. Extend when adding skins. */
+    /** Maps shortcut digit (combo order) to SkinVariants id. Digits 1-6 only (bases). */
     inline int skinVariantIdForShortcutDigit(int digit)
     {
         using namespace PluginIDs::Settings::SkinVariants;
@@ -201,10 +225,39 @@ namespace TSS
         return 0;
     }
 
+    /** Cmd/Ctrl(+Shift)+arrow skin cycle: direction -1 = previous, +1 = next; 0 = none. */
+    struct SkinArrowCycleShortcut
+    {
+        int direction = 0;
+        bool global = false;
+
+        bool isValid() const noexcept { return direction != 0; }
+    };
+
+    inline SkinArrowCycleShortcut classifySkinArrowCycleShortcut(const juce::KeyPress& key)
+    {
+        const auto mods = key.getModifiers();
+        if (! mods.isCommandDown() || mods.isAltDown())
+            return {};
+
+        // Up/left = previous; down/right = next (paired axes, not up/right vs down/left).
+        const int code = key.getKeyCode();
+        int direction = 0;
+        if (code == juce::KeyPress::upKey || code == juce::KeyPress::leftKey)
+            direction = -1;
+        else if (code == juce::KeyPress::downKey || code == juce::KeyPress::rightKey)
+            direction = 1;
+        else
+            return {};
+
+        return { direction, mods.isShiftDown() };
+    }
+
     inline bool isEditorChromeShortcut(const juce::KeyPress& key)
     {
         return classifyEditorChromeShortcut(key) != EditorChromeShortcut::kNone
-            || classifySkinVariantShortcut(key) != 0;
+            || classifySkinVariantShortcut(key) != 0
+            || classifySkinArrowCycleShortcut(key).isValid();
     }
 
     /** Platform-local shortcut glyphs for menus / Settings (English UI copy).
@@ -255,6 +308,24 @@ namespace TSS
             return macCommandGlyph() + " " + juce::String(digit);
 #else
             return "Ctrl+" + juce::String(digit);
+#endif
+        }
+
+        inline juce::String skinFamilyCycle()
+        {
+#if JUCE_MAC
+            return macCommandGlyph() + " arrows";
+#else
+            return "Ctrl+arrows";
+#endif
+        }
+
+        inline juce::String skinGlobalCycle()
+        {
+#if JUCE_MAC
+            return macCommandGlyph() + " Shift+arrows";
+#else
+            return "Ctrl+Shift+arrows";
 #endif
         }
     }

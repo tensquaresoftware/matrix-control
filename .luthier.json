@@ -11,7 +11,7 @@
   "destinationDirWindows": "C:/Users/Guillaume/Dev/Projects/JUCE",
   "destinationDirMacos": "/Volumes/Guillaume/Dev/Projects/JUCE/",
   "destinationDirLinux": "/home/guillaume/Dev/Projects/JUCE",
-  "juceDirWindows": "C:/Users/Guillaume/Dev/SDKs/JUCE-9",
+  "juceDirWindows": "C:/Users/Guillaume/Dev/SDKs/JUCE-9/JUCE",
   "juceDirMacos": "/Volumes/Guillaume/Dev/SDKs/JUCE-9/",
   "juceDirLinux": "/home/guillaume/Dev/SDKs/JUCE-9",
   "pluginType": "instrument",

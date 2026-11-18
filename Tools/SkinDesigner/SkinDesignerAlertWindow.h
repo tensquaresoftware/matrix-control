@@ -32,26 +32,26 @@ namespace SkinDesignerChrome
             if (n < 1)
                 return;
 
-            juce::Array<juce::TextButton*> buttons;
-            buttons.ensureStorageAllocated(n);
+            juce::Array<juce::TextButton*> textButtons;
+            textButtons.ensureStorageAllocated(n);
             for (int i = 0; i < n; ++i)
             {
                 auto* button = dynamic_cast<juce::TextButton*>(getButton(i));
                 if (button == nullptr)
                     return;
-                buttons.add(button);
+                textButtons.add(button);
             }
 
             int totalWidth = 0;
-            for (auto* button : buttons)
+            for (auto* button : textButtons)
                 totalWidth += button->getWidth();
             if (n > 1)
                 totalWidth += kButtonGap * (n - 1);
 
             int x = (getWidth() - totalWidth) / 2;
-            // Bottom air = 2× inter-button gap (JUCE used ~5% of height).
-            const int y = getHeight() - buttons.getFirst()->getHeight() - (kButtonGap * 2);
-            for (auto* button : buttons)
+            // Bottom air = 2x inter-button gap (JUCE used ~5% of height).
+            const int y = getHeight() - textButtons.getFirst()->getHeight() - (kButtonGap * 2);
+            for (auto* button : textButtons)
             {
                 button->setTopLeftPosition(x, y);
                 x += button->getWidth() + kButtonGap;

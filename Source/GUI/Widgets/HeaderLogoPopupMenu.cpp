@@ -11,21 +11,27 @@
 #include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ColourChart.h"
+#include "GUI/Skins/SkinCatalog.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 namespace TSS
 {
     namespace
     {
-        juce::Colour menuItemTextColour(const PopupMenuLook& look,
-                                        bool muted,
-                                        bool hot) noexcept
+        int shortcutDigitForSkinId(int skinItemId) noexcept
         {
-            if (muted)
-                return look.textDisabled;
-            if (hot)
-                return look.textHover;
-            return look.text;
+            using namespace PluginIDs::Settings::SkinVariants;
+            switch (skinItemId)
+            {
+                case kBlack: return 1;
+                case kBlackChroma: return 2;
+                case kBlackMinimal: return 3;
+                case kCream: return 4;
+                case kCreamChroma: return 5;
+                case kCreamMinimal: return 6;
+                default: return 0;
+            }
         }
     }
 
@@ -48,119 +54,14 @@ namespace TSS
         setWantsKeyboardFocus(true);
         setAlwaysOnTop(true);
         setInterceptsMouseClicks(true, true);
-        setOpaque(true);
+        // Non-opaque host so the L-gap above/below a short family flyout stays clear.
+        // Main panel + flyout paint their own chrome; hitTest still uses the full host.
+        setOpaque(false);
 
         outsideDismissWatcher_ = std::make_unique<PopupMenuOutsideDismissWatcher>(*this, [this] { closePopup(); });
     }
 
     HeaderLogoPopupMenu::~HeaderLogoPopupMenu() = default;
-
-    int HeaderLogoPopupMenu::getItemHeightPx() const
-    {
-        return juce::jmax(1, juce::roundToInt(
-            static_cast<float>(ComboBox::getPopupLayoutDimensions().itemHeight) * uiScale_));
-    }
-
-    float HeaderLogoPopupMenu::getRowHeightPx(const MenuItem& item) const
-    {
-        if (item.kind == ItemKind::HorizontalRule)
-        {
-            const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
-            return ScaledDrawing::snappedStrokeThicknessFromDesign(
-                static_cast<float>(ComboBox::getPopupLayoutDimensions().borderThickness),
-                uiScale_,
-                systemDisplayScale,
-                ScaledDrawing::StrokeSnapPolicy::kRound);
-        }
-
-        return static_cast<float>(getItemHeightPx());
-    }
-
-    float HeaderLogoPopupMenu::columnContentHeightForDisplayScale(int column, float systemDisplayScale) const
-    {
-        const float ruleHeight = ScaledDrawing::snappedStrokeThicknessFromDesign(
-            static_cast<float>(ComboBox::getPopupLayoutDimensions().borderThickness),
-            uiScale_,
-            systemDisplayScale,
-            ScaledDrawing::StrokeSnapPolicy::kRound);
-        const float itemHeight = static_cast<float>(getItemHeightPx());
-
-        float height = 0.0f;
-        for (const auto& item : items_)
-        {
-            if (item.column != column)
-                continue;
-            height += item.kind == ItemKind::HorizontalRule ? ruleHeight : itemHeight;
-        }
-        return height;
-    }
-
-    float HeaderLogoPopupMenu::getSeparatorWidth() const
-    {
-        return juce::jmax(1.0f, 1.0f * uiScale_);
-    }
-
-    float HeaderLogoPopupMenu::getColumnWidth(int column) const
-    {
-        const int designWidth = column == 0 ? kColumnWidthDesign_ : kActionColumnWidthDesign_;
-        return static_cast<float>(designWidth) * uiScale_;
-    }
-
-    juce::Colour HeaderLogoPopupMenu::sectionHeaderTextColour() const
-    {
-        // Cream logo plate: section labels need more contrast than disabled rows (Cafe300).
-        if (look_.background == juce::Colour(ColourChart::kBrandCream))
-            return juce::Colour(ColourChart::kCafe500);
-
-        return look_.textDisabled;
-    }
-
-    juce::Rectangle<float> HeaderLogoPopupMenu::getItemBounds(int flatIndex) const
-    {
-        if (! juce::isPositiveAndBelow(flatIndex, static_cast<int>(items_.size())))
-            return {};
-
-        const auto& item = items_[static_cast<size_t>(flatIndex)];
-        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
-        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
-            kBorderThicknessDesign_,
-            uiScale_,
-            systemDisplayScale,
-            ScaledDrawing::StrokeSnapPolicy::kRound);
-        const auto contentBounds = getLocalBounds().toFloat().reduced(borderThickness);
-
-        const float separatorWidth = getSeparatorWidth();
-        const float columnWidth = getColumnWidth(item.column);
-        const float columnOffset = item.column == 0
-            ? 0.0f
-            : getColumnWidth(0) + separatorWidth;
-
-        float y = contentBounds.getY();
-        for (int i = 0; i < flatIndex; ++i)
-        {
-            const auto& prior = items_[static_cast<size_t>(i)];
-            if (prior.column == item.column)
-                y += getRowHeightPx(prior);
-        }
-
-        return {
-            contentBounds.getX() + columnOffset,
-            y,
-            columnWidth,
-            getRowHeightPx(item)
-        };
-    }
-
-    int HeaderLogoPopupMenu::getFlatIndexAt(int x, int y) const
-    {
-        for (int i = 0; i < static_cast<int>(items_.size()); ++i)
-        {
-            if (getItemBounds(i).contains(static_cast<float>(x), static_cast<float>(y)))
-                return i;
-        }
-
-        return -1;
-    }
 
     bool HeaderLogoPopupMenu::isSelectableItem(int flatIndex) const
     {
@@ -171,8 +72,13 @@ namespace TSS
         if (! item.enabled)
             return false;
 
-        return item.kind == ItemKind::Skin || item.kind == ItemKind::UiScale
+        return item.kind == ItemKind::SkinFamily || item.kind == ItemKind::UiScale
             || item.kind == ItemKind::Settings || item.kind == ItemKind::About;
+    }
+
+    bool HeaderLogoPopupMenu::familyContainsCurrentSkin(Skin::SkinFamily family) const
+    {
+        return SkinCatalog::familyForItemId(currentSkinItemId_) == family;
     }
 
     bool HeaderLogoPopupMenu::isCurrentSelection(int flatIndex) const
@@ -184,8 +90,8 @@ namespace TSS
         if (item.kind == ItemKind::Settings || item.kind == ItemKind::About)
             return false;
 
-        if (item.kind == ItemKind::Skin)
-            return item.valueId == currentSkinItemId_;
+        if (item.kind == ItemKind::SkinFamily)
+            return familyContainsCurrentSkin(static_cast<Skin::SkinFamily>(item.valueId));
 
         return item.valueId == currentUiScaleId_;
     }
@@ -199,7 +105,16 @@ namespace TSS
             return;
 
         highlightedFlatIndex_ = flatIndex;
-        repaint();
+        repaint(0, 0, mainPopupWidth_, mainPopupHeight_);
+
+        if (flatIndex >= 0)
+        {
+            const auto& item = items_[static_cast<size_t>(flatIndex)];
+            if (item.kind == ItemKind::SkinFamily)
+                openFamilyFlyout(static_cast<Skin::SkinFamily>(item.valueId));
+            else
+                closeFamilyFlyout();
+        }
     }
 
     const char* HeaderLogoPopupMenu::contextualHelpTextForItem(int flatIndex) const
@@ -212,7 +127,7 @@ namespace TSS
         {
             case ItemKind::Settings:         return Help::kSettings;
             case ItemKind::About:            return Help::kAbout;
-            case ItemKind::Skin:             return Help::kSkin;
+            case ItemKind::SkinFamily:       return Help::kSkin;
             case ItemKind::UiScale:          return Help::kUiScale;
             case ItemKind::SectionHeader:
                 if (items_[static_cast<size_t>(flatIndex)].text
@@ -241,18 +156,145 @@ namespace TSS
             contextualHelpBinder_->scheduleClear();
     }
 
+    std::vector<HeaderLogoPopupMenu::FamilyMember> HeaderLogoPopupMenu::membersForFamily(
+        Skin::SkinFamily family) const
+    {
+        const int* ids = nullptr;
+        int count = 0;
+        switch (family)
+        {
+            case Skin::SkinFamily::Cream:
+                ids = SkinCatalog::kCreamFamilyIds;
+                count = static_cast<int>(sizeof(SkinCatalog::kCreamFamilyIds)
+                                        / sizeof(SkinCatalog::kCreamFamilyIds[0]));
+                break;
+            case Skin::SkinFamily::Tones:
+                ids = SkinCatalog::kTonesFamilyIds;
+                count = static_cast<int>(sizeof(SkinCatalog::kTonesFamilyIds)
+                                        / sizeof(SkinCatalog::kTonesFamilyIds[0]));
+                break;
+            case Skin::SkinFamily::Black:
+            default:
+                ids = SkinCatalog::kBlackFamilyIds;
+                count = static_cast<int>(sizeof(SkinCatalog::kBlackFamilyIds)
+                                        / sizeof(SkinCatalog::kBlackFamilyIds[0]));
+                break;
+        }
+
+        std::vector<FamilyMember> members;
+        members.reserve(static_cast<size_t>(count));
+        for (int i = 0; i < count; ++i)
+        {
+            const int skinId = ids[i];
+            FamilyMember member;
+            member.skinItemId = skinId;
+            member.text = SkinCatalog::displayNameForItemId(skinId);
+            if (const int digit = shortcutDigitForSkinId(skinId); digit > 0)
+                member.shortcut = EditorChromeShortcutLabels::skinVariant(digit);
+            members.push_back(std::move(member));
+        }
+        return members;
+    }
+
+    void HeaderLogoPopupMenu::openFamilyFlyout(Skin::SkinFamily family)
+    {
+        if (familyFlyout_ != nullptr && familyFlyout_->getFamily() == family)
+            return;
+
+        familyFlyout_.reset();
+        familyFlyout_ = std::make_unique<FamilyFlyout>(*this, family, membersForFamily(family));
+        // Ableton can deliver a synthetic mouseUp to a flyout that appears under the cursor.
+        familyFlyout_->ignoreClicksForMs(300);
+        addAndMakeVisible(*familyFlyout_);
+        layoutFamilyFlyout();
+    }
+
+    void HeaderLogoPopupMenu::closeFamilyFlyout()
+    {
+        if (familyFlyout_ == nullptr)
+            return;
+
+        familyFlyout_.reset();
+        setSize(mainPopupWidth_, mainPopupHeight_);
+    }
+
+    void HeaderLogoPopupMenu::layoutFamilyFlyout()
+    {
+        if (familyFlyout_ == nullptr)
+            return;
+
+        const int flyoutW = familyFlyout_->preferredWidth();
+        const int flyoutH = familyFlyout_->preferredHeight();
+
+        int familyRowY = 0;
+        for (int i = 0; i < static_cast<int>(items_.size()); ++i)
+        {
+            const auto& item = items_[static_cast<size_t>(i)];
+            if (item.kind == ItemKind::SkinFamily
+                && static_cast<Skin::SkinFamily>(item.valueId) == familyFlyout_->getFamily())
+            {
+                familyRowY = juce::roundToInt(getItemBounds(i).getY());
+                break;
+            }
+        }
+
+        // Overlap the shared vertical border so main + flyout do not double the stroke.
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const int borderOverlap = juce::jmax(1, juce::roundToInt(
+            ScaledDrawing::snappedStrokeThicknessFromDesign(
+                kBorderThicknessDesign_,
+                uiScale_,
+                systemDisplayScale,
+                ScaledDrawing::StrokeSnapPolicy::kRound)));
+        const int flyoutX = juce::jmax(0, mainPopupWidth_ - borderOverlap);
+        const int expandedW = flyoutX + flyoutW;
+        // Never grow taller than the main panel — TONES (15 rows) scrolls inside the flyout.
+        // Growing the modal host past the peer is what made Ableton dismiss on TONES hover.
+        const int expandedH = mainPopupHeight_;
+
+        auto bounds = getBounds().withSize(expandedW, expandedH);
+        if (auto* parent = getParentComponent())
+        {
+            const auto parentBounds = parent->getLocalBounds();
+            const int maxLeftForMain = juce::jmax(parentBounds.getX(),
+                                                  parentBounds.getRight() - mainPopupWidth_);
+            const int maxTopForMain = juce::jmax(parentBounds.getY(),
+                                                 parentBounds.getBottom() - mainPopupHeight_);
+            bounds.setX(juce::jlimit(parentBounds.getX(), maxLeftForMain, bounds.getX()));
+            bounds.setY(juce::jlimit(parentBounds.getY(), maxTopForMain, bounds.getY()));
+
+            const int maxW = juce::jmax(mainPopupWidth_, parentBounds.getRight() - bounds.getX());
+            bounds.setWidth(juce::jmin(bounds.getWidth(), maxW));
+            bounds.setHeight(mainPopupHeight_);
+        }
+        setBounds(bounds);
+
+        const int fittedFlyoutW = juce::jmin(flyoutW, juce::jmax(0, getWidth() - flyoutX));
+        const int fittedFlyoutH = juce::jmin(flyoutH, mainPopupHeight_);
+        const int maxY = juce::jmax(0, getHeight() - fittedFlyoutH);
+        familyFlyout_->setBounds(flyoutX, juce::jlimit(0, maxY, familyRowY),
+                                 fittedFlyoutW, fittedFlyoutH);
+    }
+
+    void HeaderLogoPopupMenu::selectSkinItemId(int skinItemId)
+    {
+        if (onSkinSelected_)
+            onSkinSelected_(skinItemId);
+        closePopup();
+    }
+
     void HeaderLogoPopupMenu::selectItem(int flatIndex)
     {
         if (! isSelectableItem(flatIndex))
             return;
 
         const auto& item = items_[static_cast<size_t>(flatIndex)];
-        if (item.kind == ItemKind::Skin)
+        if (item.kind == ItemKind::SkinFamily)
         {
-            if (onSkinSelected_)
-                onSkinSelected_(item.valueId);
+            openFamilyFlyout(static_cast<Skin::SkinFamily>(item.valueId));
+            return;
         }
-        else if (item.kind == ItemKind::UiScale)
+        if (item.kind == ItemKind::UiScale)
         {
             if (onUiScaleSelected_)
                 onUiScaleSelected_(item.valueId);
@@ -288,87 +330,17 @@ namespace TSS
         contextualHelpBinder_ = nullptr;
     }
 
-    void HeaderLogoPopupMenu::drawItems(juce::Graphics& g, const juce::Rectangle<float>& contentBounds)
+    void HeaderLogoPopupMenu::resized()
     {
-        const float separatorWidth = getSeparatorWidth();
-        renderer_->drawVerticalSeparators(g, {
-            .contentBounds = contentBounds,
-            .columnCount = kColumnCount_,
-            .actualColumnWidth = getColumnWidth(0),
-            .separatorWidth = separatorWidth});
-
-        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
-        const ItemDrawMetrics metrics{
-            .textPadding = static_cast<float>(ComboBox::getPopupLayoutDimensions().textLeftPadding) * uiScale_,
-            .highlightGap = juce::jmax(1.0f, kHighlightGap_ * uiScale_),
-            .ruleThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
-                static_cast<float>(ComboBox::getPopupLayoutDimensions().borderThickness),
-                uiScale_,
-                systemDisplayScale,
-                ScaledDrawing::StrokeSnapPolicy::kRound)};
-
-        for (int i = 0; i < static_cast<int>(items_.size()); ++i)
-            drawMenuItem(g, i, metrics);
+        layoutFamilyFlyout();
     }
 
-    void HeaderLogoPopupMenu::drawMenuItem(juce::Graphics& g, int flatIndex, const ItemDrawMetrics& metrics)
+    bool HeaderLogoPopupMenu::hitTest(int x, int y)
     {
-        const auto& item = items_[static_cast<size_t>(flatIndex)];
-        const auto itemBounds = getItemBounds(flatIndex);
-
-        if (item.kind == ItemKind::Spacer)
-            return;
-
-        if (item.kind == ItemKind::HorizontalRule)
-        {
-            g.setColour(look_.border);
-            g.fillRect(itemBounds.withHeight(metrics.ruleThickness));
-            return;
-        }
-
-        const bool isSectionHeader = item.kind == ItemKind::SectionHeader;
-        const bool isDisabledRow = ! item.enabled;
-        const bool isHot = ! isSectionHeader && ! isDisabledRow
-            && (highlightedFlatIndex_ == flatIndex || isCurrentSelection(flatIndex));
-
-        if (isHot)
-        {
-            g.setColour(look_.backgroundHover);
-            g.fillRect(itemBounds.reduced(metrics.highlightGap));
-        }
-
-        if (isSectionHeader)
-            g.setColour(sectionHeaderTextColour());
-        else
-            g.setColour(menuItemTextColour(look_, isDisabledRow, isHot));
-        g.setFont(cachedFont_);
-
-        const auto textBounds = itemBounds.withTrimmedLeft(metrics.textPadding)
-                                    .withTrimmedRight(metrics.textPadding);
-        g.drawText(item.text, textBounds, juce::Justification::centredLeft, false);
-
-        if (item.shortcut.isNotEmpty())
-        {
-            g.setFont(TSS::shortcutHintFont(cachedFont_.getHeight()));
-            g.drawText(item.shortcut, textBounds, juce::Justification::centredRight, false);
-        }
-    }
-
-    void HeaderLogoPopupMenu::paint(juce::Graphics& g)
-    {
-        const auto bounds = getLocalBounds().toFloat();
-        renderer_->drawBackground(g, bounds);
-
-        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
-        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
-            kBorderThicknessDesign_,
-            uiScale_,
-            systemDisplayScale,
-            ScaledDrawing::StrokeSnapPolicy::kRound);
-        const auto contentBounds = bounds.reduced(borderThickness);
-
-        drawItems(g, contentBounds);
-        renderer_->drawBorder(g, bounds, systemDisplayScale);
+        // Full host rectangle (including the L-gap between main and flyout). A hitTest
+        // hole there lets Ableton/plugin peers deliver the move/click to the editor
+        // underneath, which dismisses the modal before the family flyout can be used.
+        return x >= 0 && y >= 0 && x < getWidth() && y < getHeight();
     }
 
     void HeaderLogoPopupMenu::mouseMove(const juce::MouseEvent& e)
@@ -385,8 +357,11 @@ namespace TSS
             selectItem(flatIndex);
     }
 
-    void HeaderLogoPopupMenu::mouseExit(const juce::MouseEvent&)
+    void HeaderLogoPopupMenu::mouseExit(const juce::MouseEvent& e)
     {
+        if (familyFlyout_ != nullptr && familyFlyout_->getBounds().contains(e.getEventRelativeTo(this).getPosition()))
+            return;
+
         updateHighlightedItem(-1);
         updateContextualHelpForItem(-1);
     }
@@ -404,36 +379,24 @@ namespace TSS
 
     void HeaderLogoPopupMenu::inputAttemptWhenModal()
     {
+        // Ableton Live (and some hosts) can deliver the opening click's leftover mouseUp
+        // to the logo under the new modal; ignore dismiss during the settle window.
+        if (juce::Time::getMillisecondCounter() < ignoreModalDismissUntilMs_)
+            return;
+
+        // If the pointer is still over our host rectangle, do not dismiss (Ableton can
+        // route events through layout changes while the cursor remains on the menu).
+        if (auto* top = getTopLevelComponent())
+        {
+            const auto mouseInTop = top->getLocalPoint(
+                nullptr,
+                juce::Desktop::getInstance().getMainMouseSource().getScreenPosition());
+            const auto hostInTop = top->getLocalArea(this, getLocalBounds()).toFloat();
+            if (hostInTop.contains(mouseInTop))
+                return;
+        }
+
         closePopup();
-    }
-
-    juce::Rectangle<int> HeaderLogoPopupMenu::preferredBoundsOver(Logo& logo) const
-    {
-        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(logo);
-        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
-            kBorderThicknessDesign_,
-            uiScale_,
-            systemDisplayScale,
-            ScaledDrawing::StrokeSnapPolicy::kRound);
-        const int insetPx = juce::roundToInt(borderThickness);
-        const int separatorPx = juce::roundToInt(getSeparatorWidth());
-        const int popupWidth = juce::roundToInt(getColumnWidth(0))
-            + separatorPx
-            + juce::roundToInt(getColumnWidth(1))
-            + 2 * insetPx;
-        const float contentHeight = juce::jmax(
-            columnContentHeightForDisplayScale(0, systemDisplayScale),
-            columnContentHeightForDisplayScale(1, systemDisplayScale));
-        const int popupHeight = juce::jmax(1, juce::roundToInt(contentHeight)) + 2 * insetPx;
-
-        const auto dimensions = PopupMenuPositioner::calculateDimensions(
-            logo,
-            PopupMenuPositioner::DimensionsArgs{
-                .popupWidth = popupWidth,
-                .popupHeight = popupHeight,
-                .verticalMargin = ComboBox::getPopupLayoutDimensions().verticalMargin});
-
-        return { dimensions.x, dimensions.y, dimensions.width, dimensions.height };
     }
 
     void HeaderLogoPopupMenu::show(Logo& logo, ISkin& skin, Config config)
@@ -445,12 +408,27 @@ namespace TSS
         auto popupMenu = std::make_unique<HeaderLogoPopupMenu>(skin, std::move(config));
         auto* rawPtr = popupMenu.get();
         const auto bounds = rawPtr->preferredBoundsOver(logo);
+        rawPtr->mainPopupWidth_ = bounds.getWidth();
+        rawPtr->mainPopupHeight_ = bounds.getHeight();
+
+        if (bounds.isEmpty())
+            return;
 
         topLevelComponent->addAndMakeVisible(popupMenu.release());
         rawPtr->setBounds(bounds);
-        rawPtr->toFront(false);
+        rawPtr->toFront(true);
         rawPtr->grabKeyboardFocus();
+
+        constexpr int kOpenDismissGraceMs = 400;
+        rawPtr->ignoreModalDismissUntilMs_ = juce::Time::getMillisecondCounter()
+            + static_cast<juce::uint32>(kOpenDismissGraceMs);
+
         rawPtr->enterModalState(false, nullptr, true);
-        rawPtr->outsideDismissWatcher_->arm();
+        // Do not arm PopupMenuOutsideDismissWatcher here: in Ableton it false-dismisses
+        // when the TONES flyout lays out. in-GUI dismiss stays on inputAttemptWhenModal.
+
+        // Open the family that owns the current skin so the side popup is discoverable.
+        rawPtr->openFamilyFlyout(SkinCatalog::familyForItemId(rawPtr->currentSkinItemId_));
+        topLevelComponent->repaint(rawPtr->getBounds());
     }
 }
