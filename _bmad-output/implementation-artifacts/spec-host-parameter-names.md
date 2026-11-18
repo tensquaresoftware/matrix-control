@@ -82,6 +82,25 @@ context:
 - Given the VCF/VCA Mix parameter, when reading its host name, then it contains `DCO 2 | DCO 1 Mix` without treating `|` as a group path.
 - Given a hierarchical host, when browsing groups, then leaves do not embed `Patch Edit | …` path prefixes.
 
+### Review Findings
+
+- [x] [Review][Defer] Inventory markdown not pinned to `HostParameterNames` / descriptor `hostName` in CI — deferred: already recorded in `deferred-work.md` (2026-11-18); Acceptance Auditor manually confirmed 151↔151 match this run.
+- [x] [Review][Defer] Short DAW `getName` truncation can re-collide long host leaves — deferred: already recorded; Verification Gap reconfirmed collisions at max length 24 (e.g. Vibrato Amplitude Modulation Amount/Source).
+- [x] [Review][Defer] Standing `CONVENTIONS.md` / project-context rule for new Int/Choice `hostName` not added — deferred: already recorded; Implementation Notes carry the formula.
+- [x] [Review][Defer] `ApvtsValidator` checks empty `hostName` but not uniqueness (unlike ParameterIDs) — deferred: uniqueness AC already enforced by `HostParameterNameUniquenessTests`; startup validator is DBG-only.
+- [x] [Review][Defer] Patch Mutator Int `hostName` values sit outside `ApvtsFactory::getAllIntParameters` / validator catalog — deferred: pre-existing APVTS layout absence (hors scope); uniqueness test appends Mutator manually.
+
+Rejected:
+- `false` — VCF/VCA file extraction bundled with feature: intentional split; descriptor fields unchanged aside from `hostName`.
+- `false` — `HostParameterNames` living under `PluginDisplayNames.h`: matches approved Code Map.
+- `false` — DAW label-remap undocumented: Implementation Notes already state labels may remap while ParameterIDs stay stable.
+- `low` — inventory still named `*-draft.md`: agent hygiene only; hors scope / prior reject.
+- `low` — hard-coded `151` / `>= 149` in uniqueness tests: intentional Mutator layout exclusion; counts match inventory.
+- `low` — path-prefix guard only checks `Patch Edit |`: antipattern covered; no current path-style leaves.
+- `low` — Matrix Modulation `.hostName` same-line formatting: style only.
+- `low` — brace-removal drive-by in `ApvtsValidator` helpers: cosmetic churn; product behavior unchanged.
+- `low` — whitespace-only `hostName` vs `isEmpty()`: compile-time literals; not an everyday path.
+
 ## Implementation Notes
 
 - Host leaf formula for future Int/Choice params: `{ModuleHost} {LeafTitleCase}` from the GUI module identity (Title Case / product tokens; buses use `Bus N`); store explicitly in `PluginDisplayNames::HostParameterNames` + descriptor `hostName` — never derive from the APVTS group path or change UI `displayName`.

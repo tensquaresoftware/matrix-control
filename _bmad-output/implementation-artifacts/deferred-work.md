@@ -3441,3 +3441,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-host-parameter-names.md`
   summary: Standing `CONVENTIONS.md` / project-context rule that every new Int/Choice needs `HostParameterNames` + `hostName` was not added.
   evidence: Blind Hunter; spec Implementation Notes already record the formula; broader constitution update left for a docs pass.
+
+## Deferred from: code review of spec-host-parameter-names.md (2026-11-18)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-host-parameter-names.md`
+  summary: `ApvtsValidator` rejects empty `hostName` but does not enforce host-name uniqueness the way it does for ParameterIDs (startup validation is DBG-only; unit tests already cover uniqueness).
+  evidence: Blind Hunter + Edge Case Hunter; optional hardening if production validator gains a hard fail path.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-host-parameter-names.md`
+  summary: Patch Mutator Int `hostName` values are outside `ApvtsFactory::getAllIntParameters` / `ApvtsValidator` catalog (pre-existing APVTS layout absence).
+  evidence: Edge Case Hunter; hors scope for this chantier; uniqueness test appends Mutator manually.
