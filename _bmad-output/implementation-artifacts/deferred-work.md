@@ -3418,3 +3418,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-logo-popup-vst3.md`
   summary: Tall TONES flyout may still clip at the parent bottom after main-panel Y clamp; keyboard skin cycle remains the in-product fallback (same V1 accept as TONES ship).
   evidence: Blind Hunter restatement of existing TONES defer; no flyout scroll in this bugfix.
+
+## Deferred from: oneshot review of spec-logo-double-click-ui-scale-reset.md (2026-11-18)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-logo-double-click-ui-scale-reset.md`
+  summary: `spec-logo-popup-vst3.md` Implementation Notes still say Logo abandoned the 200 ms Timer for ComboBox-style `callAsync`; that note is stale after this restore.
+  evidence: Blind Hunter; sibling done-spec hygiene — update on next logo-popup touch, not in this bugfix.
+- source_spec: `_bmad-output/implementation-artifacts/spec-logo-double-click-ui-scale-reset.md`
+  summary: Logo `mouseUp` still arms the delayed popup for non-left buttons (no left-button filter unlike ComboBox).
+  evidence: Blind Hunter; pre-existing before the VST3 open-path change; not introduced by restoring the double-click delay.
