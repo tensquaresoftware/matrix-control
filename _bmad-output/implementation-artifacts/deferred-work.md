@@ -1,5 +1,23 @@
 # Deferred Work
 
+## Deferred from: code review of spec-diagnostic-logging-support.md (2026-11-19)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-diagnostic-logging-support.md`
+  summary: Multi-instance singleton Midi/Apvts loggers plus process-wide LogSessionHeader snapshot/instance fields can cross-talk; one instance teardown can close files while another still has diagnostic ON.
+  evidence: Blind + Edge; pre-existing singleton design; header statics amplify the same v1 defer (refcount out of scope).
+- source_spec: `_bmad-output/implementation-artifacts/spec-diagnostic-logging-support.md`
+  summary: No end-to-end automated proof of PluginProcessor diagnostic on/off and Debug-lab coexistence while diagnostic owns file sinks.
+  evidence: Verification Gap + Acceptance; processor not linked in Matrix-Control_Tests; already recorded in prior triage.
+- source_spec: `_bmad-output/implementation-artifacts/spec-diagnostic-logging-support.md`
+  summary: With diagnostic ON, MidiLogger file I/O can still run from MIDI/SysEx threads (not message-thread-only).
+  evidence: Acceptance Auditor; pre-existing call sites; not introduced by SUPPORT toggle alone.
+- source_spec: `_bmad-output/implementation-artifacts/spec-diagnostic-logging-support.md`
+  summary: Stale cached MATRIX_BUILD_*=ON can FORCE MC_BUILD_* ON even when configuring with explicit MC_BUILD_*=OFF.
+  evidence: Blind Hunter; aliases intentionally one-way ON for legacy scripts.
+- source_spec: `_bmad-output/implementation-artifacts/spec-diagnostic-logging-support.md`
+  summary: `.cursorrules` still documents MATRIX_BUILD_TESTS while CI/CONTRIBUTING use MC_BUILD_*.
+  evidence: Blind Hunter; agent-context file outside this feature patch.
+
 ## Deferred from: code review of spec-skin-editor-mappings-ergonomics.md (2026-11-03)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-ergonomics.md`

@@ -3,7 +3,9 @@
 #include "PluginProcessor.h"
 #include "PluginProcessorInternal.h"
 
+#include "Loggers/ApvtsLogger.h"
 #include "Loggers/LogSessionHeader.h"
+#include "Loggers/MidiLogger.h"
 
 #include "Core/Actions/ActionDispatcher.h"
 #include "Core/Actions/ModuleActionHandler.h"
@@ -92,8 +94,13 @@ PluginProcessor::PluginProcessor()
 
 PluginProcessor::~PluginProcessor()
 {
+    // Close SUPPORT files without restoring Debug lab logging — this processor is dying.
     if (diagnosticLoggingEnabled_)
-        setDiagnosticLoggingEnabled(false);
+    {
+        diagnosticLoggingEnabled_ = false;
+        MidiLogger::getInstance().setLogToFile(false);
+        ApvtsLogger::getInstance().setLogToFile(false);
+    }
 
     midiDeviceListConnection_.reset();
     deferredMidiPortSyncTimer_.reset();
@@ -222,6 +229,8 @@ void PluginProcessor::startMidiThread()
 
 void PluginProcessor::releaseResources()
 {
+    LogSessionHeader::clearAudioSnapshot();
+
     if (shouldUseDevelopmentLogging() && ! diagnosticLoggingEnabled_)
     {
         disableApvtsLogging();

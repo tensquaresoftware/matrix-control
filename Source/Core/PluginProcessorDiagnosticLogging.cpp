@@ -79,10 +79,13 @@ void PluginProcessor::setDiagnosticLoggingEnabled(bool enabled)
     if (enabled)
     {
         enableDiagnosticFileLoggers(loggingInstanceId_);
-        diagnosticLoggingEnabled_ = MidiLogger::getInstance().isLoggingToFile()
-                                    || ApvtsLogger::getInstance().isLoggingToFile();
+        auto& midi = MidiLogger::getInstance();
+        auto& apvtsLogger = ApvtsLogger::getInstance();
+        diagnosticLoggingEnabled_ = midi.isLoggingToFile() && apvtsLogger.isLoggingToFile();
         if (! diagnosticLoggingEnabled_)
         {
+            midi.setLogToFile(false);
+            apvtsLogger.setLogToFile(false);
             apvts.state.setProperty(
                 PluginIDs::Settings::kDiagnosticLogging,
                 PluginIDs::Settings::DiagnosticLogging::kOff,

@@ -1,5 +1,7 @@
 #include <juce_core/juce_core.h>
 
+#include "Core/Loggers/ApvtsLogger.h"
+#include "Core/Loggers/LogSessionHeader.h"
 #include "Core/Loggers/MidiLogger.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -18,12 +20,28 @@ public:
         preferenceDefaultsOff();
         diagnosticPathsUnderApplicationSupport();
         explicitPathOpensFile();
-#if ! (defined(MC_DEV_MIDI_LOG) && MC_DEV_MIDI_LOG)
-        releaseStyleInfoIsQuiet();
-#endif
+        apvtsExplicitPathOpensFile();
+        releaseStyleInfoIsQuietInFile();
+        sessionHeaderContainsRequiredKeys();
     }
 
 private:
+    static void restoreMidiLoggerDefaults(MidiLogger& midi)
+    {
+        midi.setLogToFile(false);
+        midi.setLogLevel((MC_DEV_MIDI_LOG != 0) ? MidiLogger::LogLevel::kInfo
+                                                : MidiLogger::LogLevel::kWarning);
+        midi.setLogToConsole(MC_DEV_MIDI_LOG != 0);
+    }
+
+    static void restoreApvtsLoggerDefaults(ApvtsLogger& apvts)
+    {
+        apvts.setLogToFile(false);
+        apvts.setLogLevel((MC_DEV_APVTS_LOG != 0) ? ApvtsLogger::LogLevel::kInfo
+                                                  : ApvtsLogger::LogLevel::kWarning);
+        apvts.setLogToConsole(MC_DEV_APVTS_LOG != 0);
+    }
+
     void preferenceDefaultsOff()
     {
         beginTest("Diagnostic logging preference defaults to OFF");
@@ -67,20 +85,81 @@ private:
         expect(! midi.isLoggingToFile());
         expect(probe.loadFileAsString().contains("unit probe"));
         probe.deleteFile();
+        restoreMidiLoggerDefaults(midi);
     }
 
-#if ! (defined(MC_DEV_MIDI_LOG) && MC_DEV_MIDI_LOG)
-    void releaseStyleInfoIsQuiet()
+    void apvtsExplicitPathOpensFile()
     {
-        beginTest("Release-style MidiLogger defaults drop Info when console is off");
+        beginTest("ApvtsLogger explicit diagnostic path opens, writes, and closes");
+        auto& apvtsLogger = ApvtsLogger::getInstance();
+        const juce::File apvtsDir = ProjectPaths::getDiagnosticLogsDirectory(ProjectPaths::LogCategory::kApvts);
+        expect(apvtsDir.createDirectory().wasOk() || apvtsDir.isDirectory());
+        const juce::File probe = apvtsDir.getChildFile("apvts-log-unit-probe.txt");
+        probe.deleteFile();
+        apvtsLogger.setLogLevel(ApvtsLogger::LogLevel::kInfo);
+        apvtsLogger.setLogToConsole(false);
+        apvtsLogger.setLogToFile(true, probe);
+        expect(apvtsLogger.isLoggingToFile());
+        expect(probe.existsAsFile());
+        apvtsLogger.logInfo("apvts unit probe");
+        apvtsLogger.setLogToFile(false);
+        expect(! apvtsLogger.isLoggingToFile());
+        expect(probe.loadFileAsString().contains("apvts unit probe"));
+        probe.deleteFile();
+        restoreApvtsLoggerDefaults(apvtsLogger);
+    }
+
+    void releaseStyleInfoIsQuietInFile()
+    {
+        beginTest("Release-style MidiLogger drops Info from the log file");
         auto& midi = MidiLogger::getInstance();
+        const juce::File tempDir = juce::File::getSpecialLocation(juce::File::tempDirectory);
+        const juce::File probe = tempDir.getChildFile("midi-log-release-quiet-probe.txt");
+        probe.deleteFile();
+
         midi.setLogLevel(MidiLogger::LogLevel::kWarning);
         midi.setLogToConsole(false);
-        midi.setLogToFile(false);
+        midi.setLogToFile(true, probe);
+        expect(midi.isLoggingToFile());
         midi.logInfo("must stay silent");
-        expect(! midi.isLoggingToFile());
+        midi.setLogToFile(false);
+
+        const juce::String contents = probe.loadFileAsString();
+        expect(! contents.contains("must stay silent"));
+        probe.deleteFile();
+        restoreMidiLoggerDefaults(midi);
     }
-#endif
+
+    void sessionHeaderContainsRequiredKeys()
+    {
+        beginTest("Diagnostic log session header includes required support keys");
+        auto& midi = MidiLogger::getInstance();
+        const juce::File tempDir = juce::File::getSpecialLocation(juce::File::tempDirectory);
+        const juce::File probe = tempDir.getChildFile("midi-log-header-probe.txt");
+        probe.deleteFile();
+
+        LogSessionHeader::setReportingInstanceId(LogSessionHeader::allocateInstanceId());
+        LogSessionHeader::setAudioSnapshot(48000.0, 256);
+        LogSessionHeader::setNextHeaderFormatAndHost("Standalone", "n/a");
+
+        midi.setLogLevel(MidiLogger::LogLevel::kInfo);
+        midi.setLogToConsole(false);
+        midi.setLogToFile(true, probe);
+        expect(midi.isLoggingToFile());
+        midi.setLogToFile(false);
+
+        const juce::String contents = probe.loadFileAsString();
+        // Keys are right-padded before ':' (e.g. "Product     : …") — match the key text only.
+        expect(contents.contains("Organization"));
+        expect(contents.contains("Product"));
+        expect(contents.contains("Version"));
+        expect(contents.contains("Host"));
+        expect(contents.contains("Sample rate"));
+        expect(contents.contains("Buffer size"));
+        probe.deleteFile();
+        LogSessionHeader::clearAudioSnapshot();
+        restoreMidiLoggerDefaults(midi);
+    }
 };
 
 static DiagnosticLoggingSettingsTests diagnosticLoggingSettingsTests;

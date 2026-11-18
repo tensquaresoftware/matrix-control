@@ -99,3 +99,30 @@ context: []
 - maybe-false/medium — Edge: diagnostic flag atomic race — **deferred** (unverified everyday harm; message-thread Settings is primary writer).
 - medium — Verification: Debug `MC_DEV_*` stripped on plugin target without suite noticing — **deferred** (suite does not launch plugin process).
 - low — Blind: SUPPORT combo not refreshed if Settings stays open across host restore — **deferred** (Settings typically closed; reopen restores from state).
+
+### Review Findings
+
+- [x] [Review][Patch] Require both MIDI and APVTS diagnostic files before keeping preference ON — currently `||` accepts a half-open session
+- [x] [Review][Patch] After a failed enable, refresh the SUPPORT combo from the forced-OFF property so the UI matches state [`PluginEditorSettingsDiagnostic.cpp`]
+- [x] [Review][Patch] Call `LogSessionHeader::clearAudioSnapshot()` from `releaseResources` so later headers do not keep a stale sample rate / buffer [`PluginProcessor.cpp`]
+- [x] [Review][Patch] On processor destroy, close diagnostic files without re-opening Debug lab repo Logs [`PluginProcessorDiagnosticLogging.cpp` / `~PluginProcessor`]
+- [x] [Review][Patch] Restore MidiLogger level/console/file flags after `DiagnosticLoggingSettingsTests` probes [`DiagnosticLoggingSettingsTests.cpp`]
+- [x] [Review][Patch] Always-on Release-quiet MidiLogger test that asserts Info does not land in a temp file (do not gate on `MC_DEV_MIDI_LOG`) [`DiagnosticLoggingSettingsTests.cpp`]
+- [x] [Review][Patch] Mirror Midi probe for ApvtsLogger explicit-path create/write/close under Application Support [`DiagnosticLoggingSettingsTests.cpp`]
+- [x] [Review][Patch] Always-on assertion that a freshly opened diagnostic log contains required session-header keys (`Organization`, etc.) — keep Desktop dump opt-in [`DiagnosticLoggingSettingsTests.cpp` / `LogLayoutSampleFilesTests.cpp`]
+- [x] [Review][Patch] Wiring test that legacy `MATRIX_BUILD_*` alias / FORCE block remains in CMakeLists [`Scripts/quality` or release tests]
+
+- [x] [Review][Defer] Multi-instance singleton loggers + process-wide `LogSessionHeader` snapshot/instance fields — deferred: pre-existing singleton design; header statics amplify the same v1 defer
+- [x] [Review][Defer] End-to-end `PluginProcessor` diagnostic on/off + Debug-lab coexistence — deferred: processor not linked in `Matrix-Control_Tests` (already recorded)
+- [x] [Review][Defer] Diagnostic MIDI file I/O off the message thread — deferred: pre-existing MidiLogger call sites; not introduced by SUPPORT alone
+- [x] [Review][Defer] Stale cached `MATRIX_BUILD_*=ON` can FORCE `MC_BUILD_*` over an explicit OFF — deferred: developer configure edge; aliases intentionally one-way ON
+- [x] [Review][Defer] `.cursorrules` still documents `MATRIX_BUILD_TESTS` — deferred: agent-context file outside this feature patch
+
+#### Rejected
+
+- false — Debug+ON suppresses repo lab Logs: intentional prior high patch (prevent App Support retarget); dual-path matrix wording is soft “may”; hors-scope to reopen lab vs SUPPORT
+- false — `valueTreePropertyChanged` ignores `kDiagnosticLogging`: Settings writes use `nullptr` undo and always call `setDiagnosticLoggingEnabled` or `applyDiagnosticLoggingFromState`; no everyday property-only path
+- false — About / `PluginVersion` ` (Debug)` duplicates `Build: Debug`: intentional product scope for About; header Build line is separate support metadata
+- low — unused `ApvtsLogger::getMessageColumnIndentWidth`: wrap already indents via prefix length; no SysEx twin path; not worth API churn
+- low — hardcoded Product `"Matrix-Control"` in session header: stable product string; low rename-drift risk
+- low — SUPPORT combo vs host restore while Settings stays open: already deferred in prior triage; reopen restores from state

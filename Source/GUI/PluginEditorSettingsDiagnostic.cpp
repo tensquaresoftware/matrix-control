@@ -15,6 +15,12 @@ void PluginEditor::wireSettingsDiagnosticLogging(SettingsPanel& panel)
         pluginProcessor.getApvts().state.setProperty(
             PluginIDs::Settings::kDiagnosticLogging, selectedId, nullptr);
         pluginProcessor.setDiagnosticLoggingEnabled(selectedId == kOn);
+
+        // Enable may force the property back to OFF if file open fails — keep the combo honest.
+        const int applied = static_cast<int>(pluginProcessor.getApvts().state.getProperty(
+            PluginIDs::Settings::kDiagnosticLogging, kOff));
+        panel.getDiagnosticLoggingCombo().setSelectedId(
+            applied == kOn ? kOn : kOff, juce::dontSendNotification);
     };
 
     panel.getOpenLogFolderButton().onClick = [this]

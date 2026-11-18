@@ -49,3 +49,20 @@ def test_packaging_script_exists_and_gates_cmake():
     assert "MATRIX_SKIN_DESIGNER_RECEIVER" in cmake
     # Receiver define must not be the only shared-target flag: DEV_LAYER for apply helpers.
     assert "MATRIX_SKIN_DESIGNER_DEV_LAYER" in cmake
+
+
+def test_cmake_legacy_matrix_build_aliases_force_mc_build():
+    cmake = CMAKE_LISTS.read_text(encoding="utf-8")
+    assert 'option(MATRIX_BUILD_TESTS "Deprecated alias for MC_BUILD_TESTS" OFF)' in cmake
+    assert (
+        'option(MATRIX_BUILD_SKIN_DESIGNER "Deprecated alias for MC_BUILD_SKIN_DESIGNER" OFF)'
+        in cmake
+    )
+    assert "if(MATRIX_BUILD_TESTS)" in cmake
+    assert 'set(MC_BUILD_TESTS ON CACHE BOOL "Build the Matrix-Control unit test runner" FORCE)' in cmake
+    assert "if(MATRIX_BUILD_SKIN_DESIGNER)" in cmake
+    assert (
+        'set(MC_BUILD_SKIN_DESIGNER ON CACHE BOOL '
+        '"Build Skin Designer app and Standalone Dev skin receiver" FORCE)'
+        in cmake
+    )
