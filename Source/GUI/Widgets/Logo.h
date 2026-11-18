@@ -8,7 +8,8 @@ namespace TSS
 {
     class ISkin;
 
-    class Logo : public Label
+    class Logo : public Label,
+                 private juce::Timer
     {
     public:
         explicit Logo(ISkin& skin, int width, int height);
@@ -28,13 +29,11 @@ namespace TSS
         void paint(juce::Graphics& g) override;
 
     private:
+        void timerCallback() override;
         void applyTextColour();
-        void requestPopupOpen();
-        void cancelPendingPopupOpen();
 
         ISkin* skin_ = nullptr;
         bool isHighlighted_ = false;
-        int popupShowGeneration_ = 0;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Logo)
     };

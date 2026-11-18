@@ -89,44 +89,25 @@ namespace TSS
         glyphs.draw(g);
     }
 
-    void Logo::cancelPendingPopupOpen()
-    {
-        ++popupShowGeneration_;
-    }
-
-    void Logo::requestPopupOpen()
-    {
-        const auto generation = ++popupShowGeneration_;
-
-        // Open on the next tick AFTER mouseUp so hosts (Ableton Live) cannot deliver the
-        // same click's mouseUp to the logo as an outside-modal dismiss.
-        juce::MessageManager::callAsync(
-            [safeLogo = juce::Component::SafePointer<Logo>(this), generation]
-            {
-                if (safeLogo == nullptr || safeLogo->popupShowGeneration_ != generation)
-                    return;
-
-                if (safeLogo->onPopupRequested)
-                    safeLogo->onPopupRequested();
-            });
-    }
-
     void Logo::mouseUp(const juce::MouseEvent& e)
     {
         if (e.getNumberOfClicks() > 1)
+        {
+            stopTimer();
             return;
+        }
 
         // Former Debug UI-test gesture (Shift+Ctrl): keep as hard no-op so it
         // never falls through to Shift → Settings.
         if (e.mods.isShiftDown() && e.mods.isCtrlDown())
         {
-            cancelPendingPopupOpen();
+            stopTimer();
             return;
         }
 
         if (e.mods.isShiftDown())
         {
-            cancelPendingPopupOpen();
+            stopTimer();
 
             if (onSettingsRequested)
                 onSettingsRequested();
@@ -135,20 +116,34 @@ namespace TSS
 
         // Alt/Option intentionally does nothing (Settings is the only prefs door).
         if (e.mods.isAltDown())
+        {
+            stopTimer();
             return;
+        }
 
         if (! e.mouseWasClicked())
             return;
 
-        requestPopupOpen();
+        // Wait the full JUCE double-click window so a real second click can cancel;
+        // open still happens after mouseUp so hosts (Ableton Live) cannot treat the
+        // same click as an outside-modal dismiss.
+        startTimer(juce::MouseEvent::getDoubleClickTimeout());
     }
 
     void Logo::mouseDoubleClick(const juce::MouseEvent&)
     {
-        cancelPendingPopupOpen();
+        stopTimer();
 
         if (onUiScaleReset)
             onUiScaleReset();
+    }
+
+    void Logo::timerCallback()
+    {
+        stopTimer();
+
+        if (onPopupRequested)
+            onPopupRequested();
     }
 
     void Logo::mouseEnter(const juce::MouseEvent&)
