@@ -1,0 +1,575 @@
+================================================================================
+MATRIX-CONTROL — BETA TEST GUIDE
+================================================================================
+Guide version: 1.0 (2026-11-19)
+Language: English
+Audience: Guillaume (multi-OS smoke) and external beta testers
+Format: plain UTF-8 text — edit this file and tick [ ] → [x]
+N/A convention: if a checkbox does not apply to your OS / machine / DAW,
+write N/A beside it (e.g. AU outside macOS, BANK UTILITY outside Matrix-1000).
+
+UI labels stay as on screen (English):
+GETTING STARTED, PATCH EDIT, BANK UTILITY, etc.
+
+For day-to-day product detail, also see the user manual
+(Documentation/User/manuel-utilisateur.md — currently French only).
+This document is a TEST guide, not a rewrite of the manual.
+
+Skin Designer (authoring tool) is NOT included in the public beta ZIP.
+
+
+================================================================================
+1. PREREQUISITES
+================================================================================
+
+1.1. Hardware
+-------------
+[ ] Oberheim Matrix-1000 synthesizer (minimum for a full smoke)
+[ ] Optional: Matrix-6 or Matrix-6R (to verify grayed-out areas)
+[ ] MIDI interface (USB-MIDI or audio interface with MIDI) — BOTH directions:
+    computer → synth AND synth → computer
+[ ] Audio cabling from the synth to your interface / mixer (Matrix-Control
+    does not generate the sound)
+
+1.2. Computers / OS coverage
+----------------------------
+[ ] macOS Apple Silicon (ARM)
+[ ] macOS Intel (if available)
+[ ] Windows 11
+[ ] Windows 10
+[ ] Linux Ubuntu 24.x
+[ ] Linux Ubuntu 26.x (if available)
+
+1.3. Software
+-------------
+[ ] A DAW of your choice (Ableton Live, Logic Pro, Cubase, Reaper, Reason, etc.)
+[ ] Matrix-Control build / tag under test (ZIP — no installer)
+[ ] A basic text editor to tick boxes in this file
+
+1.4. Know this before you start
+-------------------------------
+- No installer: ZIP + manual copies.
+- Builds are NOT Apple-notarized (macOS) and NOT Authenticode-signed (Windows):
+  Gatekeeper / SmartScreen warnings are NORMAL, not bugs.
+- ASIO (Windows Standalone) may be absent from the first public beta.
+  Test Standalone audio WITH and WITHOUT ASIO (WASAPI / system drivers).
+  Do not treat missing ASIO as a failure if the build ships without ASIO.
+- Backup: before STORE, heavy MUTATE, or bank import, save important RAM
+  patches (COMPUTER PATCHES → SAVE AS, or bank export).
+- On Matrix-1000, if STORE / editing seems to do nothing: check MEMORY
+  PROTECT / BANK LOCK on the hardware (or in MASTER EDIT) before filing a bug.
+
+
+================================================================================
+2. TEST IDENTITY SHEET
+================================================================================
+Fill one sheet per OS + DAW + synth combination (+ machine if useful),
+or one sheet per session.
+
+Date: ____________________
+Tester: ____________________
+Build / tag / commit: ____________________
+ZIP platform (macOS ARM / macOS Intel / Windows / Linux): ____________________
+
+OS (name + version): ____________________
+CPU architecture (ARM / x64 / other): ____________________
+Machine (model): ____________________
+
+DAW (name + version): ____________________
+Format tested: [ ] Standalone  [ ] VST3  [ ] AU (macOS)
+
+Synth: [ ] Matrix-1000  [ ] Matrix-6  [ ] Matrix-6R
+EPROM TYPE shown / selected: ____________________
+Firmware / EPROM (e.g. stock, Tauntek, Untergeek v1.21…): ____________________
+
+MIDI interface: ____________________
+Audio interface: ____________________
+
+Overall session result:
+[ ] Smoke OK    [ ] Full pass OK    [ ] Blocker found    [ ] Notes only
+
+
+================================================================================
+3. INSTALLATION AND FIRST LAUNCH
+================================================================================
+
+No installer. Unzip, copy by hand, rescan the DAW.
+
+3.1. Expected ZIP contents (per platform)
+-----------------------------------------
+[ ] Standalone present
+[ ] VST3 present
+[ ] AU present (macOS only — otherwise write N/A)
+[ ] Documentation present (manual and/or this guide)
+[ ] Skin Designer ABSENT from the public ZIP (expected)
+
+On failure: note the exact archive name and what is missing.
+
+
+--------------------------------------------------------------------------------
+3.2. macOS (ARM and Intel) — same procedure
+--------------------------------------------------------------------------------
+
+Target paths:
+  AU     → ~/Library/Audio/Plug-Ins/Components/
+  VST3   → ~/Library/Audio/Plug-Ins/VST3/
+  App    → /Applications/  (or leave next to the ZIP)
+
+Steps:
+[ ] Unzip the archive
+[ ] Copy Matrix-Control.component into the Components folder
+[ ] Copy Matrix-Control.vst3 into the VST3 folder
+[ ] (Optional) Copy Matrix-Control.app to /Applications
+[ ] Clear quarantine after a browser / GitHub download:
+      xattr -cr /path/to/Matrix-Control.app \
+                /path/to/Matrix-Control.vst3 \
+                /path/to/Matrix-Control.component
+    (Adjust paths to your copies.)
+[ ] First launch: if macOS says the developer cannot be verified,
+    right-click → Open, or allow in System Settings.
+    This is EXPECTED (non-notarized build). It is NOT a bug.
+[ ] Launch Standalone: the window opens
+[ ] In the DAW: rescan plugins if needed; Matrix-Control appears as AU and/or VST3
+[ ] Load the plugin on an instrument / MIDI track
+
+Expected result: app and plugins start. After xattr, no “damaged” message.
+An “unidentified developer” warning is still NORMAL (non-notarized build) —
+right-click → Open. You do not need to run codesign yourself: CI already
+applies an ad-hoc signature.
+
+On failure, note: exact Gatekeeper text, copy path, xattr command,
+Intel vs ARM, macOS version.
+
+
+--------------------------------------------------------------------------------
+3.3. Windows 10 / 11
+--------------------------------------------------------------------------------
+
+Target paths:
+  VST3 → C:\Program Files\Common Files\VST3\
+  Standalone → Matrix-Control.exe (from the ZIP, or any folder you prefer)
+
+Steps:
+[ ] Unzip the archive
+[ ] Copy Matrix-Control.vst3 into the system VST3 folder
+    (may require administrator rights). Without admin: copy to a user VST3
+    folder / your DAW’s custom path, point the DAW at it, then rescan.
+[ ] Run Matrix-Control.exe
+[ ] If SmartScreen / “Windows protected your PC” appears:
+    More info → Run anyway.
+    This can be NORMAL (no Authenticode signature). It is NOT a bug.
+[ ] In the DAW: rescan VST3; load Matrix-Control
+[ ] Ensure only one application owns the MIDI port at a time
+    (on Windows, a port is often exclusive)
+
+Expected result: Standalone and VST3 start; plugin visible after rescan.
+
+On failure, note: exact SmartScreen text, VST3 path, DAW, Win10 vs Win11.
+
+
+--------------------------------------------------------------------------------
+3.4. Linux (Ubuntu 24 / 26)
+--------------------------------------------------------------------------------
+
+Target paths:
+  VST3 → ~/.vst3/
+  Standalone → Matrix-Control binary from the ZIP
+
+Steps:
+[ ] Unzip the archive
+[ ] Copy Matrix-Control.vst3 to ~/.vst3/
+[ ] Make the Standalone executable if needed (chmod +x)
+[ ] Launch Standalone from a terminal if useful (to see error messages)
+[ ] In the DAW: rescan VST3; load Matrix-Control
+[ ] Standalone audio: system drivers / JACK depending on the build — note what
+    appears in SETTINGS → AUDIO
+
+Expected result: Standalone and VST3 start; no blocking missing dependency
+at launch.
+
+On failure, note: terminal message, exact distro, JACK present or not.
+
+
+================================================================================
+4. GETTING STARTED
+================================================================================
+
+Precondition: first launch (or SETTINGS → GETTING STARTED →
+RUN SETUP AGAIN / SETUP WIZARD set to SHOW WHEN INCOMPLETE).
+
+4.1. Introduction
+-----------------
+[ ] GETTING STARTED opens (auto or via RUN SETUP AGAIN)
+[ ] CONTINUE advances; CONFIGURE LATER closes without marking everything done
+
+4.2. Shared steps (plugin and Standalone)
+-----------------------------------------
+[ ] STEP 1 USER INTERFACE: change UI SCALE and SKIN — UI responds
+[ ] STEP 2 SYNTH COMMUNICATION: choose SYNTH FROM / SYNTH TO,
+    see DEVICE badge, choose or confirm EPROM TYPE
+[ ] STEP 3 MIDI KEYBOARD:
+    - Plugin: no KEYBOARD FROM list (HOST); FINISH after this step
+    - Standalone: KEYBOARD FROM list; SKIP allowed; then Audio step
+
+4.3. Standalone only — STEP 4 AUDIO
+-----------------------------------
+[ ] Choose a system audio interface (WASAPI / Core Audio / ALSA / etc.)
+[ ] Choose listen channels SYNTH FROM (AUDIO — distinct from the MIDI port)
+[ ] FINISH closes the wizard
+
+Expected result: you can finish even if MIDI is not perfect yet; completed
+steps do not force detection.
+
+On failure, note: format (plugin/Standalone), stuck step, footer message,
+CONFIGURE LATER / relaunch reminder behaviour.
+
+
+================================================================================
+5. DETECTION / MIDI DIALOGUE
+================================================================================
+
+Precondition: bidirectional cabling + synth powered on.
+
+5.1. Port selection
+-------------------
+[ ] Set SYNTH FROM / SYNTH TO (header FROM SYNTH / TO SYNTH, or
+    SETTINGS → MIDI & DEVICE, or GETTING STARTED step 2)
+[ ] MIDI activity LEDs blink when traffic flows
+[ ] DEVICE badge (bottom right) shows Matrix-1000, Matrix-6, or equivalent
+    (a Matrix-6R may appear as Matrix-6 — note if so)
+[ ] If NOT CONNECTED: follow the footer message (cables, ports, power-cycle)
+
+5.2. Locked controls without detection
+--------------------------------------
+[ ] Without correct detection, editing stays locked (intended)
+[ ] With detection, PATCH EDIT and useful areas unlock
+
+5.3. Windows — port already in use
+----------------------------------
+[ ] If the port will not open: close the other app / DAW that owns it,
+    or use a virtual MIDI port; retry
+
+Expected result: DEVICE recognized; editing possible; no error spam when
+ports are correct.
+
+On failure, note: OS, ports chosen, exact footer text, other MIDI app open,
+physical machine vs badge.
+
+
+================================================================================
+6. PATCH EDIT (representative path)
+================================================================================
+
+Precondition: synth detected + a patch loaded (INTERNAL PATCHES).
+
+6.1. Live editing
+-----------------
+[ ] Change a DCO 1 parameter (e.g. waveform / detune) — sound changes
+[ ] Change VCF (cutoff / resonance) — sound changes
+[ ] Drag a point on an envelope (ENV) with the mouse
+[ ] Drag a Track Generator point (FM/TRACK) with the mouse
+
+6.2. I / C / P on a module
+--------------------------
+[ ] I (Init) resets the module to defaults
+[ ] C (Copy) then P (Paste) on a compatible module works
+[ ] P grayed on incompatible module + footer message if clicked
+
+6.3. UNDO / REDO
+----------------
+[ ] Undo (Cmd+Z / Ctrl+Z) reverts the last edit
+[ ] Redo (Cmd+Shift+Z / Ctrl+Shift+Z) restores it
+[ ] Loading another patch clears undo history (new baseline)
+
+6.4. PATCH NAME
+---------------
+[ ] PATCH NAME display (8 characters) is read-only
+[ ] It updates when a patch loads / after mutation
+
+Expected result: audible real-time editing; coherent undo; no crash.
+
+On failure, note: module, parameter, machine, EPROM, Standalone vs plugin.
+
+
+================================================================================
+7. MODULATION MATRIX (MATRIX MODULATION)
+================================================================================
+
+Precondition: synth detected, patch loaded.
+
+[ ] On a bus (0–9): set SOURCE, AMOUNT, DESTINATION ≠ NONE
+[ ] Play a note: modulation is audible / visible on the destination
+[ ] I on a bus resets that bus
+[ ] Reorder two buses by dragging the # number (source gray, target red) —
+    contents swap; numbers stay 0–9
+[ ] UNDO after reorder reverts (one step)
+
+Expected result: buses editable; stable reorder; no “ghost” buses.
+
+On failure, note: bus number, SOURCE/DEST, order after drop.
+
+
+================================================================================
+8. INTERNAL PATCHES AND COMPUTER PATCHES
+================================================================================
+
+8.1. INTERNAL PATCHES (synth memory)
+------------------------------------
+[ ] < / > changes patch; patch is read back from the synth
+[ ] Double-click patch number: direct entry 0–99
+[ ] STORE writes the patch to the current slot (RAM banks only)
+[ ] On Matrix-1000 banks 2–9 (ROM): INIT / PASTE / STORE grayed
+[ ] Unsaved patch dialog when edits are not STORE/SAVE: Cancel / Discard /
+    Store / Save as context allows
+
+8.2. COMPUTER PATCHES (.syx files)
+----------------------------------
+[ ] OPEN: choose a patch folder
+[ ] SAVE AS: create a .syx; SAVE: overwrite the associated file
+[ ] Load a .syx from the < / > list
+[ ] If Patch name mismatch: Internal / Filename / Cancel behave as expected
+
+Expected result: patch navigation OK; STORE on RAM OK; .syx files readable;
+no surprise overwrite without an explicit action.
+
+On failure, note: bank/patch, dialog text, folder path.
+
+
+================================================================================
+9. BANK UTILITY (Matrix-1000)
+================================================================================
+
+Precondition: Matrix-1000 detected.
+On Matrix-6/6R: the whole area must be GRAYED.
+
+[ ] Matrix-6/6R only: BANK UTILITY fully grayed (N/A on 1000)
+[ ] Bank buttons 0–9 change bank; current patch is read back
+[ ] Banks 0–1: writing possible (STORE etc. as context allows)
+[ ] Banks 2–9: read-only for INIT / PASTE / STORE in INTERNAL PATCHES
+[ ] (If offered in your build) bank import / export: try once carefully
+    (prior RAM backup / export recommended)
+
+Expected result: reliable bank change; ROM protected; 6/6R grayed.
+
+On failure, note: bank, patch, button states, machine type.
+
+
+================================================================================
+10. MASTER EDIT (Matrix-1000)
+================================================================================
+
+Precondition: Matrix-1000 detected.
+On Matrix-6/6R: MASTER EDIT column GRAYED.
+
+[ ] Matrix-6/6R only: MASTER EDIT fully grayed (N/A on 1000)
+[ ] MIDI / VIBRATO / MISC modules visible and editable on 1000
+[ ] Change MIDI CHANNEL (carefully) — synth follows / stays coherent
+[ ] I on a master module: RESET MASTER MODULE? dialog —
+    Reset / Cancel work
+[ ] Master settings apply globally (not to a single patch)
+
+Expected result: master editable on 1000 only; confirmations OK.
+
+On failure, note: module, parameter, message, machine.
+
+
+================================================================================
+11. PATCH MUTATOR
+================================================================================
+
+Precondition: synth detected, patch loaded.
+
+[ ] At least one module switch (D1, D2, F/A, …, MM) enabled
+[ ] Set AMOUNT and RANDOM to non-default distinct values, then MUTATE —
+    the variation is audible / visible
+[ ] MUTATE creates a variation and sends it to the synth
+[ ] RETRY draws another variant from the same starting point
+[ ] HISTORY < / > browses session variations
+[ ] C (Compare) compares to the start and LOCKS the rest of editing
+    while active (footer message)
+[ ] Turning Compare off restores editing
+[ ] E exports the session (.syx); reopen via COMPUTER PATCHES → OPEN
+[ ] Unsaved mutations / history full / export folder exists dialogs:
+    clear choices, no silent data loss
+
+Expected result: audible mutations; Compare locks properly; export reloadable.
+
+On failure, note: AMOUNT/RANDOM, enabled modules, dialog, any crash.
+
+
+================================================================================
+12. STANDALONE VS PLUGIN
+================================================================================
+
+12.1. Plugin (AU / VST3 per OS)
+------------------------------
+[ ] Loads in the DAW without crash
+[ ] Keyboard MIDI via the host track (KEYBOARD FROM = HOST)
+[ ] Synth audio on a separate audio track (not generated by the plugin)
+[ ] GETTING STARTED without Audio step
+[ ] SETTINGS reachable (MATRIX-CONTROL logo or shortcut)
+
+12.2. Standalone
+----------------
+[ ] Standalone window; SETTINGS → AUDIO available
+[ ] Hear synth return via the chosen interface
+[ ] KEYBOARD FROM selectable (or SKIP in Getting Started)
+[ ] INPUT GAIN / header monitoring if present: responsive
+
+12.3. Windows Standalone audio — with and without ASIO
+------------------------------------------------------
+[ ] Without ASIO: WASAPI (or system driver) — audible input, acceptable latency
+[ ] With ASIO (ONLY if the build exposes it): ASIO device listable,
+    selectable, audio OK
+[ ] If ASIO is absent from the build: NOTE “build without ASIO” — this is NOT
+    a bug for the first public beta while Steinberg licensing is unfinished
+
+Expected result: plugin and Standalone usable; Standalone audio OK at least
+via system drivers.
+
+On failure, note: format, DAW, audio driver, ASIO present/absent, sample rate.
+
+
+================================================================================
+13. ABLETON LIVE — AUTO-SCALE (Windows)
+================================================================================
+
+Precondition: Windows + Ableton Live + Matrix-Control VST3.
+
+Known issue: if “Auto-Scale Plugin Window” is ON (often default), the VST3 UI
+is BLURRY at every UI Scale. Standalone stays sharp.
+
+[ ] In Live’s Browser: right-click the Matrix-Control plug-in icon
+    (not only the device title bar)
+[ ] Disable Auto-Scale Plugin Window
+[ ] Reload the device
+[ ] Confirm the VST3 UI is sharp
+[ ] Compare with Standalone on the same machine (should stay sharp)
+
+Expected result: sharp VST3 after disabling; document if Live’s menu path
+differs by version.
+
+On failure, note: Live version, exact menu path, screenshot if possible.
+
+
+================================================================================
+14. KNOWN LIMITATIONS TO VERIFY / NOTE
+================================================================================
+
+These are not necessarily “must fix for beta” bugs —
+confirm the behaviour and note any divergence.
+
+[ ] Unison (Matrix-1000): in RAMP/PORTAMENTO (and related Unison controls),
+    enable / adjust Unison. Behaviour can be counter-intuitive
+    (UI vs what you think you command). Describe what you see and hear.
+[ ] Keyboard Mode: in RAMP/PORTAMENTO, change keyboard mode.
+    Known firmware bug; worked around / fixed with Untergeek EPROM v1.21.
+    Note your EPROM and any odd behaviour (stuck notes, mode not sticking,
+    etc.).
+[ ] MEMORY PROTECT / BANK LOCK: when active, STORE may look “broken” —
+    check before filing a bug.
+[ ] MASTER EDIT and BANK UTILITY grayed on Matrix-6/6R (intended)
+[ ] Non-notarized / non-Authenticode builds: OS warnings are normal
+[ ] Matrix-6R may display as Matrix-6
+[ ] ASIO may be missing depending on build — test WASAPI / system drivers
+[ ] Skin Designer not included in the public ZIP
+
+Free-form limitation notes:
+_________________________________________________________________
+_________________________________________________________________
+
+
+================================================================================
+15. HOW TO REPORT A BUG
+================================================================================
+
+Channel: URL / email / label provided with the beta pack
+(e.g. GitHub issue): ____________________
+This guide version used: ____________________
+
+Minimum to include:
+
+1. Short title: what + where (e.g. “STORE grayed on bank 0 Matrix-1000”)
+2. Build / tag / ZIP platform
+3. OS + version + architecture
+4. Standalone or plugin (AU/VST3) + DAW + version
+5. Synth + EPROM TYPE / firmware
+6. Steps to reproduce (numbered)
+7. Expected vs actual result
+8. Frequency (always / sometimes)
+9. Exact footer or dialog text (copy-paste)
+10. Useful attachment: screenshot, log excerpt if available, this ticked file
+
+Do not send secrets, licenses, or full-disk dumps.
+
+
+================================================================================
+16. MINIMAL SMOKE CHECKLIST (30–45 min)
+================================================================================
+Goal: know within an hour whether this build is playable on THIS OS.
+Write N/A on lines outside your OS / machine / DAW.
+
+[ ] 1. ZIP install + OS friction (xattr / SmartScreen / chmod) OK
+[ ] 2. Standalone opens
+[ ] 3. Plugin loads in the DAW (after rescan)
+[ ] 4. GETTING STARTED finished (or CONFIGURE LATER then Settings)
+[ ] 5. MIDI: DEVICE recognized
+[ ] 6. Load an INTERNAL PATCHES patch; edit cutoff; hear the change
+[ ] 7. STORE to a RAM slot (1000 bank 0/1, or 6/6R slot)
+[ ] 8. One MATRIX MODULATION bus changes the sound
+[ ] 9. MUTATE once; Compare on/off
+[ ] 10. Matrix-1000: BANK UTILITY changes bank; MASTER EDIT opens a module
+     (N/A on 6/6R)
+[ ] 11. Matrix-6/6R (if present): BANK + MASTER grayed (N/A on 1000-only)
+[ ] 12. Standalone audio: hear synth return (WASAPI/system; ASIO if present)
+[ ] 13. Windows + Live: note Auto-Scale (disable if blurry) — else N/A
+[ ] 14. Quit and relaunch: MIDI ports / UI SCALE-SKIN / Getting Started state
+     behave credibly (no blocking surprise)
+[ ] 15. Fill identity sheet + note any blocker
+
+Smoke verdict: [ ] GO   [ ] NO-GO (blocker)   [ ] GO with reservations
+
+
+================================================================================
+17. FULL PATH (long session)
+================================================================================
+Two levels:
+  A) External tester: one platform (this OS + your DAW + your synth).
+  B) Guillaume / owner: multi-OS matrix (ARM/Intel, Win10/11, Ubuntu 24/26)
+     — one identity sheet per combination, not everything in one sitting.
+
+On top of smoke, when time allows:
+
+--- A) On YOUR platform ---
+[ ] Formats available here: Standalone + VST3 (+ AU if macOS)
+[ ] GETTING STARTED: CONFIGURE LATER, reminder, RUN SETUP AGAIN
+[ ] Persistence after relaunch (ports, appearance, wizard)
+[ ] PATCH EDIT: I/C/P, envelopes, Track Generator, deeper UNDO
+[ ] MATRIX MODULATION: reorder + undo
+[ ] COMPUTER PATCHES: OPEN / SAVE AS / name mismatch
+[ ] BANK UTILITY: banks 0–1 vs 2–9; import/export if present (N/A off 1000)
+[ ] MASTER EDIT: MIDI/VIBRATO/MISC + confirmed reset (N/A off 1000)
+[ ] PATCH MUTATOR: AMOUNT/RANDOM, RETRY, HISTORY, export E, dialogs
+[ ] Plugin vs Standalone: HOST keyboard vs KEYBOARD FROM
+[ ] Standalone audio with AND without ASIO (per build; N/A off Windows or
+    if build has no ASIO — note that)
+[ ] Live Auto-Scale on Windows (else N/A)
+[ ] Known limitations (Unison, Keyboard Mode / Untergeek, MEMORY PROTECT,
+    6/6R grayed)
+[ ] One blank bug report to check that the minimum info is enough
+
+--- B) Owner multi-OS (Guillaume) ---
+[ ] macOS ARM: AU + VST3 + Standalone
+[ ] macOS Intel (if available): same
+[ ] Windows 10 + 11: VST3 + Standalone; SmartScreen noted
+[ ] Ubuntu 24 + 26: VST3 + Standalone
+
+End of session — global notes:
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+
+
+================================================================================
+END OF GUIDE — Matrix-Control beta tests (EN)
+================================================================================
