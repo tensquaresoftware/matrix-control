@@ -12,9 +12,11 @@ namespace ProjectPaths
     };
 
     juce::File getProjectRoot();
+    // Default MIDI/APVTS log dirs — Application Support (alias of getDiagnosticLogsDirectory).
     juce::File getLogsDirectory(LogCategory category);
-    // Application Support Logs/ root for Release diagnostic logging (no repo walk).
+    // Application Support Logs/ root (SUPPORT + default logger destination; no repo walk).
     juce::File getDiagnosticLogsRoot();
+    // Prefer this name for SUPPORT/diagnostic; same destination as getLogsDirectory.
     juce::File getDiagnosticLogsDirectory(LogCategory category);
     // Per-user product root shared with PropertiesFile stores (Standalone + Device Connection + Init):
     // macOS ~/Library/Application Support/Ten Square Software/Matrix-Control/, Windows %APPDATA%/…,
@@ -30,5 +32,4 @@ namespace ProjectPaths
     // Empty File on failure. Manual purge = delete this folder (or profiles.xml inside).
     juce::File getAudioDeviceProfilesDirectory();
     bool isUsingFallbackRoot();
-    juce::String getFallbackRootWarning();
 }

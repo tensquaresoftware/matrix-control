@@ -1,6 +1,6 @@
 #pragma once
 
-// 1: allow log files under <project>/Logs/MIDI/ (ProjectPaths runtime root). 0: no file output.
+// 1: allow log files under Application Support Logs/MIDI/. 0: no file output.
 #ifndef MIDI_LOGGER_ENABLED
 #define MIDI_LOGGER_ENABLED 1
 #endif
@@ -73,7 +73,6 @@ private:
     MidiLogger& operator=(const MidiLogger&) = delete;
 
     void writeLog(const juce::String& formattedMessage);
-    void writeLogRaw(const juce::String& message);
     void writeNonEmptyLines(const juce::String& multiLineText);
 
     juce::String getTimestamp() const;
@@ -94,9 +93,6 @@ private:
     juce::String buildSysExHeaderMessage(const juce::String& direction,
                                          const juce::String& description,
                                          size_t byteCount) const;
-    int calculateBytesPerLine() const;
-    juce::String formatHexBytesWithLineWrapping(const juce::MemoryBlock& sysEx) const;
-    void insertNewlineIfNeeded(juce::String& hexString, size_t currentIndex, int bytesPerLine) const;
     void appendHexByteWithSpace(juce::String& hexString, juce::uint8 byte, bool isLastByte) const;
     juce::String buildTimestampString() const;
     void createLogDirectoryIfNeeded(juce::File& logDir) const;
@@ -114,5 +110,4 @@ private:
     juce::String wrapContinuationLine(const juce::String& message,
                                       int maxLineWidth,
                                       int& messageStart) const;
-    int getMessageColumnIndentWidth() const;
 };

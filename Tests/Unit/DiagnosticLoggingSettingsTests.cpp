@@ -3,6 +3,7 @@
 #include "Core/Loggers/ApvtsLogger.h"
 #include "Core/Loggers/LogSessionHeader.h"
 #include "Core/Loggers/MidiLogger.h"
+#include "Core/PluginProcessorInternal.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "Shared/ProjectPaths.h"
@@ -19,10 +20,16 @@ public:
     {
         preferenceDefaultsOff();
         diagnosticPathsUnderApplicationSupport();
+        defaultLogsDirectoryMatchesDiagnostic();
+        emptyPathOpensUnderApplicationSupport();
+        apvtsEmptyPathOpensUnderApplicationSupport();
+        developmentConsoleRestoreDoesNotOpenFiles();
         explicitPathOpensFile();
         apvtsExplicitPathOpensFile();
         releaseStyleInfoIsQuietInFile();
         sessionHeaderContainsRequiredKeys();
+        apvtsSessionHeaderOrder();
+        shortSysExStaysOnOneLine();
     }
 
 private:
@@ -42,6 +49,42 @@ private:
         apvts.setLogToConsole(MC_DEV_APVTS_LOG != 0);
     }
 
+    static juce::Array<juce::File> listLogFiles(const juce::File& dir, const juce::String& pattern)
+    {
+        return dir.findChildFiles(juce::File::findFiles, false, pattern);
+    }
+
+    static juce::File pickCreatedOrNewest(const juce::Array<juce::File>& before,
+                                          const juce::Array<juce::File>& after)
+    {
+        for (const auto& f : after)
+        {
+            bool wasBefore = false;
+            for (const auto& b : before)
+            {
+                if (b == f)
+                {
+                    wasBefore = true;
+                    break;
+                }
+            }
+            if (! wasBefore)
+                return f;
+        }
+
+        // Same-second stamp may overwrite an existing file — pick the newest.
+        juce::File newest;
+        for (const auto& f : after)
+        {
+            if (! newest.existsAsFile()
+                || f.getLastModificationTime() > newest.getLastModificationTime())
+            {
+                newest = f;
+            }
+        }
+        return newest;
+    }
+
     void preferenceDefaultsOff()
     {
         beginTest("Diagnostic logging preference defaults to OFF");
@@ -59,17 +102,123 @@ private:
     {
         beginTest("Diagnostic logs root is under Application Support");
         const juce::File root = ProjectPaths::getDiagnosticLogsRoot();
+        const juce::File appData = ProjectPaths::getApplicationDataDirectory();
         expect(root.getFullPathName().contains("Matrix-Control"));
         expectEquals(root.getFileName(), juce::String("Logs"));
+        expectEquals(root.getParentDirectory().getFullPathName(), appData.getFullPathName());
         expectEquals(ProjectPaths::getDiagnosticLogsDirectory(ProjectPaths::LogCategory::kMidi).getFileName(),
                      juce::String("MIDI"));
         expectEquals(ProjectPaths::getDiagnosticLogsDirectory(ProjectPaths::LogCategory::kApvts).getFileName(),
                      juce::String("APVTS"));
     }
 
+    void defaultLogsDirectoryMatchesDiagnostic()
+    {
+        beginTest("Default getLogsDirectory matches diagnostic Application Support dirs");
+        expectEquals(ProjectPaths::getLogsDirectory(ProjectPaths::LogCategory::kMidi).getFullPathName(),
+                     ProjectPaths::getDiagnosticLogsDirectory(ProjectPaths::LogCategory::kMidi)
+                         .getFullPathName());
+        expectEquals(ProjectPaths::getLogsDirectory(ProjectPaths::LogCategory::kApvts).getFullPathName(),
+                     ProjectPaths::getDiagnosticLogsDirectory(ProjectPaths::LogCategory::kApvts)
+                         .getFullPathName());
+        expectEquals(ProjectPaths::getLogsDirectory(ProjectPaths::LogCategory::kMidi)
+                         .getParentDirectory()
+                         .getFullPathName(),
+                     ProjectPaths::getDiagnosticLogsRoot().getFullPathName());
+    }
+
+    void emptyPathOpensUnderApplicationSupport()
+    {
+        beginTest("Empty MidiLogger setLogToFile path opens under Application Support");
+        auto& midi = MidiLogger::getInstance();
+        const juce::File expectedDir = ProjectPaths::getLogsDirectory(ProjectPaths::LogCategory::kMidi);
+        expect(expectedDir.createDirectory().wasOk() || expectedDir.isDirectory());
+        const auto before = listLogFiles(expectedDir, "midi-log-*.txt");
+
+        midi.setLogLevel(MidiLogger::LogLevel::kInfo);
+        midi.setLogToConsole(false);
+        midi.setLogToFile(true);
+        expect(midi.isLoggingToFile());
+
+        const auto after = listLogFiles(expectedDir, "midi-log-*.txt");
+        const juce::File created = pickCreatedOrNewest(before, after);
+        expect(created.existsAsFile());
+        expect(created.getFullPathName().startsWith(
+            ProjectPaths::getDiagnosticLogsRoot().getFullPathName()));
+        expectEquals(created.getParentDirectory().getFullPathName(),
+                     expectedDir.getFullPathName());
+
+        midi.setLogToFile(false);
+        if (created.existsAsFile())
+            created.deleteFile();
+        restoreMidiLoggerDefaults(midi);
+    }
+
+    void apvtsEmptyPathOpensUnderApplicationSupport()
+    {
+        beginTest("Empty ApvtsLogger setLogToFile path opens under Application Support");
+        auto& apvtsLogger = ApvtsLogger::getInstance();
+        const juce::File expectedDir = ProjectPaths::getLogsDirectory(ProjectPaths::LogCategory::kApvts);
+        expect(expectedDir.createDirectory().wasOk() || expectedDir.isDirectory());
+        const auto before = listLogFiles(expectedDir, "apvts-log-*.txt");
+
+        apvtsLogger.setLogLevel(ApvtsLogger::LogLevel::kInfo);
+        apvtsLogger.setLogToConsole(false);
+        apvtsLogger.setLogToFile(true);
+        expect(apvtsLogger.isLoggingToFile());
+
+        const auto after = listLogFiles(expectedDir, "apvts-log-*.txt");
+        const juce::File created = pickCreatedOrNewest(before, after);
+        expect(created.existsAsFile());
+        expect(created.getFullPathName().startsWith(
+            ProjectPaths::getDiagnosticLogsRoot().getFullPathName()));
+        expectEquals(created.getParentDirectory().getFullPathName(),
+                     expectedDir.getFullPathName());
+
+        apvtsLogger.setLogToFile(false);
+        if (created.existsAsFile())
+            created.deleteFile();
+        restoreApvtsLoggerDefaults(apvtsLogger);
+    }
+
+    void developmentConsoleRestoreDoesNotOpenFiles()
+    {
+        // Calls the same lab-session bodies used by enableFileLoggingForSession /
+        // enableApvtsLogging after SUPPORT OFF closes files (PluginProcessor is not linked here).
+        beginTest("Lab-session restore bodies leave file logging off");
+        auto& midi = MidiLogger::getInstance();
+        auto& apvtsLogger = ApvtsLogger::getInstance();
+        const juce::File midiDir = ProjectPaths::getDiagnosticLogsDirectory(ProjectPaths::LogCategory::kMidi);
+        const juce::File apvtsDir = ProjectPaths::getDiagnosticLogsDirectory(ProjectPaths::LogCategory::kApvts);
+        expect(midiDir.createDirectory().wasOk() || midiDir.isDirectory());
+        expect(apvtsDir.createDirectory().wasOk() || apvtsDir.isDirectory());
+        const juce::File midiProbe = midiDir.getChildFile("midi-log-console-restore-probe.txt");
+        const juce::File apvtsProbe = apvtsDir.getChildFile("apvts-log-console-restore-probe.txt");
+        midiProbe.deleteFile();
+        apvtsProbe.deleteFile();
+
+        midi.setLogToFile(true, midiProbe);
+        apvtsLogger.setLogToFile(true, apvtsProbe);
+        expect(midi.isLoggingToFile());
+        expect(apvtsLogger.isLoggingToFile());
+
+        midi.setLogToFile(false);
+        apvtsLogger.setLogToFile(false);
+        const auto instanceId = LogSessionHeader::allocateInstanceId();
+        PluginProcessorInternal::enableDevelopmentMidiConsoleLoggingForLabSession(instanceId);
+        PluginProcessorInternal::enableDevelopmentApvtsConsoleLoggingForLabSession(instanceId);
+
+        expect(! midi.isLoggingToFile());
+        expect(! apvtsLogger.isLoggingToFile());
+        midiProbe.deleteFile();
+        apvtsProbe.deleteFile();
+        restoreMidiLoggerDefaults(midi);
+        restoreApvtsLoggerDefaults(apvtsLogger);
+    }
+
     void explicitPathOpensFile()
     {
-        beginTest("Explicit diagnostic path opens a file without relying on repo Logs");
+        beginTest("Explicit diagnostic path opens a file under Application Support");
         auto& midi = MidiLogger::getInstance();
         const juce::File midiDir = ProjectPaths::getDiagnosticLogsDirectory(ProjectPaths::LogCategory::kMidi);
         expect(midiDir.createDirectory().wasOk() || midiDir.isDirectory());
@@ -156,8 +305,73 @@ private:
         expect(contents.contains("Host"));
         expect(contents.contains("Sample rate"));
         expect(contents.contains("Buffer size"));
+        expect(contents.contains("MIDI Log Session Started"));
+        // Cartouche precedes the session banner (blank line between closing rule and banner).
+        const int orgPos = contents.indexOf("Organization");
+        const int startedPos = contents.indexOf("MIDI Log Session Started");
+        expect(orgPos >= 0 && startedPos > orgPos);
+        expect(contents.contains("=\n\n=== MIDI Log Session Started")
+               || contents.contains("=\r\n\r\n=== MIDI Log Session Started"));
         probe.deleteFile();
         LogSessionHeader::clearAudioSnapshot();
+        restoreMidiLoggerDefaults(midi);
+    }
+
+    void apvtsSessionHeaderOrder()
+    {
+        beginTest("APVTS log session header places cartouche before banner");
+        auto& apvtsLogger = ApvtsLogger::getInstance();
+        const juce::File tempDir = juce::File::getSpecialLocation(juce::File::tempDirectory);
+        const juce::File probe = tempDir.getChildFile("apvts-log-header-probe.txt");
+        probe.deleteFile();
+
+        LogSessionHeader::setReportingInstanceId(LogSessionHeader::allocateInstanceId());
+        LogSessionHeader::setAudioSnapshot(48000.0, 256);
+        LogSessionHeader::setNextHeaderFormatAndHost("Standalone", "n/a");
+
+        apvtsLogger.setLogLevel(ApvtsLogger::LogLevel::kInfo);
+        apvtsLogger.setLogToConsole(false);
+        apvtsLogger.setLogToFile(true, probe);
+        expect(apvtsLogger.isLoggingToFile());
+        apvtsLogger.setLogToFile(false);
+
+        const juce::String contents = probe.loadFileAsString();
+        expect(contents.contains("Organization"));
+        expect(contents.contains("APVTS Log Session Started"));
+        const int orgPos = contents.indexOf("Organization");
+        const int startedPos = contents.indexOf("APVTS Log Session Started");
+        expect(orgPos >= 0 && startedPos > orgPos);
+        expect(contents.contains("=\n\n=== APVTS Log Session Started")
+               || contents.contains("=\r\n\r\n=== APVTS Log Session Started"));
+        probe.deleteFile();
+        LogSessionHeader::clearAudioSnapshot();
+        restoreApvtsLoggerDefaults(apvtsLogger);
+    }
+
+    void shortSysExStaysOnOneLine()
+    {
+        beginTest("Short SENT and RECEIVED SysEx keep header and hex on one line");
+        auto& midi = MidiLogger::getInstance();
+        const juce::File tempDir = juce::File::getSpecialLocation(juce::File::tempDirectory);
+        const juce::File probe = tempDir.getChildFile("midi-log-short-sysex-probe.txt");
+        probe.deleteFile();
+
+        const juce::uint8 bytes[] = { 0xF0, 0x10, 0x06, 0x06, 0x02, 0x01, 0xF7 };
+        const juce::MemoryBlock sysEx(bytes, sizeof(bytes));
+
+        midi.setLogLevel(MidiLogger::LogLevel::kDebug);
+        midi.setLogToConsole(false);
+        midi.setLogToFile(true, probe);
+        midi.logSysExSent(sysEx);
+        midi.logSysExReceived(sysEx, "Remote Parameter Edit");
+        midi.setLogToFile(false);
+
+        const juce::String contents = probe.loadFileAsString();
+        expect(contents.contains("SENT SysEx (7 bytes): F0 10 06 06 02 01 F7"));
+        expect(contents.contains(
+            "RECEIVED SysEx (Remote Parameter Edit) (7 bytes): F0 10 06 06 02 01 F7"));
+        expect(! contents.contains("bytes):\n"));
+        probe.deleteFile();
         restoreMidiLoggerDefaults(midi);
     }
 };

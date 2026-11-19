@@ -125,7 +125,7 @@ Matrix-Control/
 ├── Assets/                  # Public assets (fonts, README screenshots)
 ├── Tests/Unit/              # Unit tests (JUCE UnitTest — wired in Tests/CMakeLists.txt)
 ├── Documentation/           # Public project knowledge (.md, kebab-case filenames)
-├── Logs/                    # Runtime logs (gitignored) — MIDI/, APVTS/ via ProjectPaths
+├── Logs/                    # Legacy gitignore only — runtime logs are Application Support
 ├── Builds/                  # CMake preset output trees (gitignored)
 ├── _bmad/, _bmad-output/    # BMad tooling and artifacts (versioned)
 ├── .agents/                 # Cursor skill cache (gitignored — BMad installer)
@@ -138,7 +138,7 @@ Matrix-Control/
 | `Assets/` | Public assets | versioned |
 | `Tests/` | Unit tests | versioned |
 | `Documentation/` | Public documentation | versioned |
-| `Logs/` | Runtime logs (`MIDI/`, `APVTS/`) | **gitignored** |
+| `Logs/` | Legacy ignore path (unused for writes) | **gitignored** |
 | `Builds/` | CMake outputs (`macOS/ARM`, etc.) | **gitignored** |
 | `_bmad/`, `_bmad-output/` | BMad artifacts | versioned |
 | `.agents/` | Cursor skill cache (BMad installer) | **gitignored** |
@@ -146,7 +146,7 @@ Matrix-Control/
 
 **Tooling:** `CMakeUserPresets.json`, `project-configuration.cmake` (no `configure-platform.py`). IDE: CMake Tools + `clangd` disabled; `compile_commands.json` copied to repo root on configure.
 
-**Runtime paths (AD-10):** `ProjectPaths` discovers repo root (`.matrix-control-root`, `CMakeLists.txt` token, walk-up from executable/CWD with depth cap). Loggers write under `{root}/Logs/MIDI/` and `{root}/Logs/APVTS/`. Executables under `/Library/Audio/Plug-Ins/` skip walk-up (fallback or `MATRIX_CONTROL_PROJECT_ROOT` env for dev).
+**Runtime paths (AD-10):** `ProjectPaths` discovers repo root (`.matrix-control-root`, `CMakeLists.txt` token, walk-up from executable/CWD with depth cap) for non-log assets. MIDI/APVTS file logs write under Application Support `…/Matrix-Control/Logs/MIDI/` and `…/APVTS/` (`getLogsDirectory` aliases `getDiagnosticLogsDirectory`). Product path: journals are opened when SUPPORT diagnostic logging is ON (Debug lab is console-only). Executables under `/Library/Audio/Plug-Ins/` skip walk-up (fallback or `MATRIX_CONTROL_PROJECT_ROOT` env for dev).
 
 **Do not** reintroduce lowercase root folders (`src/`, `builds/`) or legacy generator scripts without an explicit architecture decision.
 

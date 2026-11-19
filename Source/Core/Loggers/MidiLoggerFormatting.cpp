@@ -4,8 +4,6 @@
 #include "Core/MIDI/SysEx/SysExConstants.h"
 #include "Core/MIDI/SysEx/SysExParser.h"
 
-#include <algorithm>
-
 juce::String MidiLogger::formatLogLevelColumn(LogLevel level) const
 {
     const juce::String levelName = kLogLevelNames[static_cast<int>(level)];
@@ -88,12 +86,6 @@ juce::String MidiLogger::wrapContinuationLine(const juce::String& message,
     const juce::String line = message.substring(messageStart, breakPoint) + "\n";
     messageStart = skipLeadingSpaces(message, breakPoint);
     return line;
-}
-
-int MidiLogger::getMessageColumnIndentWidth() const
-{
-    // "[LEVEL] " + "HH:MM:SS.mmm" + " - "
-    return kLogLevelColumnWidth + 1 + 12 + 3;
 }
 
 juce::String MidiLogger::wrapLogMessage(const juce::String& prefix,
@@ -181,57 +173,27 @@ void MidiLogger::logSysExDataDecimal(const juce::uint8* data,
     writeNonEmptyLines(wrapLogMessage(prefix, message + dataString));
 }
 
-int MidiLogger::calculateBytesPerLine() const
-{
-    const int usableWidth = getEffectiveLineWidth() - getMessageColumnIndentWidth();
-    return std::max(1, usableWidth / 3);
-}
-
-void MidiLogger::insertNewlineIfNeeded(juce::String& hexString,
-                                       size_t currentIndex,
-                                       int bytesPerLine) const
-{
-    if (currentIndex > 0 && currentIndex % static_cast<size_t>(bytesPerLine) == 0)
-        hexString += "\n";
-}
-
 void MidiLogger::appendHexByteWithSpace(juce::String& hexString,
                                         juce::uint8 byte,
                                         bool isLastByte) const
 {
     hexString += juce::String::toHexString(byte).paddedLeft('0', 2).toUpperCase();
-    if (!isLastByte)
+    if (! isLastByte)
         hexString += " ";
-}
-
-juce::String MidiLogger::formatHexBytesWithLineWrapping(const juce::MemoryBlock& sysEx) const
-{
-    juce::String hexString;
-    const auto* data = static_cast<const juce::uint8*>(sysEx.getData());
-    const int bytesPerLine = calculateBytesPerLine();
-
-    for (size_t i = 0; i < sysEx.getSize(); ++i)
-    {
-        insertNewlineIfNeeded(hexString, i, bytesPerLine);
-        appendHexByteWithSpace(hexString, data[i], i == sysEx.getSize() - 1);
-    }
-
-    return hexString;
 }
 
 juce::String MidiLogger::formatSysExMessage(const juce::MemoryBlock& sysEx) const
 {
-    const juce::String indent = juce::String::repeatedString(" ", getMessageColumnIndentWidth());
-
     if (sysEx.getSize() == 0)
-        return indent + "empty";
+        return "empty";
 
-    // Indent hex under the message column (same gutter as wrapped text continuations).
-    juce::StringArray lines;
-    lines.addLines(formatHexBytesWithLineWrapping(sysEx));
-    for (auto& line : lines)
-        line = indent + line;
-    return lines.joinIntoString("\n");
+    // Space-separated hex only — line wrapping is handled by wrapLogMessage (120 cols).
+    juce::String hexString;
+    const auto* data = static_cast<const juce::uint8*>(sysEx.getData());
+    for (size_t i = 0; i < sysEx.getSize(); ++i)
+        appendHexByteWithSpace(hexString, data[i], i == sysEx.getSize() - 1);
+
+    return hexString;
 }
 
 juce::String MidiLogger::buildTimestampString() const
