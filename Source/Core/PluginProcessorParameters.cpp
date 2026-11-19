@@ -10,6 +10,7 @@
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/DeviceTypeRegistry.h"
+#include "Core/Services/PatchFileService.h"
 #include "Factories/ApvtsFactory.h"
 #include "MIDI/MidiManager.h"
 #include "Shared/Definitions/ApvtsTypes.h"
@@ -157,13 +158,42 @@ std::optional<juce::String> PluginProcessor::getChoiceLabel(const juce::String& 
     return descriptor.choices[value];
 }
 
+juce::String PluginProcessor::resolveComputerPatchesSelectLabel(int selectedId) const
+{
+    if (patchFileService_ == nullptr || selectedId < 1)
+        return {};
+
+    // ComboBox selectedId is 1-based; scan lists are 0-based (same as the UI items).
+    const auto& scan = patchFileService_->getLastScanResult();
+    const int index = selectedId - 1;
+
+    if (scan.isVirtualList())
+    {
+        if (! juce::isPositiveAndBelow(index, scan.sortedValidFiles.size()))
+            return {};
+
+        return Core::PatchFileService::formatOpenListDisplayName(scan.sortedValidFiles.getReference(index));
+    }
+
+    if (! juce::isPositiveAndBelow(index, scan.sortedValidFileNames.size()))
+        return {};
+
+    return Core::PatchFileService::formatOpenListDisplayName(scan.sortedValidFileNames[index]);
+}
+
 juce::String PluginProcessor::getChoiceLabelForNumericValue(const juce::String& parameterId, const juce::var& newValue) const
 {
     if (!newValue.isInt() && !newValue.isInt64() && !newValue.isDouble())
         return {};
 
-    if (auto label = getChoiceLabel(parameterId, static_cast<int>(newValue)))
+    const int value = static_cast<int>(newValue);
+
+    if (auto label = getChoiceLabel(parameterId, value))
         return *label;
+
+    namespace SelectPatch = PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets;
+    if (parameterId == SelectPatch::kSelectPatchFile)
+        return resolveComputerPatchesSelectLabel(value);
 
     return {};
 }

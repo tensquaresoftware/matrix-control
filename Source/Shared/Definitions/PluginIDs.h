@@ -38,6 +38,7 @@ namespace PluginIDs
         constexpr const char* kEpromTypePromptPending = "settingsEpromTypePromptPending";
         constexpr const char* kPresenceCheck = "settingsPresenceCheck";
         constexpr const char* kLastSettingsTab = "settingsLastTab";
+        constexpr const char* kDiagnosticLogging = "settingsDiagnosticLogging";
 
         namespace ComputerPatchesNamesPolicy
         {
@@ -88,6 +89,13 @@ namespace PluginIDs
             constexpr int kAutoClearDurationMs = 5000;
         }
 
+        namespace DiagnosticLogging
+        {
+            constexpr int kOff = 1;
+            constexpr int kOn = 2;
+            constexpr int kDefault = kOff;
+        }
+
         namespace DeleteWarningPolicy
         {
             constexpr int kAlwaysWarn = 1;
@@ -115,14 +123,15 @@ namespace PluginIDs
             constexpr int kPatchMutator = 6;
             constexpr int kMaster = 7;
             constexpr int kGettingStarted = 8;
+            constexpr int kSupport = 9;
             /** @deprecated Prefer kMidiAndDevice (same value as legacy Device). */
             constexpr int kDevice = kMidiAndDevice;
             /** @deprecated Legacy MIDI tab id — normalize() remaps to kMidiAndDevice. */
             constexpr int kMidi = 3;
             constexpr int kDefault = kUserInterface;
-            constexpr int kMaxCount = 7;
-            constexpr int kStandaloneCount = 7;
-            constexpr int kPluginCount = 6;
+            constexpr int kMaxCount = 8;
+            constexpr int kStandaloneCount = 8;
+            constexpr int kPluginCount = 7;
 
             inline int count(bool isPluginMode) noexcept
             {
@@ -139,6 +148,7 @@ namespace PluginIDs
                     case kPatch:
                     case kPatchMutator:
                     case kMaster:
+                    case kSupport:
                         return true;
                     case kAudio:
                         return ! isPluginMode;
@@ -151,11 +161,11 @@ namespace PluginIDs
             {
                 static constexpr int kStandaloneIds[] = {
                     kGettingStarted, kUserInterface, kMidiAndDevice, kAudio, kPatch,
-                    kPatchMutator, kMaster
+                    kPatchMutator, kMaster, kSupport
                 };
                 static constexpr int kPluginIds[] = {
                     kGettingStarted, kUserInterface, kMidiAndDevice, kPatch, kPatchMutator,
-                    kMaster
+                    kMaster, kSupport
                 };
 
                 if (isPluginMode)

@@ -60,6 +60,7 @@ namespace SettingsShellMetrics
             case kPatch: return kPatchSection;
             case kPatchMutator: return kPatchMutatorSection;
             case kMaster: return kMasterSection;
+            case kSupport: return kSupportTab;
             default: return "";
         }
     }

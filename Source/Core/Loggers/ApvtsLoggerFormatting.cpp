@@ -88,6 +88,12 @@ juce::String ApvtsLogger::wrapContinuationLine(const juce::String& message,
     return line;
 }
 
+int ApvtsLogger::getMessageColumnIndentWidth() const
+{
+    // "[LEVEL] " + "HH:MM:SS.mmm" + " - "
+    return kLogLevelColumnWidth + 1 + 12 + 3;
+}
+
 juce::String ApvtsLogger::wrapLogMessage(const juce::String& prefix,
                                          const juce::String& message) const
 {
@@ -95,9 +101,10 @@ juce::String ApvtsLogger::wrapLogMessage(const juce::String& prefix,
     const int prefixLength = prefix.length();
     const int availableWidth = maxLineWidth - prefixLength;
 
-    if (prefixLength + message.length() <= maxLineWidth)
+    if (availableWidth <= 0 || prefixLength + message.length() <= maxLineWidth)
         return prefix + message;
 
+    const juce::String indent = juce::String::repeatedString(" ", prefixLength);
     juce::String wrappedMessage;
     int messageStart = 0;
     bool isFirstLine = true;
@@ -111,7 +118,7 @@ juce::String ApvtsLogger::wrapLogMessage(const juce::String& prefix,
         }
         else
         {
-            wrappedMessage += wrapContinuationLine(message, maxLineWidth, messageStart);
+            wrappedMessage += indent + wrapContinuationLine(message, availableWidth, messageStart);
         }
     }
 
@@ -166,8 +173,10 @@ void ApvtsLogger::logParameterChanged(const juce::String& parameterId,
         return;
     }
 
-    const juce::String continuationPrefix = juce::String::repeatedString(" ", prefixLength);
-    writeNonEmptyLines(prefix + firstLine + "\n" + continuationPrefix + continuationLine);
+    // Both lines go through wrapLogMessage so long parameter IDs still stay in column 3.
+    writeNonEmptyLines(wrapLogMessage(prefix, firstLine));
+    writeNonEmptyLines(wrapLogMessage(juce::String::repeatedString(" ", prefixLength),
+                                      continuationLine));
 }
 
 bool ApvtsLogger::isButtonClickTimestamp(const juce::var& value) const
@@ -197,13 +206,12 @@ juce::String ApvtsLogger::buildValueTreePropertyMessage(const ValueTreePropertyC
                                                         bool isButtonClick,
                                                         const juce::String& newValueStr) const
 {
+    // Body only — logMessage() adds [LEVEL]/timestamp and wraps under the message column.
     juce::String effectiveThreadName = change.threadName;
     if (effectiveThreadName.isEmpty())
         effectiveThreadName = getCurrentThreadName();
 
-    juce::String message = formatLogLevelColumn(LogLevel::kDebug) + " "
-                         + getTimestamp() + " - ";
-
+    juce::String message;
     if (effectiveThreadName.isNotEmpty())
         message += "Thread: " + effectiveThreadName + " | ";
 
@@ -226,7 +234,7 @@ void ApvtsLogger::logValueTreePropertyChanged(const ValueTreePropertyChangeLog& 
     const juce::String newValueStr = formatPropertyNewValue(
         change.newValue, change.choiceLabel, isButtonClick);
 
-    writeLog(buildValueTreePropertyMessage(change, isButtonClick, newValueStr));
+    logMessage(LogLevel::kDebug, buildValueTreePropertyMessage(change, isButtonClick, newValueStr));
 }
 
 juce::String ApvtsLogger::buildTimestampString() const

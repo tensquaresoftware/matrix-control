@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <bitset>
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <map>
@@ -165,6 +166,9 @@ public:
     float getHardwareLatencyMs() const;
     int getGuiScaleId() const;
     void setGuiScaleId(int scaleId);
+    void setDiagnosticLoggingEnabled(bool enabled);
+    void revealDiagnosticLogsFolder();
+    bool isDiagnosticLoggingEnabled() const noexcept;
     int getSkinVariantId() const;
     void setSkinVariantId(int skinVariantId);
     void syncHardwareLatencyFromState();
@@ -421,6 +425,9 @@ private:
     void enableApvtsLogging();
     void disableApvtsLogging();
     void ensureDevelopmentLoggingStarted();
+    void initializeDiagnosticLoggingProperty();
+    void applyDiagnosticLoggingFromState();
+    bool shouldEmitApvtsLogs() const;
 
     juce::String getThreadNameForLogging() const;
     static juce::String simplifyThreadNameForLogging(const juce::String& threadName);
@@ -434,6 +441,7 @@ private:
     void buildChoiceParameterMap();
     std::optional<juce::String> getChoiceLabel(const juce::String& parameterId, int value) const;
     juce::String getChoiceLabelForNumericValue(const juce::String& parameterId, const juce::var& newValue) const;
+    juce::String resolveComputerPatchesSelectLabel(int selectedId) const;
     void handleBankNumberChange(const juce::String& parameterId);
     void handlePatchNumberChange(const juce::String& parameterId);
     void trackSuppressedPatchNumberChange(const juce::String& parameterId);
@@ -555,6 +563,8 @@ private:
     bool suppressMutatorHistorySelectionDebounce_ { false };
     juce::uint32 editorialResyncGranularMidiQuietUntilMs_ { 0 };
     bool developmentLoggingStarted_ { false };
+    bool diagnosticLoggingEnabled_ { false };
+    std::uint32_t loggingInstanceId_ { 0 };
     std::unique_ptr<DeferredMidiPortSyncTimer> deferredMidiPortSyncTimer_;
     juce::MidiDeviceListConnection midiDeviceListConnection_;
     

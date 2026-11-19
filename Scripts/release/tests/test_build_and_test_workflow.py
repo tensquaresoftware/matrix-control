@@ -96,7 +96,7 @@ def test_build_and_test_workflow_structure():
     assert "macos-debug-arm64" in workflow_text
     assert "windows-debug" in workflow_text
     assert "linux-debug" in workflow_text
-    assert "MATRIX_BUILD_TESTS=ON" in workflow_text
+    assert "MC_BUILD_TESTS=ON" in workflow_text
     assert "USER_COPY_TO_SYSTEM_FOLDERS=OFF" in workflow_text
     assert "USER_COPY_TO_ARTEFACTS_DIR=OFF" in workflow_text
 

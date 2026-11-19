@@ -5,6 +5,10 @@
 #define MIDI_LOGGER_ENABLED 1
 #endif
 
+#ifndef MC_DEV_MIDI_LOG
+#define MC_DEV_MIDI_LOG 0
+#endif
+
 #include <fstream>
 #include <memory>
 #include <mutex>
@@ -31,6 +35,7 @@ public:
     void setLogLevel(LogLevel level);
     void setLogToFile(bool enabled, const juce::File& logFile = juce::File());
     void setLogToConsole(bool enabled);
+    bool isLoggingToFile() const noexcept { return logToFile; }
 
     void logMessage(LogLevel level, const juce::String& message);
     void logSysExSent(const juce::MemoryBlock& sysEx, const juce::String& description = "");
@@ -47,7 +52,7 @@ private:
     static constexpr const char* kLogFilenamePrefix = "midi-log";
 
     static constexpr int kMinLogLineWidth = 60;
-    static constexpr int kLogLineWidth = 80;
+    static constexpr int kLogLineWidth = 120;
 
     static constexpr const char* kLogLevelNames[] = {
         "NONE", "ERROR", "WARNING", "INFO", "DEBUG", "VERBOSE"
@@ -55,9 +60,9 @@ private:
 
     static constexpr int kLogLevelColumnWidth = 9;
 
-    LogLevel currentLogLevel = LogLevel::kInfo;
+    LogLevel currentLogLevel = (MC_DEV_MIDI_LOG != 0) ? LogLevel::kInfo : LogLevel::kWarning;
     bool logToFile = false;
-    bool logToConsole = true;
+    bool logToConsole = (MC_DEV_MIDI_LOG != 0);
     juce::File logFile;
     std::unique_ptr<std::ofstream> fileStream;
     std::mutex logMutex;
@@ -109,4 +114,5 @@ private:
     juce::String wrapContinuationLine(const juce::String& message,
                                       int maxLineWidth,
                                       int& messageStart) const;
+    int getMessageColumnIndentWidth() const;
 };

@@ -47,6 +47,7 @@ private:
         return juce::ValueTree("APVTS");
     }
 
+
     void firstOpenDefaultsToUserInterface()
     {
         beginTest("First open - missing last tab shows USER INTERFACE");
@@ -121,7 +122,8 @@ private:
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(3, true)), juce::String("PATCH"));
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(4, true)), juce::String("PATCH MUTATOR"));
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(5, true)), juce::String("MASTER"));
-        expectEquals(juce::String(SettingsShellMetrics::tabLabel(6, true)), juce::String());
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(6, true)), juce::String("SUPPORT"));
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(7, true)), juce::String());
         expectEquals(SettingsShellMetrics::midiAndDevicePageRowCount(true), 6);
         expectEquals(juce::String(PluginDisplayNames::Settings::kHardwareLatencyLabel),
                      juce::String("HARDWARE LATENCY"));
@@ -144,6 +146,7 @@ private:
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(4, false)), juce::String("PATCH"));
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(5, false)), juce::String("PATCH MUTATOR"));
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(6, false)), juce::String("MASTER"));
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(7, false)), juce::String("SUPPORT"));
         expectEquals(PluginIDs::Settings::LastTab::idAt(0, false),
                      PluginIDs::Settings::LastTab::kGettingStarted);
         expectEquals(PluginIDs::Settings::LastTab::idAt(2, false),
@@ -158,6 +161,11 @@ private:
         expectEquals(PluginIDs::Settings::LastTab::kPatchMutator, 6);
         expectEquals(PluginIDs::Settings::LastTab::kMaster, 7);
         expectEquals(PluginIDs::Settings::LastTab::kGettingStarted, 8);
+        expectEquals(PluginIDs::Settings::LastTab::kSupport, 9);
+        expectEquals(PluginIDs::Settings::LastTab::idAt(7, false),
+                     PluginIDs::Settings::LastTab::kSupport);
+        expectEquals(PluginIDs::Settings::LastTab::idAt(6, true),
+                     PluginIDs::Settings::LastTab::kSupport);
         expectEquals(SettingsShellMetrics::midiAndDevicePageRowCount(false), 6);
     }
 

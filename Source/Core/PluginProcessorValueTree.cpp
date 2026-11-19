@@ -22,7 +22,9 @@
 #include "Core/Services/PatchMutator/PatchMutatorEngine.h"
 #include "Core/Util/ComboboxPatchSendDebouncer.h"
 #include "Loggers/ApvtsLogger.h"
+#include "Loggers/LogSessionHeader.h"
 #include "Loggers/MidiLogger.h"
+#include "Shared/ProjectPaths.h"
 #include "MIDI/MidiManager.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
@@ -30,29 +32,53 @@
 
 using namespace PluginProcessorInternal;
 
+bool PluginProcessor::shouldEmitApvtsLogs() const
+{
+    return shouldUseDevelopmentApvtsLogging() || diagnosticLoggingEnabled_;
+}
+
 void PluginProcessor::ensureDevelopmentLoggingStarted()
 {
-    if (!shouldUseDevelopmentLogging() || developmentLoggingStarted_)
+    if (developmentLoggingStarted_)
+        return;
+
+    const bool enableMidi = shouldUseDevelopmentMidiLogging();
+    const bool enableApvts = shouldUseDevelopmentApvtsLogging();
+    if (! enableMidi && ! enableApvts)
         return;
 
     developmentLoggingStarted_ = true;
-    enableFileLoggingForSession();
-    enableApvtsLogging();
+    if (enableMidi)
+        enableFileLoggingForSession();
+    if (enableApvts)
+        enableApvtsLogging();
 }
 
 void PluginProcessor::enableFileLoggingForSession()
 {
+    if (diagnosticLoggingEnabled_)
+        return;
+
+    LogSessionHeader::setReportingInstanceId(loggingInstanceId_);
     MidiLogger::getInstance().setLogLevel(MidiLogger::LogLevel::kDebug);
+    MidiLogger::getInstance().setLogToConsole(true);
     MidiLogger::getInstance().setLogToFile(true);
 }
 
 void PluginProcessor::closeLogFileForSession()
 {
+    if (diagnosticLoggingEnabled_)
+        return;
+
     MidiLogger::getInstance().setLogToFile(false);
 }
 
 void PluginProcessor::enableApvtsLogging()
 {
+    if (diagnosticLoggingEnabled_)
+        return;
+
+    LogSessionHeader::setReportingInstanceId(loggingInstanceId_);
     ApvtsLogger::getInstance().setLogLevel(ApvtsLogger::LogLevel::kDebug);
     ApvtsLogger::getInstance().setLogToConsole(true);
     ApvtsLogger::getInstance().setLogToFile(true);
@@ -61,6 +87,9 @@ void PluginProcessor::enableApvtsLogging()
 
 void PluginProcessor::disableApvtsLogging()
 {
+    if (diagnosticLoggingEnabled_)
+        return;
+
     ApvtsLogger::getInstance().setLogToFile(false);
 }
 
@@ -114,7 +143,7 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
     juce::String parameterId = resolveParameterIdFromTree(treeWhosePropertyHasChanged, property);
     juce::String choiceLabel = getChoiceLabelForNumericValue(parameterId, newValue);
 
-    if (shouldUseDevelopmentLogging())
+    if (shouldEmitApvtsLogs())
     {
         ApvtsLogger::getInstance().logValueTreePropertyChanged({
             juce::Identifier(parameterId),
@@ -281,7 +310,7 @@ void PluginProcessor::valueTreeChildAdded(juce::ValueTree& parentTree,
 {
     juce::ignoreUnused(parentTree, childWhichHasBeenAdded);
 
-    if (shouldUseDevelopmentLogging())
+    if (shouldEmitApvtsLogs())
         ApvtsLogger::getInstance().logDebug("ValueTree child added: " + childWhichHasBeenAdded.getType().toString());
 }
 
@@ -291,7 +320,7 @@ void PluginProcessor::valueTreeChildRemoved(juce::ValueTree& parentTree,
 {
     juce::ignoreUnused(parentTree, childWhichHasBeenRemoved, indexFromWhichChildWasRemoved);
 
-    if (shouldUseDevelopmentLogging())
+    if (shouldEmitApvtsLogs())
         ApvtsLogger::getInstance().logDebug("ValueTree child removed: " + childWhichHasBeenRemoved.getType().toString());
 }
 
@@ -300,7 +329,7 @@ void PluginProcessor::valueTreeChildOrderChanged(juce::ValueTree& parentTreeWhos
 {
     juce::ignoreUnused(parentTreeWhoseChildrenHaveChanged, oldIndex, newIndex);
 
-    if (shouldUseDevelopmentLogging())
+    if (shouldEmitApvtsLogs())
         ApvtsLogger::getInstance().logDebug("ValueTree child order changed");
 }
 
@@ -308,7 +337,7 @@ void PluginProcessor::valueTreeParentChanged(juce::ValueTree& treeWhoseParentHas
 {
     juce::ignoreUnused(treeWhoseParentHasChanged);
 
-    if (shouldUseDevelopmentLogging())
+    if (shouldEmitApvtsLogs())
         ApvtsLogger::getInstance().logDebug("ValueTree parent changed");
 }
 
@@ -316,7 +345,7 @@ void PluginProcessor::valueTreeRedirected(juce::ValueTree& treeWhichHasBeenChang
 {
     juce::ignoreUnused(treeWhichHasBeenChanged);
 
-    if (shouldUseDevelopmentLogging())
+    if (shouldEmitApvtsLogs())
         ApvtsLogger::getInstance().logStateReplaced();
 
     apvtsPatchMapper_->apvtsToBuffer();

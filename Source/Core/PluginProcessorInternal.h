@@ -70,16 +70,57 @@ namespace PluginProcessorInternal
         return isMidiOutputDeviceAvailable(deviceId) ? deviceId : juce::String();
     }
 
-    inline bool shouldUseDevelopmentLogging()
+    inline bool isDevMidiLogCompileEnabled() noexcept
     {
-#if JUCE_DEBUG
-        if (isStandaloneWrapper())
-            return true;
-
-        return !ProjectPaths::isUsingFallbackRoot();
+#if defined(MC_DEV_MIDI_LOG) && MC_DEV_MIDI_LOG
+        return true;
 #else
         return false;
 #endif
+    }
+
+    inline bool isDevApvtsLogCompileEnabled() noexcept
+    {
+#if defined(MC_DEV_APVTS_LOG) && MC_DEV_APVTS_LOG
+        return true;
+#else
+        return false;
+#endif
+    }
+
+    inline bool shouldUseDevelopmentMidiLogging()
+    {
+#if JUCE_DEBUG
+        if (! isDevMidiLogCompileEnabled())
+            return false;
+
+        if (isStandaloneWrapper())
+            return true;
+
+        return ! ProjectPaths::isUsingFallbackRoot();
+#else
+        return false;
+#endif
+    }
+
+    inline bool shouldUseDevelopmentApvtsLogging()
+    {
+#if JUCE_DEBUG
+        if (! isDevApvtsLogCompileEnabled())
+            return false;
+
+        if (isStandaloneWrapper())
+            return true;
+
+        return ! ProjectPaths::isUsingFallbackRoot();
+#else
+        return false;
+#endif
+    }
+
+    inline bool shouldUseDevelopmentLogging()
+    {
+        return shouldUseDevelopmentMidiLogging() || shouldUseDevelopmentApvtsLogging();
     }
 
     inline constexpr int kEditorialUndoMaxStoredUnits = 100; // transaction depth (see undo-policy.md)

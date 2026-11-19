@@ -329,7 +329,7 @@ def test_release_workflow_structure():
     assert "macos-latest" in build_yaml
     assert "windows-latest" in build_yaml
     assert "ubuntu-latest" in build_yaml
-    assert "MATRIX_BUILD_TESTS=ON" in workflow_text
+    assert "MC_BUILD_TESTS=ON" in workflow_text
     assert "USER_COPY_TO_SYSTEM_FOLDERS=OFF" in workflow_text
     assert "USER_COPY_TO_ARTEFACTS_DIR=OFF" in workflow_text
     assert "fail-fast: false" in build_yaml or "fail-fast: false" in build_yaml.replace("'", '"')

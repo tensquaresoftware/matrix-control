@@ -256,6 +256,7 @@ private:
     void restoreSettingsPresenceCheckFromState(SettingsPanel& panel);
     void wireSettingsAppearanceCombos(SettingsPanel& panel);
     void wireSettingsContextualHelpCombo(SettingsPanel& panel);
+    void wireSettingsDiagnosticLogging(SettingsPanel& panel);
     void wireSettingsGettingStartedControls(SettingsPanel& panel);
     void wireSettingsPolicyCombos(SettingsPanel& panel);
     void wireSettingsInitAndMasterActions(SettingsPanel& panel);

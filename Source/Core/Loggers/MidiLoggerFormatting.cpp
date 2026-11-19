@@ -4,6 +4,8 @@
 #include "Core/MIDI/SysEx/SysExConstants.h"
 #include "Core/MIDI/SysEx/SysExParser.h"
 
+#include <algorithm>
+
 juce::String MidiLogger::formatLogLevelColumn(LogLevel level) const
 {
     const juce::String levelName = kLogLevelNames[static_cast<int>(level)];
@@ -88,6 +90,12 @@ juce::String MidiLogger::wrapContinuationLine(const juce::String& message,
     return line;
 }
 
+int MidiLogger::getMessageColumnIndentWidth() const
+{
+    // "[LEVEL] " + "HH:MM:SS.mmm" + " - "
+    return kLogLevelColumnWidth + 1 + 12 + 3;
+}
+
 juce::String MidiLogger::wrapLogMessage(const juce::String& prefix,
                                         const juce::String& message) const
 {
@@ -95,9 +103,10 @@ juce::String MidiLogger::wrapLogMessage(const juce::String& prefix,
     const int prefixLength = prefix.length();
     const int availableWidth = maxLineWidth - prefixLength;
 
-    if (prefixLength + message.length() <= maxLineWidth)
+    if (availableWidth <= 0 || prefixLength + message.length() <= maxLineWidth)
         return prefix + message;
 
+    const juce::String indent = juce::String::repeatedString(" ", prefixLength);
     juce::String wrappedMessage;
     int messageStart = 0;
     bool isFirstLine = true;
@@ -111,7 +120,7 @@ juce::String MidiLogger::wrapLogMessage(const juce::String& prefix,
         }
         else
         {
-            wrappedMessage += wrapContinuationLine(message, maxLineWidth, messageStart);
+            wrappedMessage += indent + wrapContinuationLine(message, availableWidth, messageStart);
         }
     }
 
@@ -174,7 +183,8 @@ void MidiLogger::logSysExDataDecimal(const juce::uint8* data,
 
 int MidiLogger::calculateBytesPerLine() const
 {
-    return (getEffectiveLineWidth() - 1) / 3;
+    const int usableWidth = getEffectiveLineWidth() - getMessageColumnIndentWidth();
+    return std::max(1, usableWidth / 3);
 }
 
 void MidiLogger::insertNewlineIfNeeded(juce::String& hexString,
@@ -211,10 +221,17 @@ juce::String MidiLogger::formatHexBytesWithLineWrapping(const juce::MemoryBlock&
 
 juce::String MidiLogger::formatSysExMessage(const juce::MemoryBlock& sysEx) const
 {
-    if (sysEx.getSize() == 0)
-        return "empty";
+    const juce::String indent = juce::String::repeatedString(" ", getMessageColumnIndentWidth());
 
-    return formatHexBytesWithLineWrapping(sysEx);
+    if (sysEx.getSize() == 0)
+        return indent + "empty";
+
+    // Indent hex under the message column (same gutter as wrapped text continuations).
+    juce::StringArray lines;
+    lines.addLines(formatHexBytesWithLineWrapping(sysEx));
+    for (auto& line : lines)
+        line = indent + line;
+    return lines.joinIntoString("\n");
 }
 
 juce::String MidiLogger::buildTimestampString() const

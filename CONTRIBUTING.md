@@ -159,7 +159,7 @@ EOF
 Each leg:
 
 1. Checks out JUCE **9.0.5** (cached between runs)
-2. Configures with `MATRIX_BUILD_TESTS=ON` and plugin copy disabled (`USER_COPY_TO_*=OFF`)
+2. Configures with `MC_BUILD_TESTS=ON` and plugin copy disabled (`USER_COPY_TO_*=OFF`)
 3. Builds the `Matrix-Control` plugin target and `Matrix-Control_Tests`
 4. Runs the `Matrix-Control_Tests` console binary (headless Core unit tests — no MIDI hardware)
 
@@ -174,7 +174,7 @@ Set `JUCE_DIR` to your JUCE 9.0.5 install, then configure with the preset for yo
 ```bash
 export JUCE_DIR=/Volumes/Guillaume/Dev/SDKs/JUCE-9
 cmake --preset macos-debug-arm64 \
-  -DMATRIX_BUILD_TESTS=ON \
+  -DMC_BUILD_TESTS=ON \
   -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF \
   -DUSER_COPY_TO_ARTEFACTS_DIR=OFF
 cmake --build --preset macos-debug-arm64 --target Matrix-Control Matrix-Control_Tests
@@ -186,7 +186,7 @@ cmake --build --preset macos-debug-arm64 --target Matrix-Control Matrix-Control_
 ```powershell
 $env:JUCE_DIR = "C:\Users\Guillaume\Dev\SDKs\JUCE-9\JUCE"
 cmake --preset windows-debug `
-  -DMATRIX_BUILD_TESTS=ON `
+  -DMC_BUILD_TESTS=ON `
   -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF `
   -DUSER_COPY_TO_ARTEFACTS_DIR=OFF
 cmake --build --preset windows-debug --target Matrix-Control Matrix-Control_Tests --config Debug
@@ -200,7 +200,7 @@ Install the same packages as the workflow (`build-essential`, `ninja-build`, ALS
 ```bash
 export JUCE_DIR=/path/to/JUCE-9
 cmake --preset linux-debug \
-  -DMATRIX_BUILD_TESTS=ON \
+  -DMC_BUILD_TESTS=ON \
   -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF \
   -DUSER_COPY_TO_ARTEFACTS_DIR=OFF
 cmake --build --preset linux-debug --target Matrix-Control Matrix-Control_Tests
@@ -268,7 +268,7 @@ If CI is unavailable, build Release locally and pack with:
 
 ```bash
 cmake --preset macos-release-arm64 \
-  -DMATRIX_BUILD_TESTS=ON \
+  -DMC_BUILD_TESTS=ON \
   -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF \
   -DUSER_COPY_TO_ARTEFACTS_DIR=OFF \
   -DMATRIX_CONTROL_PRERELEASE_SUFFIX=""

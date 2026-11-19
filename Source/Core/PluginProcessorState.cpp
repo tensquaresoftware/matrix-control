@@ -123,7 +123,9 @@ void PluginProcessor::applyRestoredPluginState(juce::ValueTree restoredState)
         dirtyPatchTracker_->captureSnapshot(*patchModel_);
     }
 
-    if (shouldUseDevelopmentLogging())
+    applyDiagnosticLoggingFromState();
+
+    if (shouldEmitApvtsLogs())
         ApvtsLogger::getInstance().logStateLoaded("DAW state");
 }
 

@@ -180,6 +180,7 @@ set(PLUGIN_SOURCES
     Source/Core/PluginProcessorParameters.cpp
     Source/Core/PluginProcessorState.cpp
     Source/Core/PluginProcessorValueTree.cpp
+    Source/Core/PluginProcessorDiagnosticLogging.cpp
     Source/Core/Audio/AudioPassthroughProcessor.cpp
     Source/Core/Audio/AudioInputSourceCatalog.cpp
     Source/Core/Audio/AudioFromSourceSync.cpp
@@ -285,6 +286,7 @@ set(PLUGIN_SOURCES
     Source/GUI/PluginEditorWindows.cpp
     Source/GUI/PluginEditorSettingsOverlay.cpp
     Source/GUI/PluginEditorSettings.cpp
+    Source/GUI/PluginEditorSettingsDiagnostic.cpp
     Source/GUI/PluginEditorSettingsDevice.cpp
     Source/GUI/PluginEditorSettingsAppearance.cpp
     Source/GUI/PluginEditorGettingStarted.cpp
@@ -352,6 +354,9 @@ set(PLUGIN_SOURCES
     Source/GUI/Skins/SkinColourAccessors.cpp
     Source/GUI/Skins/SkinZoneOverlay.cpp
     Source/GUI/Skins/Dev/DevSkinColourElementList.cpp
+    # Product Minimal variants (Skin::create) — not Skin-Designer-only
+    Source/GUI/Skins/Dev/DevSkinMinimalSeedBlack.cpp
+    Source/GUI/Skins/Dev/DevSkinMinimalSeedCream.cpp
     
     # GUI - Looks
     Source/GUI/Looks/LookBuilders.cpp
@@ -469,23 +474,34 @@ set(PLUGIN_SOURCES
     Source/Core/Loggers/MidiLoggerFormatting.cpp
     Source/Core/Loggers/ApvtsLogger.cpp
     Source/Core/Loggers/ApvtsLoggerFormatting.cpp
+    Source/Core/Loggers/LogSessionHeader.cpp
 )
 
 # ============================================================================
 # UNIT TEST RUNNER (console app)
 # Unit tests use juce::UnitTest and must NOT be linked into AU/VST3/Standalone
 # (static UnitTest registrars crash some hosts). They build into a dedicated
-# console target instead. Enable with -DMATRIX_BUILD_TESTS=ON, then:
+# console target instead. Enable with -DMC_BUILD_TESTS=ON, then:
 #   cmake --build <buildDir> --target Matrix-Control_Tests
 #   "<buildDir>/Matrix-Control_Tests_artefacts/<config>/Matrix-Control Tests"
 # Only Core sources under test are compiled here — no GUI, no plugin target.
 # ============================================================================
-option(MATRIX_BUILD_TESTS "Build the Matrix-Control unit test runner" OFF)
+option(MC_BUILD_TESTS "Build the Matrix-Control unit test runner" OFF)
 
 # Dev author tool: Matrix-Control Skin Designer + Standalone Dev thin-bridge receiver.
 # Keep OFF for Release user packaging / AU / VST3. Enable for local invent work:
-#   cmake --preset macos-debug-arm64 -DMATRIX_BUILD_SKIN_DESIGNER=ON
-option(MATRIX_BUILD_SKIN_DESIGNER "Build Skin Designer app and Standalone Dev skin receiver" OFF)
+#   cmake --preset macos-debug-arm64 -DMC_BUILD_SKIN_DESIGNER=ON
+option(MC_BUILD_SKIN_DESIGNER "Build Skin Designer app and Standalone Dev skin receiver" OFF)
+
+# Legacy aliases (accept -DMATRIX_BUILD_*=ON from older scripts/docs).
+option(MATRIX_BUILD_TESTS "Deprecated alias for MC_BUILD_TESTS" OFF)
+option(MATRIX_BUILD_SKIN_DESIGNER "Deprecated alias for MC_BUILD_SKIN_DESIGNER" OFF)
+if(MATRIX_BUILD_TESTS)
+    set(MC_BUILD_TESTS ON CACHE BOOL "Build the Matrix-Control unit test runner" FORCE)
+endif()
+if(MATRIX_BUILD_SKIN_DESIGNER)
+    set(MC_BUILD_SKIN_DESIGNER ON CACHE BOOL "Build Skin Designer app and Standalone Dev skin receiver" FORCE)
+endif()
 
 # Shared Dev-layer + editor client sources (no BridgeServer — Standalone-only).
 set(MATRIX_SKIN_DEV_LAYER_SOURCES
@@ -515,8 +531,15 @@ set(MATRIX_SKIN_DEV_RECEIVER_SOURCES
     Source/GUI/Skins/Dev/DevSkinReceiverController.cpp
 )
 
-if(MATRIX_BUILD_TESTS)
+if(MC_BUILD_TESTS)
     juce_add_console_app(Matrix-Control_Tests PRODUCT_NAME "Matrix-Control Tests")
+
+    target_compile_definitions(Matrix-Control_Tests PRIVATE
+        $<$<CONFIG:Debug>:MC_DEV_MIDI_LOG=1>
+        $<$<CONFIG:Debug>:MC_DEV_APVTS_LOG=1>
+        $<$<NOT:$<CONFIG:Debug>>:MC_DEV_MIDI_LOG=0>
+        $<$<NOT:$<CONFIG:Debug>>:MC_DEV_APVTS_LOG=0>
+    )
 
     target_sources(Matrix-Control_Tests PRIVATE
         Tests/TestMain.cpp
@@ -710,6 +733,8 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/DeviceSetupDeviceRowTests.cpp
         Tests/Unit/MatrixModalCopyTests.cpp
         Tests/Unit/SettingsTabsShellTests.cpp
+        Tests/Unit/DiagnosticLoggingSettingsTests.cpp
+        Tests/Unit/LogLayoutSampleFilesTests.cpp
         Tests/Unit/WindowsAsioDeviceTypeTests.cpp
         Tests/Unit/LinuxJackDeviceTypeTests.cpp
         Tests/Unit/DeviceConnectionMachineDefaultsTests.cpp
@@ -897,6 +922,9 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/MIDI/SysEx/SysExEncoder.cpp
         Source/Core/Loggers/MidiLogger.cpp
         Source/Core/Loggers/MidiLoggerFormatting.cpp
+        Source/Core/Loggers/ApvtsLogger.cpp
+        Source/Core/Loggers/ApvtsLoggerFormatting.cpp
+        Source/Core/Loggers/LogSessionHeader.cpp
         Source/Shared/Definitions/PluginDescriptors.cpp
         Source/Shared/Definitions/PluginDescriptorsMasterEdit.cpp
         Source/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
@@ -953,6 +981,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/MIDI/SysEx/SysExParser.cpp
         Source/Core/Loggers/MidiLogger.cpp
         Source/Core/Loggers/MidiLoggerFormatting.cpp
+        Source/Core/Loggers/LogSessionHeader.cpp
         Source/Shared/Definitions/PluginDescriptors.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEditVcfVca.cpp
@@ -964,6 +993,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
         Source/Shared/Definitions/PluginHelpers.cpp
+        Source/Shared/Definitions/PluginVersion.cpp
         Source/Shared/ProjectPaths.cpp
     )
 
@@ -1048,7 +1078,7 @@ target_compile_definitions(Matrix-Control_Standalone PRIVATE
     JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=1
 )
 
-if(MATRIX_BUILD_SKIN_DESIGNER)
+if(MC_BUILD_SKIN_DESIGNER)
     # Shared apply helpers for PluginEditor overlay (no receiver listen socket in AU/VST3).
     target_sources(Matrix-Control PRIVATE
         Source/GUI/Skins/Dev/DevSkinApplier.cpp
@@ -1064,8 +1094,6 @@ if(MATRIX_BUILD_SKIN_DESIGNER)
         Source/GUI/Skins/Dev/DevSkinPaletteCatalog.cpp
         Source/GUI/Skins/Dev/DevSkinSsotSeed.cpp
         Source/GUI/Skins/Dev/DevSkinKindCodec.cpp
-        Source/GUI/Skins/Dev/DevSkinMinimalSeedBlack.cpp
-        Source/GUI/Skins/Dev/DevSkinMinimalSeedCream.cpp
         Source/GUI/Skins/Dev/DevSkinStandalonePaintState.cpp
     )
     target_compile_definitions(Matrix-Control PRIVATE
@@ -1119,6 +1147,10 @@ target_compile_definitions(Matrix-Control
     PRIVATE
         MATRIX_CONTROL_PROJECT_VERSION="${PROJECT_VERSION}"
         MATRIX_CONTROL_PRERELEASE_SUFFIX="${MATRIX_CONTROL_PRERELEASE_SUFFIX}"
+        $<$<CONFIG:Debug>:MC_DEV_MIDI_LOG=1>
+        $<$<CONFIG:Debug>:MC_DEV_APVTS_LOG=1>
+        $<$<NOT:$<CONFIG:Debug>>:MC_DEV_MIDI_LOG=0>
+        $<$<NOT:$<CONFIG:Debug>>:MC_DEV_APVTS_LOG=0>
 )
 
 # Windows Standalone Settings AUDIO: register JUCE ASIO device type (GH-42).
@@ -1231,11 +1263,11 @@ add_dependencies(ExportMatrixModals Matrix-Control)
 
 # =============================================================================
 # DEV TOOL: Matrix-Control Skin Designer (native JUCE GUI app)
-#   cmake --preset macos-debug-arm64 -DMATRIX_BUILD_SKIN_DESIGNER=ON
+#   cmake --preset macos-debug-arm64 -DMC_BUILD_SKIN_DESIGNER=ON
 #   cmake --build --preset macos-debug-arm64 --target Matrix-Control_SkinDesigner
-# Absent from Release user packaging when MATRIX_BUILD_SKIN_DESIGNER=OFF.
+# Absent from Release user packaging when MC_BUILD_SKIN_DESIGNER=OFF.
 # =============================================================================
-if(MATRIX_BUILD_SKIN_DESIGNER)
+if(MC_BUILD_SKIN_DESIGNER)
     juce_add_gui_app(Matrix-Control_SkinDesigner
         PRODUCT_NAME "Matrix-Control Skin Designer"
         COMPANY_NAME "Ten Square Software"
@@ -1438,7 +1470,7 @@ if(COPY_TO_ARTEFACTS_DIR)
     endif()
 
     # Skin Designer (dev author tool — lands next to Matrix-Control in Standalone/)
-    if(MATRIX_BUILD_SKIN_DESIGNER AND TARGET Matrix-Control_SkinDesigner)
+    if(MC_BUILD_SKIN_DESIGNER AND TARGET Matrix-Control_SkinDesigner)
         list(APPEND ALL_PLUGIN_TARGETS "Matrix-Control_SkinDesigner")
         if(APPLE)
             set(SKIN_DESIGNER_SOURCE "${CMAKE_BINARY_DIR}/Matrix-Control_SkinDesigner_artefacts/$<CONFIG>/Matrix-Control Skin Designer.app")
@@ -1479,7 +1511,7 @@ if(COPY_TO_ARTEFACTS_DIR)
     )
 
     # Skin Designer solo builds (`--target Matrix-Control_SkinDesigner`) also land in Dropbox.
-    if(MATRIX_BUILD_SKIN_DESIGNER AND TARGET Matrix-Control_SkinDesigner)
+    if(MC_BUILD_SKIN_DESIGNER AND TARGET Matrix-Control_SkinDesigner)
         if(APPLE)
             # Build bundle is re-signed by the unconditional POST_BUILD above; here
             # re-sign + clear xattrs on the artefacts copy after solo-target builds.

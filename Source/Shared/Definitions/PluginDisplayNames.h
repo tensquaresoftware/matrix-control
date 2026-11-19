@@ -166,6 +166,11 @@ namespace PluginDisplayNames
         constexpr const char* kPatchSection            = "PATCH";
         constexpr const char* kPatchMutatorSection     = "PATCH MUTATOR";
         constexpr const char* kMasterSection           = "MASTER";
+        constexpr const char* kSupportTab              = "SUPPORT";
+        constexpr const char* kDiagnosticLoggingLabel  = "DIAGNOSTIC LOGGING";
+        constexpr const char* kOpenLogFolderButton     = "OPEN LOG FOLDER";
+        constexpr const char* kOff                     = "OFF";
+        constexpr const char* kOn                      = "ON";
         constexpr const char* kDriverTypeLabel         = "DRIVER TYPE";
         constexpr const char* kInputDeviceLabel        = "INPUT DEVICE";
         constexpr const char* kOutputDeviceLabel       = "OUTPUT DEVICE";

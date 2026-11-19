@@ -7,7 +7,7 @@
 #   Linux  — linux-release          (Ninja)
 #
 # CI overrides:
-#   -DMATRIX_BUILD_TESTS=ON
+#   -DMC_BUILD_TESTS=ON
 #   -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF
 #   -DUSER_COPY_TO_ARTEFACTS_DIR=OFF
 #   -DMATRIX_CONTROL_PRERELEASE_SUFFIX=<from tag suffix, empty for stable>
@@ -148,7 +148,7 @@ jobs:
           JUCE_DIR: ${{ github.workspace }}/JUCE
         run: |
           cmake --preset "${{ matrix.preset }}" \
-            -DMATRIX_BUILD_TESTS=ON \
+            -DMC_BUILD_TESTS=ON \
             -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF \
             -DUSER_COPY_TO_ARTEFACTS_DIR=OFF \
             -DMATRIX_CONTROL_PRERELEASE_SUFFIX="${{ needs.validate-tag.outputs.suffix }}"

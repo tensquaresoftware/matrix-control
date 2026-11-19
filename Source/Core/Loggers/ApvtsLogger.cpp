@@ -2,6 +2,8 @@
 
 #include "ApvtsLogger.h"
 
+#include "LogSessionHeader.h"
+
 #include "Shared/ProjectPaths.h"
 
 #include <juce_core/juce_core.h>
@@ -94,11 +96,15 @@ void ApvtsLogger::setLogToFile(bool enabled, const juce::File& filePath)
         if (!enabled)
             return;
 
-        static std::once_flag fallbackWarningFlag;
-        std::call_once(fallbackWarningFlag, [&shouldEmitFallbackWarning]()
+        // Explicit path = diagnostic/support location; do not walk project root.
+        if (filePath.getFullPathName().isEmpty())
         {
-            shouldEmitFallbackWarning = ProjectPaths::isUsingFallbackRoot();
-        });
+            static std::once_flag fallbackWarningFlag;
+            std::call_once(fallbackWarningFlag, [&shouldEmitFallbackWarning]()
+            {
+                shouldEmitFallbackWarning = ProjectPaths::isUsingFallbackRoot();
+            });
+        }
 
         logFile = determineLogFilePath(filePath);
         ensureLogDirectoryExists(logFile);
@@ -187,7 +193,6 @@ void ApvtsLogger::openNewLogFile()
 
 void ApvtsLogger::writeSessionStartedHeader()
 {
-    const juce::Time now = juce::Time::getCurrentTime();
     const juce::String separator = generateSeparatorLine();
     const juce::String headerText = "=== APVTS Log Session Started ";
     const int remainingChars = getEffectiveLineWidth() - headerText.length();
@@ -202,8 +207,7 @@ void ApvtsLogger::writeSessionStartedHeader()
         *fileStream << headerText.toRawUTF8() << "\n";
     }
 
-    *fileStream << "Date: " << now.toString(true, true, false, true).toRawUTF8() << "\n";
-    *fileStream << "Log file: " << logFile.getFileName().toRawUTF8() << "\n";
+    *fileStream << LogSessionHeader::buildMetadataBlock(logFile).toRawUTF8();
     *fileStream << separator.toRawUTF8() << "\n\n";
     fileStream->flush();
 }

@@ -3,6 +3,10 @@
 #include "PluginProcessor.h"
 #include "PluginProcessorInternal.h"
 
+#include "Loggers/ApvtsLogger.h"
+#include "Loggers/LogSessionHeader.h"
+#include "Loggers/MidiLogger.h"
+
 #include "Core/Actions/ActionDispatcher.h"
 #include "Core/Actions/ModuleActionHandler.h"
 #include "Core/Actions/MutatorActionHandler.h"
@@ -78,6 +82,7 @@ PluginProcessor::PluginProcessor()
     , clipboardService_{ std::make_unique<Core::ClipboardService>() }
     , dirtyPatchTracker_{ std::make_unique<Core::DirtyPatchTracker>() }
 {
+    loggingInstanceId_ = LogSessionHeader::allocateInstanceId();
     midiManager->setActiveNoteRegistry(activeNoteRegistry_.get());
     createSysExDispatchers();
     createInitAndFileServices();
@@ -89,6 +94,14 @@ PluginProcessor::PluginProcessor()
 
 PluginProcessor::~PluginProcessor()
 {
+    // Close SUPPORT files without restoring Debug lab logging — this processor is dying.
+    if (diagnosticLoggingEnabled_)
+    {
+        diagnosticLoggingEnabled_ = false;
+        MidiLogger::getInstance().setLogToFile(false);
+        ApvtsLogger::getInstance().setLogToFile(false);
+    }
+
     midiDeviceListConnection_.reset();
     deferredMidiPortSyncTimer_.reset();
     apvts.state.removeListener(this);
@@ -159,13 +172,13 @@ void PluginProcessor::changeProgramName(int index, const juce::String& newName)
 
 void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
-    juce::ignoreUnused(samplesPerBlock);
     ensureAudioInputBusEnabled();
     syncAudioRuntimeFromState();
 
     audioPassthroughSampleRate_ = sampleRate > 0.0 ? sampleRate : 44100.0;
     refreshAudioPassthroughLayout(audioPassthroughSampleRate_);
     applyHardwareLatencyToHost();
+    LogSessionHeader::setAudioSnapshot(audioPassthroughSampleRate_, samplesPerBlock);
 
     if (shouldUseDevelopmentLogging())
         ensureDevelopmentLoggingStarted();
@@ -216,7 +229,9 @@ void PluginProcessor::startMidiThread()
 
 void PluginProcessor::releaseResources()
 {
-    if (shouldUseDevelopmentLogging())
+    LogSessionHeader::clearAudioSnapshot();
+
+    if (shouldUseDevelopmentLogging() && ! diagnosticLoggingEnabled_)
     {
         disableApvtsLogging();
         closeLogFileForSession();

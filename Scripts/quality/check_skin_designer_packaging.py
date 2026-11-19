@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prove MATRIX_BUILD_SKIN_DESIGNER=OFF omits Skin Designer target and Dev receiver linkage.
+"""Prove MC_BUILD_SKIN_DESIGNER=OFF omits Skin Designer target and Dev receiver linkage.
 
 Exit 0 on success. Intended for Matrix Test Audit (Release / user packaging row).
 """
@@ -22,14 +22,14 @@ def run(cmd: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
 
 def assert_cmake_gates(cmake_lists: Path) -> None:
     text = cmake_lists.read_text(encoding="utf-8")
-    if "option(MATRIX_BUILD_SKIN_DESIGNER" not in text:
-        raise SystemExit("CMakeLists.txt missing MATRIX_BUILD_SKIN_DESIGNER option")
+    if "option(MC_BUILD_SKIN_DESIGNER" not in text:
+        raise SystemExit("CMakeLists.txt missing MC_BUILD_SKIN_DESIGNER option")
     if not re.search(
-        r"if\s*\(\s*MATRIX_BUILD_SKIN_DESIGNER\s*\).*juce_add_gui_app\s*\(\s*Matrix-Control_SkinDesigner",
+        r"if\s*\(\s*MC_BUILD_SKIN_DESIGNER\s*\).*juce_add_gui_app\s*\(\s*Matrix-Control_SkinDesigner",
         text,
         re.S,
     ):
-        raise SystemExit("Skin Designer target is not gated behind MATRIX_BUILD_SKIN_DESIGNER")
+        raise SystemExit("Skin Designer target is not gated behind MC_BUILD_SKIN_DESIGNER")
     if "MATRIX_SKIN_DESIGNER_RECEIVER" not in text:
         raise SystemExit("Receiver compile define MATRIX_SKIN_DESIGNER_RECEIVER missing from CMakeLists")
     if "DevSkinBridgeServer.cpp" not in text or "DevSkinReceiverController.cpp" not in text:
@@ -47,8 +47,8 @@ def configure_off(project_root: Path, binary_dir: Path, juce_dir: str) -> None:
         "-G",
         "Ninja",
         "-DCMAKE_BUILD_TYPE=Release",
-        "-DMATRIX_BUILD_SKIN_DESIGNER=OFF",
-        "-DMATRIX_BUILD_TESTS=OFF",
+        "-DMC_BUILD_SKIN_DESIGNER=OFF",
+        "-DMC_BUILD_TESTS=OFF",
         "-DUSER_COPY_TO_SYSTEM_FOLDERS=OFF",
         "-DUSER_COPY_TO_ARTEFACTS_DIR=OFF",
         f"-DJUCE_DIR={juce_dir}",
@@ -66,7 +66,7 @@ def assert_no_skin_designer_target(binary_dir: Path) -> None:
     help_result = run(["cmake", "--build", str(binary_dir), "--target", "help"], binary_dir)
     combined = help_result.stdout + help_result.stderr
     if "Matrix-Control_SkinDesigner" in combined:
-        raise SystemExit("Matrix-Control_SkinDesigner still listed when MATRIX_BUILD_SKIN_DESIGNER=OFF")
+        raise SystemExit("Matrix-Control_SkinDesigner still listed when MC_BUILD_SKIN_DESIGNER=OFF")
 
     # Ninja build files should not mention the editor target.
     build_ninja = binary_dir / "build.ninja"
@@ -99,7 +99,7 @@ def assert_receiver_not_in_plugin_formats(binary_dir: Path) -> None:
     for marker in receiver_markers:
         if marker in ninja_text:
             raise SystemExit(
-                f"Receiver marker {marker!r} present in build graph with MATRIX_BUILD_SKIN_DESIGNER=OFF"
+                f"Receiver marker {marker!r} present in build graph with MC_BUILD_SKIN_DESIGNER=OFF"
             )
 
 

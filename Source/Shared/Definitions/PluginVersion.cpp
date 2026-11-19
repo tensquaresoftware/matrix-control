@@ -30,6 +30,10 @@ juce::String getVersionString()
     if (suffix.isNotEmpty())
         version << "-" << suffix;
 
+#if JUCE_DEBUG
+    version << " (Debug)";
+#endif
+
     return version;
 }
 
