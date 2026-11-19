@@ -303,6 +303,11 @@ private:
         expect(contents.contains("Host"));
         expect(contents.contains("Sample rate"));
         expect(contents.contains("Buffer size"));
+        expect(contents.contains("MIDI Log Session Started"));
+        // Cartouche precedes the session banner (blank line between closing rule and banner).
+        const int orgPos = contents.indexOf("Organization");
+        const int startedPos = contents.indexOf("MIDI Log Session Started");
+        expect(orgPos >= 0 && startedPos > orgPos);
         probe.deleteFile();
         LogSessionHeader::clearAudioSnapshot();
         restoreMidiLoggerDefaults(midi);

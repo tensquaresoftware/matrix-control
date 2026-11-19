@@ -162,21 +162,18 @@ void MidiLogger::openNewLogFile()
 void MidiLogger::writeSessionStartedHeader()
 {
     const juce::String separator = generateSeparatorLine();
-    const juce::String headerText = "=== MIDI Log Session Started ";
-    const int remainingChars = getEffectiveLineWidth() - headerText.length();
+    const juce::String bannerText = "=== MIDI Log Session Started ";
+    const int remainingChars = getEffectiveLineWidth() - bannerText.length();
+    const juce::String banner = remainingChars > 0
+        ? bannerText + separator.substring(separator.length() - remainingChars)
+        : bannerText;
 
-    if (remainingChars > 0)
-    {
-        *fileStream << headerText.toRawUTF8()
-                    << separator.substring(separator.length() - remainingChars).toRawUTF8() << "\n";
-    }
-    else
-    {
-        *fileStream << headerText.toRawUTF8() << "\n";
-    }
-
+    // Cartouche first; blank line; then session banner before the first event lines.
+    *fileStream << separator.toRawUTF8() << "\n";
     *fileStream << LogSessionHeader::buildMetadataBlock(logFile).toRawUTF8();
-    *fileStream << separator.toRawUTF8() << "\n\n";
+    *fileStream << separator.toRawUTF8() << "\n";
+    *fileStream << "\n";
+    *fileStream << banner.toRawUTF8() << "\n\n";
     fileStream->flush();
 }
 
