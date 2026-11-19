@@ -73,7 +73,6 @@ private:
     MidiLogger& operator=(const MidiLogger&) = delete;
 
     void writeLog(const juce::String& formattedMessage);
-    void writeLogRaw(const juce::String& message);
     void writeNonEmptyLines(const juce::String& multiLineText);
 
     juce::String getTimestamp() const;
@@ -111,5 +110,4 @@ private:
     juce::String wrapContinuationLine(const juce::String& message,
                                       int maxLineWidth,
                                       int& messageStart) const;
-    int getMessageColumnIndentWidth() const;
 };

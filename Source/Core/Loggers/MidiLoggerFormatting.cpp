@@ -88,12 +88,6 @@ juce::String MidiLogger::wrapContinuationLine(const juce::String& message,
     return line;
 }
 
-int MidiLogger::getMessageColumnIndentWidth() const
-{
-    // "[LEVEL] " + "HH:MM:SS.mmm" + " - "
-    return kLogLevelColumnWidth + 1 + 12 + 3;
-}
-
 juce::String MidiLogger::wrapLogMessage(const juce::String& prefix,
                                         const juce::String& message) const
 {

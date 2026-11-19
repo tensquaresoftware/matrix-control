@@ -6,6 +6,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "Core/Loggers/ApvtsLogger.h"
+#include "Core/Loggers/LogSessionHeader.h"
 #include "Core/Loggers/MidiLogger.h"
 #include "Shared/ProjectPaths.h"
 
@@ -136,6 +137,21 @@ namespace PluginProcessorInternal
     {
         ApvtsLogger::getInstance().setLogLevel(ApvtsLogger::LogLevel::kDebug);
         ApvtsLogger::getInstance().setLogToConsole(true);
+    }
+
+    // Bodies shared by PluginProcessor::enableFileLoggingForSession / enableApvtsLogging
+    // (when diagnostic logging is OFF). Tests call these so a file reopen cannot sneak in.
+    inline void enableDevelopmentMidiConsoleLoggingForLabSession(std::uint32_t instanceId)
+    {
+        LogSessionHeader::setReportingInstanceId(instanceId);
+        enableDevelopmentMidiConsoleLogging();
+    }
+
+    inline void enableDevelopmentApvtsConsoleLoggingForLabSession(std::uint32_t instanceId)
+    {
+        LogSessionHeader::setReportingInstanceId(instanceId);
+        enableDevelopmentApvtsConsoleLogging();
+        ApvtsLogger::getInstance().logInfo("APVTS logging enabled");
     }
 
     inline constexpr int kEditorialUndoMaxStoredUnits = 100; // transaction depth (see undo-policy.md)

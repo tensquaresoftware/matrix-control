@@ -59,8 +59,7 @@ void PluginProcessor::enableFileLoggingForSession()
     if (diagnosticLoggingEnabled_)
         return;
 
-    LogSessionHeader::setReportingInstanceId(loggingInstanceId_);
-    enableDevelopmentMidiConsoleLogging();
+    enableDevelopmentMidiConsoleLoggingForLabSession(loggingInstanceId_);
 }
 
 void PluginProcessor::closeLogFileForSession()
@@ -76,9 +75,7 @@ void PluginProcessor::enableApvtsLogging()
     if (diagnosticLoggingEnabled_)
         return;
 
-    LogSessionHeader::setReportingInstanceId(loggingInstanceId_);
-    enableDevelopmentApvtsConsoleLogging();
-    ApvtsLogger::getInstance().logInfo("APVTS logging enabled");
+    enableDevelopmentApvtsConsoleLoggingForLabSession(loggingInstanceId_);
 }
 
 void PluginProcessor::disableApvtsLogging()

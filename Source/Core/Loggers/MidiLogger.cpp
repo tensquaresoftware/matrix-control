@@ -252,22 +252,6 @@ void MidiLogger::writeLog(const juce::String& formattedMessage)
 #endif
 }
 
-void MidiLogger::writeLogRaw(const juce::String& message)
-{
-    std::lock_guard<std::mutex> lock(logMutex);
-
-    if (logToConsole)
-        std::cout << message.toRawUTF8() << std::endl;
-
-#if MIDI_LOGGER_ENABLED
-    if (logToFile && fileStream && fileStream->is_open())
-    {
-        *fileStream << message.toRawUTF8() << std::endl;
-        // Avoid flush-per-message on the MIDI consumer hot path.
-    }
-#endif
-}
-
 void MidiLogger::writeNonEmptyLines(const juce::String& multiLineText)
 {
     juce::StringArray lines;

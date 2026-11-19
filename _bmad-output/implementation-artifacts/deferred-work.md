@@ -8,6 +8,15 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-unify-logs-application-support.md`
   summary: Done sibling `spec-diagnostic-logging-support.md` still documents Debug repo `Logs/` and dual-path acceptance text superseded by this unify work.
   evidence: Blind Hunter; historical done artifact; unify spec is the new SSOT for destinations.
+- source_spec: `_bmad-output/implementation-artifacts/spec-unify-logs-application-support.md`
+  summary: CONTRIBUTING documents only the macOS Application Support path for attaching logs; Windows/Linux equivalents missing.
+  evidence: Blind Hunter; OPEN LOG FOLDER remains primary; multi-OS path list is docs polish.
+- source_spec: `_bmad-output/implementation-artifacts/spec-unify-logs-application-support.md`
+  summary: `PluginProcessorInternal.h` includes full MidiLogger/ApvtsLogger headers for two inline console helpers.
+  evidence: Blind Hunter; coupling acceptable for small helpers; .cpp home only if include cost hurts.
+- source_spec: `_bmad-output/implementation-artifacts/spec-unify-logs-application-support.md`
+  summary: No automated long-SysEx assertion for wrap-at-120 multi-line readability after hex pre-wrap removal.
+  evidence: Blind Hunter; short one-line was the smoke ask; long-dump layout is follow-up.
 
 ## Deferred from: code review of spec-diagnostic-logging-support.md (2026-11-19)
 

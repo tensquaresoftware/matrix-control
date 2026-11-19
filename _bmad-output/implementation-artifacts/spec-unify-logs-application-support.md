@@ -85,6 +85,7 @@ context: []
 - Removed repo-root fallback warning from MidiLogger/ApvtsLogger `setLogToFile` (logs no longer depend on project root).
 - Verified: DiagnosticLoggingSettings category 0 failures; `lint_touched.py` OK.
 - Review patches: console helpers in `PluginProcessorInternal`; removed dead `getFallbackRootWarning`; empty-path tests for MIDI+APVTS with same-second-safe picker; docs wording softened.
+- Post-review patches (unify + polish): removed dead `writeLogRaw` / Midi `getMessageColumnIndentWidth`; lab-session enable bodies shared via Internal (tested); empty-path always deletes probe; RECEIVED one-line + APVTS/MIDI cartouche blank-line asserts.
 
 ## Spec Change Log
 
@@ -110,3 +111,22 @@ context: []
 **Manual checks (if no CLI):**
 - Debug Standalone + SUPPORT OFF: no new files under Application Support or repo `Logs/`.
 - SUPPORT ON → files only under `~/Library/Application Support/Ten Square Software/Matrix-Control/Logs/`; OPEN LOG FOLDER reveals it; OFF closes without reopening lab files.
+
+### Review Findings
+
+- [x] [Review][Patch] Remove dead MidiLogger helpers left by SysEx one-line logging (`writeLogRaw`, `getMessageColumnIndentWidth`) [Source/Core/Loggers/MidiLogger.h:76]
+- [x] [Review][Patch] Empty-path tests must always delete the probe file they opened [Tests/Unit/DiagnosticLoggingSettingsTests.cpp:151]
+- [x] [Review][Patch] SUPPORT OFF restore test must call production `enableFileLoggingForSession` / `enableApvtsLogging`, not only Internal console helpers [Tests/Unit/DiagnosticLoggingSettingsTests.cpp:183]
+- [x] [Review][Patch] Assert short RECEIVED SysEx stays header+hex on one line (and honors description) [Tests/Unit/DiagnosticLoggingSettingsTests.cpp:316]
+- [x] [Review][Patch] Lock session-header order for APVTS and assert the blank line between cartouche and banner on MIDI [Tests/Unit/DiagnosticLoggingSettingsTests.cpp:280]
+- [x] [Review][Defer] CONTRIBUTING only documents the macOS Application Support path — deferred: Win/Linux equivalents are nice-to-have; OPEN LOG FOLDER remains the primary guidance
+- [x] [Review][Defer] PluginProcessorInternal pulls full Midi/Apvts logger headers for two inline helpers — deferred: acceptable coupling for small helpers; move to .cpp only if include cost becomes a problem
+- [x] [Review][Defer] `enableFileLoggingForSession` / `enableApvtsLogging` naming still says “file” — deferred: already tracked in deferred-work.md; rename remains out of this review’s patch set
+- [x] [Review][Defer] No long-SysEx regression for wrap-at-120 readability — deferred: smoke asked for short one-line; long-dump layout is follow-up polish
+
+**Rejected**
+- false — Explicit `setLogToFile(true, path)` can open outside Application Support: intentional API for tests/diagnostics; default empty path is the App Support SSOT.
+- false — SysEx formatting + session-header cartouche “out of frozen unify Intent”: intentional polish commits in this branch review scope; not a defect.
+- false — Done-spec Code Map still present-tense about repo `Logs/`: rejected because the fix would be editing the frozen/done spec under review; Implementation Notes already record the new behavior.
+- low — Console-restore test does not assert console/level turned on: helpers are two-line inlines; file-off assert is the contract that matters.
+- low — `wrapLogMessage` may break at `:` and push hex to the next line on long dumps: changing punctuation preference would add special-casing beyond a direct fix.
