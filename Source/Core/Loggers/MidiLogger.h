@@ -94,9 +94,6 @@ private:
     juce::String buildSysExHeaderMessage(const juce::String& direction,
                                          const juce::String& description,
                                          size_t byteCount) const;
-    int calculateBytesPerLine() const;
-    juce::String formatHexBytesWithLineWrapping(const juce::MemoryBlock& sysEx) const;
-    void insertNewlineIfNeeded(juce::String& hexString, size_t currentIndex, int bytesPerLine) const;
     void appendHexByteWithSpace(juce::String& hexString, juce::uint8 byte, bool isLastByte) const;
     juce::String buildTimestampString() const;
     void createLogDirectoryIfNeeded(juce::File& logDir) const;

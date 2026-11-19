@@ -28,6 +28,7 @@ public:
         apvtsExplicitPathOpensFile();
         releaseStyleInfoIsQuietInFile();
         sessionHeaderContainsRequiredKeys();
+        shortSysExStaysOnOneLine();
     }
 
 private:
@@ -304,6 +305,30 @@ private:
         expect(contents.contains("Buffer size"));
         probe.deleteFile();
         LogSessionHeader::clearAudioSnapshot();
+        restoreMidiLoggerDefaults(midi);
+    }
+
+    void shortSysExStaysOnOneLine()
+    {
+        beginTest("Short SENT SysEx keeps header and hex on one line");
+        auto& midi = MidiLogger::getInstance();
+        const juce::File tempDir = juce::File::getSpecialLocation(juce::File::tempDirectory);
+        const juce::File probe = tempDir.getChildFile("midi-log-short-sysex-probe.txt");
+        probe.deleteFile();
+
+        const juce::uint8 bytes[] = { 0xF0, 0x10, 0x06, 0x06, 0x02, 0x01, 0xF7 };
+        const juce::MemoryBlock sysEx(bytes, sizeof(bytes));
+
+        midi.setLogLevel(MidiLogger::LogLevel::kDebug);
+        midi.setLogToConsole(false);
+        midi.setLogToFile(true, probe);
+        midi.logSysExSent(sysEx);
+        midi.setLogToFile(false);
+
+        const juce::String contents = probe.loadFileAsString();
+        expect(contents.contains("SENT SysEx (7 bytes): F0 10 06 06 02 01 F7"));
+        expect(! contents.contains("bytes):\n"));
+        probe.deleteFile();
         restoreMidiLoggerDefaults(midi);
     }
 };

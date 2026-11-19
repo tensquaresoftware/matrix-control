@@ -191,8 +191,10 @@ void MidiLogger::logSysExSent(const juce::MemoryBlock& sysEx, const juce::String
     if (LogLevel::kDebug > currentLogLevel)
         return;
 
-    logMessage(LogLevel::kDebug, buildSysExHeaderMessage("SENT", description, sysEx.getSize()));
-    writeLogRaw(formatSysExMessage(sysEx));
+    // Header + hex on one logical message; wrapLogMessage breaks only at kLogLineWidth.
+    logMessage(LogLevel::kDebug,
+               buildSysExHeaderMessage("SENT", description, sysEx.getSize())
+                   + " " + formatSysExMessage(sysEx));
 }
 
 void MidiLogger::logSysExReceived(const juce::MemoryBlock& sysEx, const juce::String& description)
@@ -200,10 +202,9 @@ void MidiLogger::logSysExReceived(const juce::MemoryBlock& sysEx, const juce::St
     if (LogLevel::kDebug > currentLogLevel)
         return;
 
-    juce::ignoreUnused(description);
-
-    logMessage(LogLevel::kDebug, "Received SysEx data:");
-    writeLogRaw(formatSysExMessage(sysEx));
+    logMessage(LogLevel::kDebug,
+               buildSysExHeaderMessage("RECEIVED", description, sysEx.getSize())
+                   + " " + formatSysExMessage(sysEx));
 
     const juce::String analysis = analyzeSysExMessage(sysEx);
     if (analysis.isNotEmpty())
