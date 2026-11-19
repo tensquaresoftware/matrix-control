@@ -42,7 +42,7 @@ When filing a bug, please include:
 - **Steps to reproduce** — the minimal sequence of actions that triggers the bug
 - **Expected behaviour** — what you expected to happen
 - **Actual behaviour** — what actually happened
-- **Logs** — if relevant, attach any output from the plugin's debug logging (see `Logs/` in the project)
+- **Logs** — if relevant, attach files from Settings → SUPPORT → OPEN LOG FOLDER (macOS: `~/Library/Application Support/Ten Square Software/Matrix-Control/Logs/`; enable DIAGNOSTIC LOGGING first if the folder is empty)
 - **MIDI captures** — if the bug involves incorrect SysEx or MIDI behaviour, a MIDI Monitor capture is extremely helpful
 
 Use the **Bug Report** issue template when available.

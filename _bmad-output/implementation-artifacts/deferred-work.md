@@ -1,5 +1,14 @@
 # Deferred Work
 
+## Deferred from: code review of spec-unify-logs-application-support.md (2026-11-19)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-unify-logs-application-support.md`
+  summary: `enableFileLoggingForSession` / `enableApvtsLogging` still name “file” logging while they are console-only after SUPPORT_ONLY_FILES.
+  evidence: Blind Hunter; rename is broader API polish; Internal console helpers + comments mitigate everyday confusion.
+- source_spec: `_bmad-output/implementation-artifacts/spec-unify-logs-application-support.md`
+  summary: Done sibling `spec-diagnostic-logging-support.md` still documents Debug repo `Logs/` and dual-path acceptance text superseded by this unify work.
+  evidence: Blind Hunter; historical done artifact; unify spec is the new SSOT for destinations.
+
 ## Deferred from: code review of spec-diagnostic-logging-support.md (2026-11-19)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-diagnostic-logging-support.md`

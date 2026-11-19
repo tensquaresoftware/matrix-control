@@ -79,54 +79,38 @@ void ApvtsLogger::closeExistingLogFile()
 
 void ApvtsLogger::setLogToFile(bool enabled, const juce::File& filePath)
 {
-    bool shouldEmitFallbackWarning = false;
+    std::lock_guard<std::mutex> lock(logMutex);
 
-    {
-        std::lock_guard<std::mutex> lock(logMutex);
-
-        closeExistingLogFile();
+    closeExistingLogFile();
 
 #if !APVTS_LOGGER_ENABLED
-        juce::ignoreUnused(filePath);
-        logToFile = false;
-        return;
+    juce::ignoreUnused(filePath);
+    logToFile = false;
+    return;
 #endif
 
-        logToFile = enabled;
-        if (!enabled)
-            return;
+    logToFile = enabled;
+    if (! enabled)
+        return;
 
-        // Explicit path = diagnostic/support location; do not walk project root.
-        if (filePath.getFullPathName().isEmpty())
-        {
-            static std::once_flag fallbackWarningFlag;
-            std::call_once(fallbackWarningFlag, [&shouldEmitFallbackWarning]()
-            {
-                shouldEmitFallbackWarning = ProjectPaths::isUsingFallbackRoot();
-            });
-        }
+    // Empty path → Application Support via getLogsDirectory; non-empty path is caller-chosen.
+    logFile = determineLogFilePath(filePath);
+    ensureLogDirectoryExists(logFile);
 
-        logFile = determineLogFilePath(filePath);
-        ensureLogDirectoryExists(logFile);
+    if (! logToFile)
+        return;
 
-        if (!logToFile)
-            return;
+    openNewLogFile();
 
-        openNewLogFile();
-
-        if (fileStream && fileStream->is_open())
-        {
-            writeSessionStartedHeader();
-        }
-        else
-        {
-            logToFile = false;
-            fileStream.reset();
-        }
+    if (fileStream && fileStream->is_open())
+    {
+        writeSessionStartedHeader();
     }
-
-    if (shouldEmitFallbackWarning)
-        logWarning(ProjectPaths::getFallbackRootWarning());
+    else
+    {
+        logToFile = false;
+        fileStream.reset();
+    }
 }
 
 void ApvtsLogger::writeSessionEndedFooter()

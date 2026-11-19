@@ -60,9 +60,7 @@ void PluginProcessor::enableFileLoggingForSession()
         return;
 
     LogSessionHeader::setReportingInstanceId(loggingInstanceId_);
-    MidiLogger::getInstance().setLogLevel(MidiLogger::LogLevel::kDebug);
-    MidiLogger::getInstance().setLogToConsole(true);
-    MidiLogger::getInstance().setLogToFile(true);
+    enableDevelopmentMidiConsoleLogging();
 }
 
 void PluginProcessor::closeLogFileForSession()
@@ -79,9 +77,7 @@ void PluginProcessor::enableApvtsLogging()
         return;
 
     LogSessionHeader::setReportingInstanceId(loggingInstanceId_);
-    ApvtsLogger::getInstance().setLogLevel(ApvtsLogger::LogLevel::kDebug);
-    ApvtsLogger::getInstance().setLogToConsole(true);
-    ApvtsLogger::getInstance().setLogToFile(true);
+    enableDevelopmentApvtsConsoleLogging();
     ApvtsLogger::getInstance().logInfo("APVTS logging enabled");
 }
 

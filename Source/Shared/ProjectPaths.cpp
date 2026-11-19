@@ -214,13 +214,8 @@ juce::File ProjectPaths::getProjectRoot()
 
 juce::File ProjectPaths::getLogsDirectory(LogCategory category)
 {
-    const juce::String subfolder = category == LogCategory::kMidi
-        ? kMidiLogsFolderName
-        : kApvtsLogsFolderName;
-
-    return getProjectRoot()
-        .getChildFile(kLogsFolderName)
-        .getChildFile(subfolder);
+    // Same Application Support tree as diagnostic / SUPPORT logging (no repo root).
+    return getDiagnosticLogsDirectory(category);
 }
 
 juce::File ProjectPaths::getDiagnosticLogsRoot()
@@ -289,10 +284,4 @@ bool ProjectPaths::isUsingFallbackRoot()
 {
     resolveProjectRootIfNeeded();
     return getRootCache().usedFallback;
-}
-
-juce::String ProjectPaths::getFallbackRootWarning()
-{
-    return "Project root not found - logs written to user data folder: "
-        + getProjectRoot().getFullPathName();
 }

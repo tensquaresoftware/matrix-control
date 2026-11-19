@@ -1,6 +1,6 @@
 #pragma once
 
-// 1: allow log files under <project>/Logs/MIDI/ (ProjectPaths runtime root). 0: no file output.
+// 1: allow log files under Application Support Logs/MIDI/. 0: no file output.
 #ifndef MIDI_LOGGER_ENABLED
 #define MIDI_LOGGER_ENABLED 1
 #endif

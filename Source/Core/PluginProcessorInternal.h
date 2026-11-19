@@ -5,6 +5,8 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "Core/Loggers/ApvtsLogger.h"
+#include "Core/Loggers/MidiLogger.h"
 #include "Shared/ProjectPaths.h"
 
 // Free helpers shared by PluginProcessor.cpp and its PluginProcessor*.cpp companions.
@@ -121,6 +123,19 @@ namespace PluginProcessorInternal
     inline bool shouldUseDevelopmentLogging()
     {
         return shouldUseDevelopmentMidiLogging() || shouldUseDevelopmentApvtsLogging();
+    }
+
+    // Debug lab console verbosity only — never opens log files (SUPPORT owns file journals).
+    inline void enableDevelopmentMidiConsoleLogging()
+    {
+        MidiLogger::getInstance().setLogLevel(MidiLogger::LogLevel::kDebug);
+        MidiLogger::getInstance().setLogToConsole(true);
+    }
+
+    inline void enableDevelopmentApvtsConsoleLogging()
+    {
+        ApvtsLogger::getInstance().setLogLevel(ApvtsLogger::LogLevel::kDebug);
+        ApvtsLogger::getInstance().setLogToConsole(true);
     }
 
     inline constexpr int kEditorialUndoMaxStoredUnits = 100; // transaction depth (see undo-policy.md)
