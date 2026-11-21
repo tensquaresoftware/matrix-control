@@ -1,0 +1,815 @@
+================================================================================
+MATRIX-CONTROL — GUIDE DE BÊTA-TESTS
+================================================================================
+Organisation : Ten Square Software
+Auteur : Guillaume DUPONT
+Produit : Matrix-Control
+Version du guide : 1.1
+Date de révision : 19/11/2026
+
+
+--------------------------------------------------------------------------------
+BIENVENUE
+--------------------------------------------------------------------------------
+
+Merci de participer aux bêta-tests du Matrix-Control ! :)
+
+Matrix-Control est un éditeur MIDI pour les synthétiseurs Oberheim Matrix-1000,
+Matrix-6 et Matrix-6R. Cet éditeur ne produit pas de son lui-même : le son est
+toujours produit par votre synthé. Le logiciel, utilisable sous la forme d'une application autonome ou d'un plugin, sert uniquement de « télécommande » à l'écran, pour voir et modifier plus confortablement les réglages du synthé.
+
+Ce document n'est pas un cours sur la synthèse sonore, ni le manuel utilisateur complet du Matrix-Control. C'est un guide de TESTS : une liste de situations concrètes à rejouer chez vous, pour vérifier que tout se comporte correctement sur la version bêta du logiciel, avant la diffusion d'une version finale et stable par le développeur. Vos retours (surtout les bugs et les moments de confusion) sont précieux !
+
+Comment utiliser ce guide de tests ?
+------------------------------------
+1. Ouvrez-le dans n'importe quel éditeur de texte basique (TextEdit sous macOS,
+   Bloc-notes sous Windows, gedit sous Linux, etc.).
+2. Au fur et à mesure, remplacez les [ ] par [x] devant les étapes que vous avez
+   effectuées, ou cochez-les à la main si vous imprimez ce document.
+3. Quand une étape ne concerne pas votre installation (par exemple le format de
+   plugin AudioUnit ou « AU » si vous êtes sous Windows, ou BANK UTILITY si vous testez sur un Matrix-6/6R au lieu d'un Matrix-1000), écrivez simplement « sans objet » à côté, ou ignorez-la.
+4. Si quelque chose échoue, notez ce que vous voyez : le message exact à
+   l'écran aide beaucoup.
+
+Deux rythmes possibles
+----------------------
+- Le parcours RAPIDE (section 16) : environ 30 à 45 minutes, pour voir si
+  l'essentiel du logiciel fonctionne sur votre ordinateur.
+- Le parcours COMPLET (section 17) : une session de tests plus longue, quand
+  vous avez le temps d'explorer davantage.
+
+Une seule combinaison ordinateur + logiciel de MAO (DAW) + synthé + Matrix-Control suffit déjà à être utile. Si vous pouvez tester sur plusieurs machines, tant mieux — mais ce n'est pas obligatoire.
+
+À propos des noms affichés à l'écran
+------------------------------------
+L'interface graphique du Matrix-Control est uniquement en anglais. Dans ce guide, les noms des écrans et boutons restent donc en anglais, comme vous les voyez : GETTING STARTED, PATCH EDIT, BANK UTILITY, etc. Le reste du texte est en
+français dans ce guide, pour mieux vous accompagner.
+
+Un manuel utilisateur plus détaillé peut être fourni avec le Matrix-Control ;
+ce guide de tests ne le remplace pas.
+
+
+================================================================================
+1. CE DONT VOUS AUREZ BESOIN POUR TESTER LE MATRIX-CONTROL
+================================================================================
+
+--------------------------------------------------------------------------------
+1.1. Matériel
+--------------------------------------------------------------------------------[ ] Un synthétiseur Oberheim Matrix-1000 (idéal pour couvrir presque tout
+    le guide de tests, y compris les banques et les réglages globaux)
+[ ] Ou un synthétiseur Oberheim Matrix-6 / Matrix-6R (très utile aussi :
+    certaines zones du logiciel seront volontairement grisées, c'est normal — voir plus loin)
+[ ] Une interface MIDI (boîtier USB-MIDI, ou interface audio avec prises MIDI).
+    Important : il faut câbler les DEUX sens de communication en même temps —
+    de l'ordinateur vers le synthé, et du synthé vers l'ordinateur. Sans cela, le Matrix-Control ne pourra pas « dialoguer » correctement avec votre synthétiseur.
+[ ] La sortie audio du synthé branchée vers une entrée de votre interface
+    audio, table de mixage ou enceintes. Le Matrix-Control pilote uniquement le synthé en MIDI, il ne remplace pas la prise de son.
+
+--------------------------------------------------------------------------------
+1.2. Ordinateur
+--------------------------------------------------------------------------------Notez le système que vous utilisez pour cette session de tests (cochez ce qui
+correspond) :
+
+[ ] macOS sur Mac Apple Silicon (puce M1, M2, M3, M4, M5, M6)
+[ ] macOS sur Mac Intel
+[ ] Windows 11
+[ ] Windows 10
+[ ] Linux Ubuntu 24.x
+[ ] Linux Ubuntu 26.x (ou autre Linux proche)
+
+--------------------------------------------------------------------------------
+1.3. Logiciels
+--------------------------------------------------------------------------------[ ] Un logiciel de MAO (DAW) si vous voulez tester le plugin :
+    Ableton Live, Logic Pro, Cubase, Reaper, Reason, etc.
+    Vous pouvez aussi tester uniquement l'application autonome (Standalone) du Matrix-Control, sans DAW.
+[ ] Le fichier ZIP du Matrix-Control fourni pour la bêta (il n'y a pas
+    d'installateur : vous serez amené à copier les fichiers exécutables à la main dans votre ordinateur — la suite du guide explique comment).
+[ ] Un éditeur de texte basique pour cocher ce guide au fur et à mesure.
+
+
+--------------------------------------------------------------------------------
+1.4. Quelques points importants avant de commencer
+--------------------------------------------------------------------------------
+
+Ces points évitent de prendre pour des bugs des comportements voulus, ou
+des messages habituels sous macOS / Windows.
+
+Distribution en fichier ZIP, sans installateur
+----------------------------------------------
+Le Matrix-Control arrive dans une archive ZIP. Vous extrayez l'archive, puis
+vous copiez vous-même l'application et/ou les plugins aux endroits habituels
+de votre système (détail en section 3). Ce n'est pas un oubli : pour cette version bêta, il n'y a pas encore d'installeur du type « Suivant / Suivant / Terminer ».
+
+Messages de sécurité de macOS ou Windows
+----------------------------------------
+Les fichiers de la bêta ne passent pas encore par la certification payante
+d'Apple (« notarisation ») ni par la signature éditeur Microsoft Windows. Résultat fréquent et NORMAL :
+
+- sous macOS : avertissement du type « développeur non identifié » ;
+- sous Windows : écran SmartScreen du type « Windows a protégé votre PC ».
+
+Ce n'est en général PAS un virus ni un bug du plugin. La section 3 explique
+comment continuer en confiance (par exemple clic droit → Ouvrir sous macOS).
+
+Écouter le synthé dans l'application autonome (Windows)
+-------------------------------------------------------
+En mode Standalone (l'appli seule, hors DAW), le Matrix-Control peut écouter
+le retour audio de votre synthé via l'interface de votre ordinateur.
+Sous Windows, cela passe souvent par le pilote audio du système (parfois
+appelé WASAPI). Certains builds proposent aussi ASIO (un autre type de
+pilote, fréquent en MAO).
+
+Si votre version n'affiche pas ASIO, ce n'est pas forcément un échec de
+test : notez-le simplement et vérifiez que l'écoute fonctionne avec le
+pilote système. L'important est d'entendre le synthé et de pouvoir éditer.
+
+Protégez vos patches avant d'écrire dans le synthé
+--------------------------------------------------
+Certaines étapes demandent d'enregistrer un patch dans la mémoire du synthé
+(STORE) ou de générer des variations (Patch Mutator). Si vous tenez à des
+patches déjà présents en mémoire dans votre Matrix-1000/6/6R, sauvegardez-les d'abord sur l'ordinateur (module COMPUTER PATCHES, bouton SAVE AS, fichiers au format .syx) avant de faire des essais d'écriture dans le synthé.
+
+Si « enregistrer dans le synthé » semble ne rien faire (Matrix-1000)
+--------------------------------------------------------------------
+Sur un Matrix-1000, une protection mémoire ou un verrouillage de banque
+(MEMORY PROTECT / BANK LOCK, sur la machine ou dans MASTER EDIT) peut
+empêcher l'écriture des patches. Vérifiez cela avant de conclure à un bug.
+
+
+================================================================================
+2. QUI TESTE, SUR QUEL MATÉRIEL ?
+================================================================================
+
+Remplissez cette petite fiche au début (ou à la fin) de votre session de tests.
+Une phrase ou quelques mots suffisent — inutile de rédiger un roman. Si vous changez d'ordinateur ou de synthé, recommencez une fiche (ou dupliquez ce fichier).
+
+Date de la session :
+
+Votre prénom ou pseudo :
+
+Version testée du Matrix-Control :
+(indiquée dans ABOUT… via le logo MATRIX-CONTROL, ou sur la page /
+le message qui accompagnait le téléchargement)
+
+Système d'exploitation (ex. macOS 27.2.1, Windows 11 26H2, Ubuntu 26.04) :
+
+Type d'ordinateur (ex. MacBook Pro M5, PC de bureau AMD, ThinkPad…) :
+
+Logiciel de MAO utilisé, avec sa version si vous la connaissez
+(ou « Standalone seulement » si vous n'ouvrez pas de DAW) :
+
+Forme testée aujourd'hui du Matrix-Control :
+[ ] Application autonome (Standalone)
+[ ] Plugin VST3
+[ ] Plugin AU (macOS uniquement)
+
+Synthé branché :
+[ ] Matrix-1000
+[ ] Matrix-6
+[ ] Matrix-6R
+
+Type d'EPROM / firmware (si vous le savez) :
+(ex. EPROM Oberheim d'origine, Tauntek, Untergeek v1.21…)
+
+Dans le Matrix-Control > Settings , la liste EPROM TYPE affichait :
+
+Interface MIDI utilisée :
+
+Interface audio utilisée :
+
+Bilan de la session :
+[ ] Parcours rapide : tout s'est bien passé
+[ ] Parcours complet : tout s'est bien passé
+[ ] J'ai trouvé un problème bloquant
+[ ] J'ai surtout pris des notes / questions
+
+
+================================================================================
+3. INSTALLATION ET PREMIER LANCEMENT
+================================================================================
+
+Le Matrix-Control est fourni sans installateur. Vous devez donc extraire l'archive ZIP, copier les fichiers exécutables aux endroits indiqués, puis éventuellement demander à votre DAW de rescanner la liste des plugins.
+
+--------------------------------------------------------------------------------
+3.1. Contenu du ZIP
+--------------------------------------------------------------------------------Selon votre système, vous devriez trouver au moins :
+
+[ ] L'application autonome (Standalone)
+[ ] Le plugin VST3
+[ ] Sur macOS seulement : le plugin AU
+[ ] De la documentation (manuel utilisateur et/ou ce guide de tests)
+
+Si quelque chose manque, notez le nom exact du fichier ZIP téléchargé
+et ce qui est absent.
+
+
+--------------------------------------------------------------------------------
+3.2. Sous macOS (processeur Apple Silicon ou Intel)
+--------------------------------------------------------------------------------
+
+Où copier les fichiers (emplacements habituels) :
+
+  Plugin AU   →  Bibliothèque de votre compte /
+                 Audio / Plug-Ins / Components/
+                 (chemin typique : ~/Library/Audio/Plug-Ins/Components/)
+
+  Plugin VST3 →  ~/Library/Audio/Plug-Ins/VST3/
+
+  Application →  /Applications/
+                 (ou laissez-la à côté du ZIP, si vous préférez)
+
+Étapes :
+[ ] Extraire le ZIP
+[ ] Copier Matrix-Control.component dans le dossier Components
+[ ] Copier Matrix-Control.vst3 dans le dossier VST3
+[ ] (Optionnel) Copier Matrix-Control.app dans Applications
+[ ] Après un téléchargement depuis le navigateur ou GitHub, lever le
+    « drapeau de quarantaine » de macOS. Ouvrez l'app Terminal et lancez
+    une commande du type (adaptez les chemins à vos copies) :
+
+      xattr -cr /chemin/vers/Matrix-Control.app \
+                /chemin/vers/Matrix-Control.vst3 \
+                /chemin/vers/Matrix-Control.component
+
+[ ] Premier lancement : si macOS refuse d'ouvrir en disant que le
+    développeur n'est pas identifié, faites un clic droit sur l'icône
+    → Ouvrir, ou autorisez dans Réglages Système.
+    C'est attendu pour cette bêta. Ce n'est pas un bug.
+[ ] Lancez l'application Standalone : la fenêtre Matrix-Control s'ouvre
+[ ] Dans votre DAW : rescanner les plugins si besoin ; Matrix-Control
+    apparaît en AU et/ou VST3
+[ ] Chargez le plugin sur une piste instrument / MIDI
+
+Ce qui est normal :
+- l'application autonome et les plugins démarrent ;
+- après la commande xattr, vous ne devez en principe plus voir un message
+  du type « endommagé » / « damaged » ;
+- un simple avertissement « développeur non identifié » peut encore
+  apparaître : cliquez droit → Ouvrir.
+
+Si ça bloque, notez : le message exact de macOS, où vous avez copié les
+fichiers, Apple Silicon ou Intel, et la version de macOS.
+
+
+--------------------------------------------------------------------------------
+3.3. Sous Windows 10 ou 11
+--------------------------------------------------------------------------------
+
+Où copier les fichiers :
+
+  Plugin VST3 →  C:\Program Files\Common Files\VST3\
+                 (souvent réservé aux administrateurs)
+
+  Standalone  →  Matrix-Control.exe depuis le ZIP
+                 (vous pouvez le laisser où vous voulez)
+
+Étapes :
+[ ] Extraire le ZIP
+[ ] Copier Matrix-Control.vst3 dans le dossier VST3 ci-dessus.
+    Sans droits administrateur : copiez-le dans un dossier VST3 de votre
+    compte, ou dans un dossier « plugins » défini par votre DAW, puis
+    indiquez ce dossier au DAW et rescanner.
+[ ] Lancer Matrix-Control.exe
+[ ] Si SmartScreen affiche « Windows a protégé votre PC » :
+    Informations complémentaires → Exécuter quand même.
+    Cela peut être normal pour cette bêta (pas de signature éditeur
+    Windows). Ce n'est en général pas un bug.
+[ ] Dans le DAW : rescanner les VST3 ; charger Matrix-Control
+[ ] Sous Windows, un port MIDI est souvent réservé à une seule application
+    à la fois. Si le Matrix-Control ne parvient pas à ouvrir le port MIDI, fermez l'autre logiciel qui l'utilise, puis réessayez.
+
+Ce qui est normal : Standalone et VST3 démarrent ; le plugin apparaît
+après un rescan.
+
+Si ça bloque, notez : le message SmartScreen exact, le chemin du VST3,
+le DAW, Windows 10 ou 11.
+
+
+--------------------------------------------------------------------------------
+3.4. Sous Linux (Ubuntu 24 / 26 ou proche)
+--------------------------------------------------------------------------------
+
+Où copier les fichiers :
+
+  Plugin VST3 →  ~/.vst3/
+  Standalone  →  le binaire Matrix-Control fourni dans le ZIP
+
+Étapes :
+[ ] Extraire le ZIP
+[ ] Copier Matrix-Control.vst3 vers ~/.vst3/
+[ ] Rendre le Standalone exécutable si besoin (chmod +x sur le fichier)
+[ ] Lancer le Standalone (depuis un terminal si vous voulez voir d'éventuels
+    messages d'erreur)
+[ ] Dans le DAW : rescanner les VST3 ; charger le Matrix-Control
+[ ] Pour l'écoute audio en Standalone : ouvrez SETTINGS → AUDIO et notez
+    ce qui est proposé (pilotes système, JACK, etc.)
+
+Ce qui est normal : Standalone et VST3 démarrent sans message bloquant
+de bibliothèque manquante.
+
+Si ça bloque, notez : le message exact, votre distribution Linux, et si
+vous utilisez JACK ou non.
+
+
+================================================================================
+4. PREMIER LANCEMENT : ASSITANT « GETTING STARTED »
+================================================================================
+
+Au premier lancement (ou quand la configuration n'est pas terminée), le Matrix-Control peut ouvrir un assistant appelé GETTING STARTED. C'est un
+parcours guidé pour régler l'apparence, le MIDI vers le synthé, le clavier MIDI,
+et — en Standalone seulement — l'écoute audio.
+
+Vous pouvez aussi le relancer plus tard : logo MATRIX-CONTROL → SETTINGS…
+→ onglet GETTING STARTED → RUN SETUP AGAIN
+(ou laisser SETUP WIZARD sur SHOW WHEN INCOMPLETE).
+
+--------------------------------------------------------------------------------
+4.1. Écran d'accueil de l'assistant
+--------------------------------------------------------------------------------[ ] La fenêtre GETTING STARTED s'ouvre (toute seule, ou après RUN SETUP AGAIN)
+[ ] CONTINUE passe à la suite
+[ ] CONFIGURE LATER ferme l'assistant sans tout considérer comme terminé
+    (pratique si vous voulez finir plus tard dans Settings)
+
+--------------------------------------------------------------------------------
+4.2. Étapes communes (plugin dans le DAW et Standalone)
+--------------------------------------------------------------------------------[ ] STEP 1 / USER INTERFACE : essayez UI SCALE (taille de l'interface) et
+    SKIN (apparence). La fenêtre doit se mettre à jour.
+[ ] STEP 2 / SYNTH COMMUNICATION : choisissez les ports MIDI du synthé
+    (SYNTH FROM / SYNTH TO), regardez le badge DEVICE, et confirmez ou
+    choisissez EPROM TYPE.
+[ ] STEP 3 / MIDI KEYBOARD :
+    - En plugin : les notes viennent du DAW ; il n'y a pas de liste
+      KEYBOARD FROM à choisir. L'étape se termine avec FINISH.
+    - En Standalone : vous pouvez choisir KEYBOARD FROM, ou SKIP si vous
+      n'avez pas (encore) de clavier maître. Ensuite vient l'audio.
+
+--------------------------------------------------------------------------------
+4.3. Standalone seulement — STEP 4 / AUDIO
+--------------------------------------------------------------------------------[ ] Choisissez votre interface audio
+[ ] Choisissez les canaux d'écoute du retour synthé (libellé SYNTH FROM
+    dans l'onglet AUDIO — attention : ce n'est pas le même « SYNTH FROM »
+    que le port MIDI)
+[ ] FINISH ferme l'assistant
+
+Résultat attendu : vous pouvez terminer l'assistant même si le dialogue
+MIDI n'est pas encore parfait. Les étapes « terminées » ne forcent pas
+la détection du synthé.
+
+Si quelque chose coince, notez : plugin ou Standalone, à quelle étape,
+le message en bas de fenêtre, et ce qui se passe si vous choisissez
+CONFIGURE LATER puis relancez le logiciel.
+
+
+================================================================================
+5. BRANCHER LE SYNTHÉ ET ÉTABLIR LA COMMUNICATION MIDI
+================================================================================
+
+C'est l'étape la plus importante. Tant que le synthé n'est pas reconnu sur le réseau MIDI, une grande partie de l'éditeur reste verrouillée — c'est voulu, pour éviter d'envoyer des changements « à l'aveugle ».
+
+Préparez : deux câbles MIDI au format DIN 5 broches, câblés dans les deux sens, synthé allumé.
+
+--------------------------------------------------------------------------------
+5.1. Choisir les ports MIDI
+--------------------------------------------------------------------------------[ ] Réglez SYNTH FROM et SYNTH TO (dans le bandeau haut : FROM SYNTH /
+    TO SYNTH, ou dans SETTINGS → MIDI & DEVICE, ou dans GETTING STARTED
+    étape 2)
+[ ] Quand du MIDI circule, les petits voyants à côté des listes clignotent
+[ ] En bas à droite, le badge DEVICE affiche Matrix-1000, Matrix-6, etc.
+    (un Matrix-6R peut pour l'instant apparaître simplement comme Matrix-6 :
+    notez-le si c'est votre cas)
+[ ] Si vous voyez NOT CONNECTED : suivez le message en bas de fenêtre
+    (câbles, ports, éteindre/rallumer le synthé)
+
+--------------------------------------------------------------------------------
+5.2. Édition verrouillée puis débloquée
+--------------------------------------------------------------------------------[ ] Sans détection correcte, l'édition reste verrouillée (normal)
+[ ] Une fois le synthé reconnu, PATCH EDIT et les zones utiles se débloquent
+
+--------------------------------------------------------------------------------
+5.3. Sous Windows : port MIDI déjà réquisitionnés
+--------------------------------------------------------------------------------[ ] Si le port refuse de s'ouvrir : fermez l'autre application ou le DAW
+    qui l'occupe, ou utilisez un port MIDI virtuel, puis réessayez
+
+Résultat attendu : DEVICE reconnu, édition possible, pas de cascade
+de messages d'erreur si les ports sont bons.
+
+Si échec, notez : système, ports choisis, message exact en bas de fenêtre,
+autre logiciel MIDI ouvert, type réel du synthé vs ce qu'affiche le badge.
+
+
+================================================================================
+6. ÉDITER UN PATCH (SECTION « PATCH EDIT »)
+================================================================================
+
+Une fois le synthé détecté, chargez un patch via le module INTERNAL PATCHES
+(voir section 8), puis travaillez dans PATCH EDIT.
+
+L'idée : chaque mouvement à l'écran est envoyé au synthé ; vous devez
+entendre le changement sur la machine.
+
+--------------------------------------------------------------------------------
+6.1. Quelques gestes représentatifs
+--------------------------------------------------------------------------------[ ] Dans DCO 1, changez un paramètre (forme d'onde, désaccord…) : le son
+    change
+[ ] Dans VCF/VCA, bougez la fréquence de coupure ou la résonance du filtre : le
+    son change
+[ ] Sur une enveloppe (ENV), déplacez un point à la souris
+[ ] Dans FM/TRACK, déplacez un point du Track Generator à la souris
+
+--------------------------------------------------------------------------------
+6.2. Boutons I / C / P sur un module
+--------------------------------------------------------------------------------Sur plusieurs modules, l'en-tête propose :
+  I = Init (remettre le module à des valeurs par défaut)
+  C = Copy (copier vers le press-papier)
+  P = Paste (coller depuis le presse-papier)
+
+[ ] I réinitialise le module
+[ ] C puis P sur un module compatible fonctionne
+[ ] Sur un module incompatible, P est grisé ; un clic peut afficher un
+    message en bas de fenêtre
+
+--------------------------------------------------------------------------------
+6.3. Annuler / rétablir
+--------------------------------------------------------------------------------[ ] Annuler (Cmd+Z sous macOS, Ctrl+Z sous Windows/Linux) revient en arrière
+[ ] Rétablir (Cmd+Shift+Z / Ctrl+Shift+Z) restaure
+[ ] Charger un autre patch efface cet historique d'annulation : le nouvel
+    état devient le point de départ
+
+--------------------------------------------------------------------------------
+6.4. Nom du patch
+--------------------------------------------------------------------------------[ ] L'afficheur PATCH NAME (8 caractères) est en lecture seule :
+    on ne le tape pas à la main ici
+[ ] Il se met à jour quand on charge un patch ou après certaines actions
+    du Patch Mutator
+
+Résultat attendu : édition audible en temps réel, annulation cohérente,
+pas de fermeture intempestive du logiciel.
+
+Si échec, notez : quel module, quel paramètre, quel synthé, quelle EPROM,
+Standalone ou plugin.
+
+
+================================================================================
+7. ÉDITER LA MATRICE DE MODULATION (SECTION « MATRIX MODULATION »)
+================================================================================
+
+C'est le « câblage » interne du synthé : on relie une source (LFO,
+enveloppe, vélocité…) à une destination (filtre, hauteur…). La matrice de modulation comporte dix bus (un par ligne) numérotées de 0 à 9.
+
+Préparez : synthé détecté, un patch chargé.
+
+[ ] Sur un bus, choisissez une SOURCE, un AMOUNT, une DESTINATION
+    (autre que NONE)
+[ ] Jouez une note : la modulation se sent / s'entend
+[ ] Le bouton I sur un bus remet ce bus à zéro
+[ ] Réordonnez deux bus en glissant le numéro # : le bus de départ devient gris,
+    le bus de destination devient rouge ; les contenus des bus s'échangent, les numéros de bus restent 0 à 9
+[ ] Annuler après ce réordonnancement revient en arrière d'une étape
+
+Résultat attendu : bus éditables, réordonnancement stable.
+
+Si échec, notez : numéro de bus, SOURCE / DESTINATION, ordre après le
+glisser-déposer.
+
+
+================================================================================
+8. PATCHES DANS LA MÉMOIRE DU SYNTHÉ ET DANS DES FICHIERS SUR L'ORDINATEUR
+================================================================================
+
+--------------------------------------------------------------------------------
+8.1. MODULE « INTERNAL PATCHES » (mémoire du synthé)
+--------------------------------------------------------------------------------Dans PATCH MANAGER → INTERNAL PATCHES :
+
+[ ] Les boutons < et > changent de patch ; Le Matrix-Control relit le patch
+    depuis le synthé
+[ ] Double-clic sur le numéro de patch : saisie directe entre 0 et 99
+[ ] STORE enregistre le patch dans l'emplacement courant du synthé
+    (sur Matrix-1000 : surtout les banques User 0 et 1, qui sont en mémoire
+    réinscriptible)
+[ ] Sur Matrix-1000, banques Factory 2 à 9 (mémoire d'usine en lecture seule) :
+    INIT, PASTE et STORE sont grisés — c'est normal
+[ ] Si vous avez modifié un patch sans STORE ni sauvegarde fichier, un
+    dialogue « Unsaved patch » peut proposer Cancel / Discard / Store /
+    Save selon le contexte : vérifiez que les choix sont clairs
+
+--------------------------------------------------------------------------------
+8.2. MODULE « COMPUTER PATCHES » (fichiers informatiques)
+--------------------------------------------------------------------------------Pour garder des copies sur l'ordinateur (fichiers .syx) :
+
+[ ] OPEN : choisissez un dossier de patches
+[ ] SAVE AS : créez un nouveau fichier ; SAVE : enregistrez dans le fichier
+    déjà associé
+[ ] Parcourez la liste avec < / > et rechargez un .syx
+[ ] Si un dialogue « Patch name mismatch » apparaît (nom interne du patch
+    différent du nom de fichier) : Internal / Filename / Cancel se
+    comportent de façon compréhensible
+
+Résultat attendu : navigation fluide, STORE sur mémoire réinscriptible OK,
+fichiers .syx lisibles, pas d'écrasement surprise sans action claire de
+votre part.
+
+Si échec, notez : banque / numéro de patch, texte du dialogue, dossier
+utilisé.
+
+
+================================================================================
+9. BANQUES DU MATRIX-1000 (MODULE « BANK UTILITY »)
+================================================================================
+
+Le Matrix-1000 organise ses patches en 10 banques (0 à 9) de 100 patches. Le module BANK UTILITY sert à changer de banque.
+
+Si vous possédez un Matrix-6 ou Matrix-6R : ce module est entièrement grisé,
+parce que ces machines n'ont pas de banques. C'est voulu.
+
+[ ] Matrix-6 / 6R : BANK UTILITY est grisé (sans objet sur Matrix-1000)
+[ ] Matrix-1000 : les boutons 0 à 9 changent la banque ; le patch courant
+    est relu depuis le synthé
+[ ] Banques 0 et 1 : vous pouvez enregistrer (STORE, etc.)
+[ ] Banques 2 à 9 : lecture seule pour INIT / PASTE / STORE dans
+    INTERNAL PATCHES
+[ ] Si votre version propose un import / export de banque : essayez une
+    fois avec prudence, après avoir sauvegardé vos sons importants
+
+Résultat attendu : changement de banque fiable ; banques d'usine protégées ;
+zone grisée sur 6 / 6R.
+
+Si échec, notez : banque, patch, état des boutons, type de synthé.
+
+
+================================================================================
+10. RÉGLAGES GLOBAUX (SECTION « MASTER EDIT ») — Matrix-1000
+================================================================================
+
+MASTER EDIT regroupe des réglages qui concernent tout le synthétiseur
+(canal MIDI, vibrato global, accordage…), et non un patch spécifique.
+
+Sur les Matrix-6/6R, toute cette colonne est grisée — c'est voulu.
+
+[ ] Matrix-6/6R : MASTER EDIT est grisé (sans objet sur Matrix-1000)
+[ ] Matrix-1000 : les modules MIDI, VIBRATO et MISC sont visibles et
+    éditables
+[ ] Changez le CHANNEL MIDI avec prudence : le comportement reste cohérent
+[ ] Bouton I sur un module : le dialogue RESET MASTER MODULE? propose
+    Reset / Cancel, et les deux fonctionnent
+[ ] Un réglage master influence le comportement général, quel que soit
+    le patch chargé
+
+Résultat attendu : édition possible sur Matrix-1000 seulement ;
+confirmations claires.
+
+Si échec, notez : module, paramètre, message, type de synthé.
+
+
+================================================================================
+11. MODULE « PATCH MUTATOR »
+================================================================================
+
+Le Patch Mutator crée des variations aléatoires contrôlées du patch
+courant — pratique pour explorer de nouveaux timbres rapidement.
+
+Préparez : synthé détecté, un patch chargé. Pensez à sauvegarder avant
+si le son de départ vous est précieux.
+
+[ ] Activez au moins un commutateur de module (D1, D2, F/A, …, MM)
+[ ] Réglez AMOUNT et RANDOM à des valeurs différentes des défauts, puis
+    lancez MUTATE : une variation audible / visible apparaît et part
+    vers le synthé
+[ ] RETRY propose une autre variante à partir du même point de départ
+[ ] HISTORY avec < / > parcourt les variations de la session
+[ ] Le bouton C (Compare) compare avec le départ et VERROUILLE le reste
+    de l'édition tant qu'il est actif (un message en bas de fenêtre le
+    rappelle)
+[ ] Désactiver Compare rend l'édition à nouveau possible
+[ ] Le bouton E exporte la session en fichiers .syx ; vous pouvez les
+    rouvrir via COMPUTER PATCHES → OPEN
+[ ] Les dialogues du type historique plein, mutations non exportées, ou
+    dossier d'export déjà existant : les choix sont clairs, sans perte
+    silencieuse de données
+
+Résultat attendu : mutations audibles, Compare qui bloque bien l'édition,
+export rechargeable.
+
+Si échec, notez : valeurs AMOUNT / RANDOM, modules activés, dialogue vu,
+et si le logiciel a quitté inopinément.
+
+
+================================================================================
+12. APPLICATION AUTONOME ET PLUGIN
+================================================================================
+
+Vous pouvez utiliser le Matrix-Control de deux façons :
+- comme plugin dans votre DAW (VST3 partout ; AU en plus sous macOS) ;
+- comme application autonome (Standalone), sans DAW.
+
+--------------------------------------------------------------------------------
+12.1. En plugin
+--------------------------------------------------------------------------------[ ] Le plugin se charge dans le DAW sans planter
+[ ] Les notes du clavier arrivent via la piste du DAW
+    (KEYBOARD FROM reste sur HOST)
+[ ] Le son du synthé revient sur une piste audio séparée (le plugin
+    n'est pas un instrument qui génère l'audio du Matrix)
+[ ] GETTING STARTED n'impose pas d'étape Audio (le DAW gère déjà
+    l'audio de la session)
+[ ] SETTINGS… est accessible (logo MATRIX-CONTROL, ou raccourci clavier)
+
+--------------------------------------------------------------------------------
+12.2. En Standalone
+--------------------------------------------------------------------------------[ ] La fenêtre autonome s'ouvre ; SETTINGS → AUDIO est disponible
+[ ] Vous entendez le retour du synthé via l'interface choisie
+[ ] KEYBOARD FROM est sélectionnable (ou SKIP dans Getting Started)
+[ ] Si INPUT GAIN / monitoring apparaît dans le bandeau : il réagit
+
+--------------------------------------------------------------------------------
+12.3. Écoute audio sous Windows (Standalone)
+--------------------------------------------------------------------------------[ ] Sans ASIO : avec le pilote système (souvent WASAPI), l'entrée est
+    audible et la latence reste acceptable pour éditer le synthé
+[ ] Avec ASIO : seulement si votre version le propose dans la liste —
+    le périphérique apparaît, se sélectionne, et l'audio fonctionne
+[ ] Si ASIO n'apparaît pas : notez « version sans ASIO » et continuez
+    avec le pilote système. Pour cette première bêta, ce n'est pas
+    forcément un échec
+
+Résultat attendu : plugin et Standalone utilisables ; au minimum, écoute
+Standalone via les pilotes système.
+
+Si échec, notez : plugin ou Standalone, DAW, type de pilote audio,
+présence ou non d'ASIO, fréquence d'échantillonnage.
+
+
+================================================================================
+13. ABLETON LIVE SOUS WINDOWS — IMAGE FLOUE (OPTION « AUTO-SCALE »)
+================================================================================
+
+Uniquement si vous êtes sous Windows et que vous utilisez Ableton Live
+avec le Matrix-Control en version plugin VST3.
+
+Problème connu : Live propose souvent une option « Auto-Scale Plugin Window ».
+Quand cette option est activée, l'interface graphique du Matrix-Control
+peut apparaître floue dans le plugin, quelle que soit la taille d'interface (réglage UI Scale). L'application Standalone, elle, reste nette sur la même machine.
+
+[ ] Dans le navigateur (Browser) de Live : clic droit sur l'icône du
+    plug-in Matrix-Control (pas seulement sur la barre de titre du
+    device déjà chargé)
+[ ] Désactivez « Auto-Scale Plugin Window »
+[ ] Rechargez le device
+[ ] Vérifiez que l'interface du VST3 est à présent nette
+[ ] Comparez avec le Standalone (doit rester net)
+
+Résultat attendu : VST3 net après désactivation. Si le menu Live diffère
+selon la version, notez le chemin exact.
+
+Si échec, notez : version de Live, chemin du menu, capture d'écran si
+possible.
+
+
+================================================================================
+14. POINTS CONNUS À VÉRIFIER (CE NE SONT PAS TOUJOURS DES BUGS)
+================================================================================
+
+Certains comportements surprennent. Confirmez ce que vous voyez et
+décrivez tout écart important — même si ce n'est « pas forcément un bug ».
+
+[ ] Unison (surtout Matrix-1000) : dans RAMP/PORTAMENTO (et réglages
+    Unison liés), activez / réglez Unison. Le lien entre ce que montre
+    l'écran et ce que l'on croit commander peut être contre-intuitif.
+    Décrivez ce que vous voyez et entendez.
+[ ] Keyboard Mode : toujours dans RAMP/PORTAMENTO, changez le mode
+    clavier. Un comportement bizarre côté firmware est connu ; il est
+    souvent contourné ou résolu avec une EPROM Untergeek v1.21.
+    Notez votre EPROM et ce qui se passe (notes qui restent collées,
+    mode qui ne « prend » pas, etc.).
+[ ] MEMORY PROTECT / BANK LOCK : s'ils sont actifs, STORE peut sembler
+    cassé — vérifiez avant de signaler un bug.
+[ ] Sur Matrix-6 / 6R : MASTER EDIT et BANK UTILITY grisés (voulu)
+[ ] Avertissements macOS / Windows au lancement : souvent normaux pour
+    cette bêta (voir section 1.4 et 3)
+[ ] Un Matrix-6R peut s'afficher comme Matrix-6
+[ ] ASIO peut manquer selon la version Windows — testez quand même
+    l'écoute avec le pilote système
+
+Notes libres :
+(ajoutez ici ce qui vous a surpris)
+
+
+================================================================================
+15. COMMENT SIGNALER UN PROBLÈME
+================================================================================
+
+Utilisez le canal indiqué avec le pack bêta (adresse e-mail, forum,
+page GitHub, etc.) :
+
+Canal utilisé :
+
+Version de CE guide :
+
+Indiquez au minimum :
+
+1. Un titre court : quoi + où
+   (ex. « STORE grisé sur banque 0, Matrix-1000 »)
+2. La version de Matrix-Control testée
+3. Votre système (nom + version) et le type d'ordinateur
+4. Standalone ou plugin (AU / VST3) + DAW et sa version
+5. Votre synthé + EPROM / firmware si connu
+6. Les étapes pour reproduire, numérotées
+7. Ce que vous attendiez, et ce qui s'est passé
+8. Est-ce que ça arrive toujours, ou seulement parfois ?
+9. Le texte exact du message en bas de fenêtre ou du dialogue
+   (copier-coller)
+10. Si possible : une capture d'écran, et ce fichier de guide coché
+
+Inutile d'envoyer des mots de passe, licences, ou une copie entière
+de votre disque.
+
+
+================================================================================
+16. PARCOURS RAPIDE (environ 30 à 45 minutes)
+================================================================================
+
+Objectif : savoir rapidement si Matrix-Control est jouable chez vous,
+sur cet ordinateur. Si une ligne ne s'applique pas, écrivez « sans objet ».
+
+[ ] 1. Installation depuis le ZIP + messages de sécurité OS gérés
+[ ] 2. Le Standalone s'ouvre
+[ ] 3. Le plugin se charge dans le DAW (après rescan si besoin)
+[ ] 4. GETTING STARTED terminé (ou CONFIGURE LATER, puis Settings)
+[ ] 5. MIDI : le badge DEVICE reconnaît le synthé
+[ ] 6. Charger un patch via INTERNAL PATCHES ; bouger le cutoff ; entendre
+       le changement
+[ ] 7. STORE dans un emplacement réinscriptible
+       (Matrix-1000 banque 0 ou 1, ou un numéro sur 6 / 6R)
+[ ] 8. Un bus de MATRIX MODULATION change le son
+[ ] 9. MUTATE une fois ; activer puis désactiver Compare
+[ ] 10. Matrix-1000 : changer de banque dans BANK UTILITY et ouvrir un
+        module de MASTER EDIT (sans objet sur 6 / 6R)
+[ ] 11. Matrix-6 / 6R : BANK UTILITY et MASTER EDIT grisés
+        (sans objet si vous n'avez que le 1000)
+[ ] 12. Standalone : entendre le retour audio du synthé
+[ ] 13. Windows + Ableton Live : vérifier Auto-Scale si l'UI est floue
+        (sinon sans objet)
+[ ] 14. Quitter et relancer : ports MIDI, taille / apparence, et état de
+        Getting Started se comportent de façon raisonnable
+[ ] 15. Fiche « qui teste » remplie + problèmes notés
+
+Verdict du parcours rapide :
+[ ] Tout va bien, on peut continuer
+[ ] Problème bloquant : je ne peux pas vraiment tester
+[ ] Ça marche, avec des réserves (expliquez en bas)
+
+
+================================================================================
+17. PARCOURS COMPLET (session plus longue)
+================================================================================
+
+Quand vous avez plus de temps, ajoutez ce qui suit au parcours rapide.
+Testez surtout ce qui existe chez vous (votre OS, votre DAW, votre synthé).
+Tester plusieurs ordinateurs est un plus, pas une obligation.
+
+Sur votre installation
+----------------------
+[ ] Formats disponibles chez vous : Standalone + VST3
+    (+ AU si vous êtes sous macOS)
+[ ] GETTING STARTED : CONFIGURE LATER, rappel au prochain lancement,
+    RUN SETUP AGAIN
+[ ] Après une relance : les ports, l'apparence et l'assistant se
+    comportent de façon crédible
+[ ] PATCH EDIT : I / C / P, enveloppes, Track Generator, annulations
+    plus poussées
+[ ] MATRIX MODULATION : réordonnancement + annulation
+[ ] COMPUTER PATCHES : OPEN / SAVE AS / dialogue de noms divergents
+[ ] BANK UTILITY : banques 0–1 vs 2–9 ; import / export si proposé
+    (sans objet hors Matrix-1000)
+[ ] MASTER EDIT : MIDI / VIBRATO / MISC + reset confirmé
+    (sans objet hors Matrix-1000)
+[ ] PATCH MUTATOR : AMOUNT / RANDOM, RETRY, HISTORY, export E, dialogues
+[ ] Plugin vs Standalone : clavier via le DAW vs KEYBOARD FROM
+[ ] Audio Standalone avec et sans ASIO si les deux existent chez vous
+    (sinon notez ce qui est disponible)
+[ ] Ableton Live sous Windows : Auto-Scale (sinon sans objet)
+[ ] Points de la section 14 (Unison, Keyboard Mode, protections mémoire,
+    zones grisées sur 6 / 6R…)
+[ ] Rédiger un signalement « à blanc » pour vérifier que la liste
+    d'infos de la section 15 est suffisante
+
+Si vous testez plusieurs systèmes
+---------------------------------
+Cochez ce que vous avez pu couvrir (une fiche « qui teste » par machine
+aide beaucoup) :
+
+[ ] macOS Apple Silicon : AU + VST3 + Standalone
+[ ] macOS Intel : idem
+[ ] Windows 10
+[ ] Windows 11
+[ ] Ubuntu 24.x
+[ ] Ubuntu 26.x (ou autre)
+
+Notes de fin de session
+-----------------------
+(Ce qui vous a plu, ce qui a bloqué, ce qui mériterait d'être plus clair
+dans le logiciel ou dans ce guide)
+
+
+================================================================================
+FIN DU GUIDE — Matrix-Control, bêta-tests
+Merci infiniment pour votre aide ! :)
+Guillaume | Ten Square Software
+================================================================================
