@@ -7,7 +7,7 @@
 - **Email :** tensquaresoftware@gmail.com
 - **Produit :** Matrix-Control
 - **Version du guide :** 1.0
-- **Date de révision :** 21/11/2026
+- **Date de révision :** 22/11/2026
 
 ## Sommaire
 
@@ -183,7 +183,7 @@ Au moins un synthétiseur Oberheim compatible :
 
 ### 1.3. Accessoires
 
-- [ ] Une interface MIDI (boîtier USB-MIDI, ou interface audio équipée de connecteurs MIDI au format DIN 5 broches), avec assez de câbles pour les DEUX sens (ordinateur ↔ synthé). Le branchement concret se fait en section 5, avant l'assistant GETTING STARTED.
+- [ ] Une interface MIDI (boîtier USB-MIDI, ou interface audio équipée de connecteurs MIDI au format DIN 5 broches), avec assez de câbles pour les DEUX sens (ordinateur ↔ synthé). Le branchement concret se fait en section 5.
 - [ ] Un chemin audio pour entendre le synthé (sortie du synthé vers une entrée d'interface audio, table de mixage ou enceintes). Le Matrix-Control pilote uniquement le synthé en MIDI : il n'enregistre pas le son et ne le remplace pas.
 
 ### 1.4. Logiciels
@@ -269,7 +269,9 @@ Interface audio utilisée (modèle ou nom affiché) :
 
 Le Matrix-Control est fourni sans assistant d'installation. Vous devez donc extraire l'archive ZIP, copier les fichiers exécutables aux endroits indiqués, puis éventuellement demander à votre DAW de rescanner la liste des plugins.
 
-Le but ici : installer et vérifier que le logiciel s'ouvre. Branchez le synthé juste après (section 5), avant de remplir l'assistant GETTING STARTED (section 6). Si cet assistant s'ouvre trop tôt pendant l'installation, choisissez CONFIGURE LATER et continuez — vous le reprendrez une fois le MIDI en place.
+L'objectif ici : installer les fichiers et vérifier que le logiciel peut s'ouvrir (messages de sécurité compris).
+
+Si GETTING STARTED s'ouvre déjà : choisissez CONFIGURE LATER, puis continuez l'installation.
 
 ### 4.1. Contenu de l'archive ZIP
 
@@ -327,7 +329,7 @@ Application →  /Applications/
   Variante sans glisser-déposer : copier la commande d'exemple ci-dessus (sélection à la souris, puis ⌘C), coller dans Terminal (⌘V), remplacer les chemins par les vôtres, puis Entrée. Sur succès, passer à l'étape 5.
 
 - [ ] Premier lancement : si macOS dit « développeur non identifié », clic droit → Ouvrir, ou autoriser dans Réglages Système. C'est attendu pour cette bêta. Ce n'est pas un bug.
-- [ ] Lancer le Standalone : la fenêtre s'ouvre (si GETTING STARTED apparaît : CONFIGURE LATER pour l'instant — section 6)
+- [ ] Lancer le Standalone : la fenêtre s'ouvre. Si GETTING STARTED apparaît : CONFIGURE LATER
 - [ ] Dans le DAW : rescanner si besoin ; le Matrix-Control apparaît en AU et/ou VST3
 - [ ] Charger le plugin sur une piste instrument / MIDI
 
@@ -370,7 +372,7 @@ Standalone  →  Matrix-Control.exe (où vous voulez)
 
   Ensuite, dites au DAW où chercher : ouvrez les préférences / options du DAW, section Plugins / VST / VST3, ajoutez le dossier choisi (A ou B) s'il n'y est pas déjà, puis lancez un rescan (souvent un bouton du type « Rescan », « Scan », ou « Actualiser »). Sans cette étape, le Matrix-Control peut être bien copié sur le disque mais invisible dans la liste des instruments.
 
-- [ ] Lancer Matrix-Control.exe (double-clic sur le fichier) (si GETTING STARTED apparaît : CONFIGURE LATER pour l'instant — section 6)
+- [ ] Lancer Matrix-Control.exe (double-clic sur le fichier) : la fenêtre s'ouvre. Si GETTING STARTED apparaît : CONFIGURE LATER
 - [ ] Si Windows affiche SmartScreen (« Windows a protégé votre PC ») :
 
   C'est attendu pour cette bêta : le fichier n'a pas encore la signature payante d'un éditeur Windows. Ce n'est en général PAS un virus.
@@ -451,7 +453,7 @@ Standalone  →  binaire nommé Matrix-Control (ou proche) fourni dans le ZIP
 
     (même astuce : taper le début du chemin ou glisser le fichier, puis Entrée)
 
-  Si GETTING STARTED apparaît : CONFIGURE LATER pour l'instant (vous le reprendrez en section 6, après le branchement).
+  Si GETTING STARTED apparaît : CONFIGURE LATER
 
 - [ ] Dans le DAW : rescanner la liste des plugins VST3 ; le Matrix-Control doit apparaître. Chargez-le sur une piste instrument / MIDI.
 - [ ] Ouvrir SETTINGS → AUDIO et noter ce qui est proposé (noms de périphériques, pilotes système type ALSA / PulseAudio / PipeWire, éventuellement JACK). Pas besoin de tout comprendre : l'idée est de savoir quel chemin audio Linux vous propose, pour le noter dans la fiche de session (section 3) si un problème audio apparaît plus tard.
@@ -466,33 +468,29 @@ Notes (installation Linux) :
 
 ## 5. Connecter le synthétiseur
 
-Avant d'ouvrir l'assistant GETTING STARTED, branchez le matériel. Sinon l'étape MIDI de l'assistant n'aura rien à détecter — ou semblera « cassée » alors que seuls les câbles manquent.
+Branchez le matériel pour que le Matrix-Control puisse dialoguer avec le synthé et que vous entendiez les changements pendant les tests.
 
 - [ ] Synthé allumé
 - [ ] Interface MIDI allumée / reconnue par l'ordinateur
 - [ ] Câble MIDI de l'ordinateur vers le synthé (MIDI OUT de l'interface → MIDI IN du synthé)
 - [ ] Câble MIDI du synthé vers l'ordinateur (MIDI OUT du synthé → MIDI IN de l'interface) Les DEUX sens en même temps sont obligatoires.
-- [ ] Sortie audio du synthé branchée vers votre interface audio, table de mixage ou enceintes (pour entendre les changements pendant les tests)
+- [ ] Sortie audio du synthé branchée vers votre interface audio, table de mixage ou enceintes
 
-Ne choisissez pas encore les ports MIDI dans le logiciel : ce sera l'étape suivante (assistant GETTING STARTED), puis une vérification MIDI dédiée.
-
-Résultat attendu : le matériel est prêt ; dès que les ports seront choisis dans le logiciel, le Matrix-Control pourra dialoguer avec le synthé.
+Résultat attendu : synthé, MIDI (dans les deux sens) et écoute audio sont en place.
 
 Notes (branchement) :
 
 ## 6. Premier lancement du Matrix-Control
 
-Au premier lancement (ou si la configuration n'est pas terminée), le Matrix-Control peut ouvrir l'assistant GETTING STARTED : choix d'un skin (apparence), d'un UI Scale (taille de l'interface graphique à l'écran), des ports MIDI de connexion au synthé, du clavier MIDI, et — en Standalone seulement — de l'écoute audio.
+Lancez le Matrix-Control (ou rouvrez-le) et allez jusqu'au bout de l'assistant GETTING STARTED : skin (apparence), UI Scale (taille de l'interface), ports MIDI, clavier MIDI, et — en Standalone seulement — écoute audio.
 
-Prérequis : le synthé et les câbles MIDI / audio sont déjà en place (section 5). Sans cela, l'étape SYNTH COMMUNICATION risque d'échouer pour une raison purement matérielle.
-
-Pour relancer cet assistant plus tard : logo MATRIX-CONTROL → SETTINGS… → onglet GETTING STARTED → RUN SETUP AGAIN (ou laisser SETUP WIZARD sur SHOW WHEN INCOMPLETE).
+Si GETTING STARTED ne s'ouvre pas : logo MATRIX-CONTROL → SETTINGS… → onglet GETTING STARTED → RUN SETUP AGAIN (ou laissez SETUP WIZARD sur SHOW WHEN INCOMPLETE).
 
 ### 6.1. Écran d'accueil
 
-- [ ] La fenêtre GETTING STARTED s'ouvre (seule, ou après RUN SETUP AGAIN)
+- [ ] La fenêtre GETTING STARTED s'ouvre (au lancement, ou après RUN SETUP AGAIN)
 - [ ] CONTINUE passe à la suite
-- [ ] CONFIGURE LATER ferme sans tout marquer comme terminé (pratique pour finir plus tard dans Settings)
+- [ ] (Optionnel) CONFIGURE LATER ferme sans tout marquer comme terminé
 
 ### 6.2. Étapes communes (plugin et Standalone)
 
@@ -508,7 +506,7 @@ Cette étape correspond à STEP 4 / AUDIO dans l'assistant GETTING STARTED (elle
 - [ ] Choisissez les canaux d'écoute du retour synthé (SYNTH FROM dans l'onglet AUDIO — ce n'est PAS le même « SYNTH FROM » que le port MIDI)
 - [ ] FINISH ferme l'assistant
 
-Résultat attendu : vous pouvez terminer même si le MIDI n'est pas encore parfaitement configuré. Les étapes « terminées » ne forcent pas la détection du synthé.
+Résultat attendu : vous terminez GETTING STARTED jusqu'à FINISH. Les étapes « terminées » ne forcent pas à elles seules la détection du synthé.
 
 Notes (GETTING STARTED) :
 
@@ -516,11 +514,9 @@ Notes (GETTING STARTED) :
 
 C'est l'étape la plus importante côté logiciel. Tant que le synthé n'est pas reconnu sur le réseau MIDI, une grande partie de l'éditeur reste verrouillée — c'est voulu, pour éviter d'envoyer des changements « à l'aveugle ».
 
-Si vous avez déjà choisi SYNTH FROM / SYNTH TO dans GETTING STARTED (section 6), confirmez ici que tout est bon. Si vous aviez choisi CONFIGURE LATER, réglez les ports maintenant.
-
 ### 7.1. Choisir ou confirmer les ports MIDI
 
-- [ ] Réglez ou vérifiez SYNTH FROM et SYNTH TO (bandeau FROM SYNTH / TO SYNTH, ou SETTINGS → MIDI & DEVICE, ou GETTING STARTED étape 2)
+- [ ] Réglez ou vérifiez SYNTH FROM et SYNTH TO (bandeau FROM SYNTH / TO SYNTH, ou SETTINGS → MIDI & DEVICE)
 - [ ] Quand du MIDI circule, les voyants à côté des listes clignotent
 - [ ] En bas à droite, le badge DEVICE affiche Matrix-1000, Matrix-6, etc. (un Matrix-6R peut apparaître comme Matrix-6 : notez-le si c'est le cas)
 - [ ] Si NOT CONNECTED : suivez le message en bas de fenêtre (câbles — section 5 —, ports, éteindre/rallumer le synthé)
@@ -898,7 +894,7 @@ Cochez ici ce que vous avez déjà fait dans les sections précédentes. Si une 
 - [ ] 2. Synthé branché (MIDI dans les deux sens + audio) (section 5)
 - [ ] 3. Standalone s'ouvre
 - [ ] 4. Plugin charge dans le DAW (après rescan si besoin)
-- [ ] 5. GETTING STARTED terminé ou CONFIGURE LATER puis Settings (section 6)
+- [ ] 5. GETTING STARTED terminé jusqu'à FINISH (section 6)
 - [ ] 6. MIDI : badge DEVICE reconnaît le synthé (section 7)
 - [ ] 7. Cadre d'usage : Standalone et/ou plugin OK (section 8)
 - [ ] 8. Windows + Live : Auto-Scale si l'UI est floue (section 9 ; sinon sans objet)
@@ -918,7 +914,7 @@ Vous pouvez vous arrêter ici et passer au bilan (section 22) : c'est déjà un 
 
 Si vous avez plus de temps, ajoutez ce qui suit (toujours sur votre installation : OS + DAW + synthé).
 
-- [ ] GETTING STARTED : CONFIGURE LATER, rappel au prochain lancement, RUN SETUP AGAIN
+- [ ] GETTING STARTED : parcours jusqu'à FINISH ; aussi CONFIGURE LATER / rappel / RUN SETUP AGAIN si vous explorez ces chemins
 - [ ] PATCH EDIT : I / C / P, enveloppes, Track Generator, annulations plus poussées ; renommage PATCH NAME selon banque / machine
 - [ ] MATRIX MODULATION : réordonnancement + annulation (+ C/P de section si présent)
 - [ ] INTERNAL PATCHES (section 12) : INIT + COPY/PASTE + Unsaved patch forcé
