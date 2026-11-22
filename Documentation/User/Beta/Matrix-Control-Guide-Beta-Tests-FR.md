@@ -593,8 +593,6 @@ Comment désactiver l'option :
 - [ ] Vérifiez que l'interface VST3 est nette
 - [ ] Comparez avec le Standalone (doit rester net)
 
-Ne cherchez pas cette option dans le navigateur (Browser) à gauche : un clic droit sur Matrix-Control dans la liste des plug-ins ne montre en général que le regroupement et les couleurs, pas Auto-Scale.
-
 Notes personnelles :
 
 ## 10. Éditer un patch
@@ -648,9 +646,9 @@ P = Paste  (coller depuis le presse-papiers)
 Le nom s'affiche et s'édite dans le champ PATCH NAME (8 caractères).
 
 - [ ] L'afficheur PATCH NAME montre le nom actuel (8 caractères)
-- [ ] Double-clic pour renommer quand c'est autorisé : - Matrix-1000 : possible surtout sur les banques 0 et 1 (mémoire réinscriptible) ; souvent impossible sur les banques 2 a 9 (usine) - Matrix-6/6R : en général possible (pas de banques ROM du même type)
+- [ ] Double-clic pour renommer quand c'est autorisé : - Matrix-1000 : possible surtout sur les banques 0 et 1 (mémoire réinscriptible) ; souvent impossible sur les banques 2 à 9 (usine) - Matrix-6/6R : en général possible (pas de banques ROM du même type)
 - [ ] Sur une banque ou le renommage est refusé, le double-clic ne doit pas ouvrir d'édition (ou le champ reste bloqué) — notez ce que vous voyez
-- [ ] Le nom se met aussi a jour au chargement d'un patch ou après certaines actions du PATCH MUTATOR
+- [ ] Le nom se met aussi à jour au chargement d'un patch ou après certaines actions du PATCH MUTATOR
 
 Résultat attendu : édition audible, annulation cohérente, pas de fermeture intempestive.
 
@@ -666,7 +664,7 @@ Préparez : synthé détecté, un patch chargé.
 - [ ] Jouez une note : la modulation s'entend / se sent
 - [ ] Le bouton I sur un bus remet ce bus à zéro
 - [ ] Si C / P existent au niveau de la section MATRIX MODULATION : copier / coller un bus (ou la section) se comporte de façon claire ; sinon notez « sans objet »
-- [ ] Réordonnez deux bus en glissant le numéro # : départ gris, arrivée rouge ; les contenus s'échangent, les numéros restent 0 a 9
+- [ ] Réordonnez deux bus en glissant le numéro # : départ gris, arrivée rouge ; les contenus s'échangent, les numéros restent 0 à 9
 - [ ] Annuler après ce réordonnancement revient d'une étape
 
 Résultat attendu : bus éditables, réordonnancement stable.
@@ -848,7 +846,7 @@ Ces préférences (logo MATRIX-CONTROL → SETTINGS…) s'ouvrent dans la fenêt
 - [ ] UNSAVED STATE : ALWAYS WARN vs NEVER WARN — le dialogue Unsaved patch apparaît ou non comme attendu
 - [ ] CONTEXTUAL HELP est activé : le survol d'un contrôle affiche le texte HELP en bas de fenêtre
 - [ ] INIT TEMPLATE (PATCH) : SAVE AS INIT, puis INIT dans INTERNAL PATCHES utilise le modèle
-- [ ] Plugin seulement : HARDWARE LATENCY est réglable dans MIDI & DEVICE (pas besoin de mesurer la latence)
+- [ ] Plugin seulement : HARDWARE LATENCY est réglable dans MIDI & DEVICE
 - [ ] Logo → ABOUT… : la version est lisible ; Échap ferme ABOUT et/ou SETTINGS
 
 Résultat attendu : les options Settings se comportent comme leur libellé ; pas de plantage en ouvrant/fermant Settings.
@@ -859,7 +857,7 @@ Notes personnelles :
 
 Certains comportements surprennent. Confirmez ce que vous voyez.
 
-- [ ] Unison (surtout Matrix-1000) : dans le module RAMP/PORTAMENTO (et réglages Unison liés, y compris côté MASTER EDIT / MISC selon votre machine), activez / réglez Unison. Le rendu peut être contre-intuitif : ce que l'on croit commander à l'écran ne correspond pas toujours à ce que l'on entend. Cela vient surtout de la façon dont le Matrix-1000 gère l'Unison côté machine (plusieurs notions liées : mode clavier, Unison master, etc.), pas d'un simple bug d'affichage du Matrix-Control. Decrivez ce que vous voyez et entendez.
+- [ ] Unison (surtout Matrix-1000) : dans le module RAMP/PORTAMENTO (et réglages Unison liés, y compris côté MASTER EDIT / MISC selon votre machine), activez / réglez Unison. Le rendu peut être contre-intuitif : ce que l'on croit commander à l'écran ne correspond pas toujours à ce que l'on entend. Cela vient surtout de la façon dont le Matrix-1000 gère l'Unison côté machine (plusieurs notions liées : mode clavier, Unison master, etc.), pas d'un simple bug d'affichage du Matrix-Control. Décrivez ce que vous voyez et entendez.
 - [ ] Keyboard Mode : toujours dans RAMP/PORTAMENTO, changez le mode clavier. Un comportement bizarre côté firmware du synthé est connu ; il est souvent contourné ou résolu avec une EPROM Untergeek v1.21. Notez votre EPROM et ce qui se passe (notes collées, mode qui ne « prend » pas, etc.).
 - [ ] Protections mémoire : Matrix-1000 — MEMORY PROTECT / BANK LOCK ; Matrix-6/6R — Memory Protect (arrière) et protect de patch sur la façade. Si actifs, STORE peut sembler cassé — vérifiez avant de signaler un bug.
 - [ ] Sur Matrix-6/6R : MASTER EDIT et BANK UTILITY sont grisés (voulu)

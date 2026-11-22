@@ -738,13 +738,14 @@ Notes personnelles :
 9. ABLETON LIVE ET IMAGE FLOUE SOUS WINDOWS
 ================================================================================
 
-Uniquement sous Windows + Ableton Live + plugin VST3 du Matrix-Control.
-(Sous macOS, cette option n'existe pas : section sans objet.)
+Ce problème concerne uniquement les utilisateurs sous Windows + Ableton Live +
+plugin VST3 du Matrix-Control. (Sous macOS, cette option n'existe pas : section
+sans objet.)
 
-Problème connu sous Windows : Live propose souvent
-« Auto-Scale Plugin Window ». Quand c'est activé, l'interface du
-Matrix-Control peut apparaître floue dans le plugin, quelle que soit
-UI Scale. Le Standalone reste net sur la même machine.
+Problème connu sous Windows : Live propose souvent une option « Auto-Scale
+Plugin Window ». Quand elle est activé, l'interface graphique du Matrix-Control
+peut apparaître floue dans le plugin, quelle que soit le UI Scale. L'application
+Standalone reste nette sur la même machine.
 
 Comment désactiver l'option :
 [ ] Chargez d'abord le Matrix-Control sur une piste dans Live
@@ -753,10 +754,6 @@ Comment désactiver l'option :
 [ ] Rechargez le device
 [ ] Vérifiez que l'interface VST3 est nette
 [ ] Comparez avec le Standalone (doit rester net)
-
-Ne cherchez pas cette option dans le navigateur (Browser) à gauche :
-un clic droit sur Matrix-Control dans la liste des plug-ins ne montre
-en général que le regroupement et les couleurs, pas Auto-Scale.
 
 Notes personnelles :
 
@@ -777,20 +774,20 @@ changement sur la machine.
 
 Modules typiques dans PATCH EDIT :
   DCO 1 / DCO 2     oscillateurs
-  VCF/VCA           filtre et volume
+  VCF/VCA           filtre et amplificateurs
   FM/TRACK          FM + Track Generator
   RAMP/PORTAMENTO   rampes, portamento, mode clavier
   ENV 1 / 2 / 3     enveloppes
-  LFO 1 / LFO 2     oscillateurs lents
+  LFO 1 / LFO 2     oscillateurs basse fréquence
   PATCH NAME        nom du patch (8 caractères)
 
 --------------------------------------------------------------------------------
 10.1. Gestes représentatifs
 --------------------------------------------------------------------------------
-[ ] Dans le module DCO 1, changez un paramètre (forme d'onde, désaccord…) :
+[ ] Dans le module DCO 1, changez un paramètre (forme d'onde, désaccordage…) :
     le son change
-[ ] Dans VCF/VCA, bougez la fréquence de coupure ou la résonance : le son
-    change
+[ ] Dans VCF/VCA, bougez la fréquence de coupure ou la résonance du filtre :
+    le son change
 [ ] Sur une enveloppe (ENV), déplacez un point à la souris : le son ou
     l'affichage réagit
 [ ] Dans FM/TRACK, déplacez un point du Track Generator à la souris : le son ou
@@ -800,9 +797,9 @@ Modules typiques dans PATCH EDIT :
 10.2. Boutons I / C / P sur un module
 --------------------------------------------------------------------------------
 Sur plusieurs modules, l'en-tête propose :
-  I = Init   (remettre le module a des valeurs par défaut)
-  C = Copy   (copier vers le presse-papiers)
-  P = Paste  (coller depuis le presse-papiers)
+  I = Init   (remettre le module à des valeurs par défaut)
+  C = Copy   (copier le module vers le presse-papiers)
+  P = Paste  (coller le module depuis le presse-papiers)
 
 [ ] I réinitialise le module
 [ ] C puis P sur un module compatible fonctionne
@@ -813,7 +810,7 @@ Sur plusieurs modules, l'en-tête propose :
 10.3. Annuler / rétablir
 --------------------------------------------------------------------------------
 [ ] Annuler (Cmd+Z sous macOS, Ctrl+Z sous Windows/Linux) revient en arrière
-[ ] Rétablir (Cmd+Shift+Z / Ctrl+Shift+Z) restaure
+[ ] Rétablir (Cmd+Shift+Z / Ctrl+Shift+Z) restaure la dernière opération
 [ ] Charger un autre patch efface cet historique d'annulation
 
 --------------------------------------------------------------------------------
@@ -824,12 +821,12 @@ Le nom s'affiche et s'édite dans le champ PATCH NAME (8 caractères).
 
 [ ] L'afficheur PATCH NAME montre le nom actuel (8 caractères)
 [ ] Double-clic pour renommer quand c'est autorisé :
-    - Matrix-1000 : possible surtout sur les banques 0 et 1 (mémoire
-      réinscriptible) ; souvent impossible sur les banques 2 a 9 (usine)
+    - Matrix-1000 : possible uniquement sur les banques 0 et 1 (mémoires
+      réinscriptibles) ; indisponible sur les banques 2 à 9 (mémoires d'usine)
     - Matrix-6/6R : en général possible (pas de banques ROM du même type)
 [ ] Sur une banque ou le renommage est refusé, le double-clic ne doit pas
     ouvrir d'édition (ou le champ reste bloqué) — notez ce que vous voyez
-[ ] Le nom se met aussi a jour au chargement d'un patch ou après certaines
+[ ] Le nom se met aussi à jour au chargement d'un patch ou après certaines
     actions du PATCH MUTATOR
 
 Résultat attendu : édition audible, annulation cohérente, pas de fermeture
@@ -855,7 +852,7 @@ Préparez : synthé détecté, un patch chargé.
     notez « sans objet »
 [ ] Réordonnez deux bus en glissant le numéro # : départ gris, arrivée rouge
     ;
-    les contenus s'échangent, les numéros restent 0 a 9
+    les contenus s'échangent, les numéros restent 0 à 9
 [ ] Annuler après ce réordonnancement revient d'une étape
 
 Résultat attendu : bus éditables, réordonnancement stable.
@@ -1148,7 +1145,6 @@ Settings et modifient le comportement au quotidien. Une passe suffit.
 [ ] INIT TEMPLATE (PATCH) : SAVE AS INIT, puis INIT dans INTERNAL PATCHES
     utilise le modèle
 [ ] Plugin seulement : HARDWARE LATENCY est réglable dans MIDI & DEVICE
-    (pas besoin de mesurer la latence)
 [ ] Logo → ABOUT… : la version est lisible ; Échap ferme ABOUT et/ou SETTINGS
 
 Résultat attendu : les options Settings se comportent comme leur libellé ;
@@ -1170,7 +1166,7 @@ Certains comportements surprennent. Confirmez ce que vous voyez.
     surtout de la façon dont le Matrix-1000 gère l'Unison côté machine
     (plusieurs notions liées : mode clavier, Unison master, etc.), pas
     d'un simple bug d'affichage du Matrix-Control.
-    Decrivez ce que vous voyez et entendez.
+    Décrivez ce que vous voyez et entendez.
 [ ] Keyboard Mode : toujours dans RAMP/PORTAMENTO, changez le mode clavier.
     Un comportement bizarre côté firmware du synthé est connu ; il est
     souvent contourné ou résolu avec une EPROM Untergeek v1.21.
