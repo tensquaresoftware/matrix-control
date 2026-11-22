@@ -256,11 +256,11 @@ d'écriture dans le synthé.
 
 2.5. Si STORE semble ne pas enregistrer
 ---------------------------------------
-Sur le Matrix-1000, une protection mémoire ou un verrouillage de banque
+Sur un Matrix-1000, une protection mémoire ou un verrouillage de banque
 (MEMORY PROTECT / BANK LOCK, sur la machine ou dans la section MASTER EDIT)
 peut empêcher l'écriture des patches.
 
-Sur les Matrix-6 / Matrix-6R, vérifiez surtout l'interrupteur Memory Protect
+Sur un Matrix-6/6R, vérifiez surtout l'interrupteur Memory Protect
 à l'arrière de la machine (souvent sur Off pour pouvoir enregistrer), et
 éventuellement la protection par patch sur la façade. Ces réglages ne
 sont pas éditables dans le Matrix-Control (MASTER EDIT est grisé).
@@ -677,11 +677,11 @@ Quand le synthé est reconnu, le Matrix-Control l'interroge en MIDI pour en
 déduire le modèle et le type d'EPROM / firmware. Notez ce qui s'affiche —
 surtout si cela diffère de ce que vous pensiez avoir.
 
-Sur Matrix-1000 comme sur Matrix-6/6R : regardez dans SETTINGS → MIDI & DEVICE
-(liste EPROM TYPE, et éventuellement le badge DEVICE en bas à droite de la
-fenêtre du logiciel). Un Matrix-6R peut apparaître comme Matrix-6 ; les libellés
-d'EPROM proposés peuvent différer selon la machine. Si la liste indique UNKNOWN,
-notez-le aussi.
+Sur un Matrix-1000 comme sur un Matrix-6/6R : regardez dans SETTINGS →
+MIDI & DEVICE (liste EPROM TYPE, et éventuellement le badge DEVICE en bas
+à droite de la fenêtre du logiciel). Un Matrix-6R peut apparaître comme
+Matrix-6 ; les libellés d'EPROM proposés peuvent différer selon la machine.
+Si la liste indique UNKNOWN, notez-le aussi.
 
 Version testée du Matrix-Control :
 (logo MATRIX-CONTROL → ABOUT…, ou message / page du téléchargement)
@@ -785,7 +785,8 @@ Modules typiques dans la section PATCH EDIT :
 --------------------------------------------------------------------------------
 10.1. Gestes représentatifs
 --------------------------------------------------------------------------------
-[ ] Dans le module DCO 1, changez un paramètre (forme d'onde, désaccordage…) :
+[ ] Dans le module DCO 1, changez un paramètre (forme d'onde, désaccordage,
+    etc.) :
     le son change
 [ ] Dans le module VCF/VCA, bougez la fréquence de coupure ou la résonance
     du filtre : le son change
@@ -840,8 +841,9 @@ Notes personnelles :
 ================================================================================
 
 Cette matrice est le « câblage » interne du synthé : on relie une source (LFO,
-enveloppe, vélocité…) à une destination (filtre, hauteur…). Dix bus, numérotés
-de 0 à 9, sont affichés sous forme de lignes de programmation à l'écran.
+enveloppe, vélocité, etc.) à une destination (filtre, hauteur, etc.). Dix bus,
+numérotés de 0 à 9, sont affichés sous forme de lignes de programmation à
+l'écran.
 
 
 Préparez : synthé détecté, un patch chargé.
@@ -869,8 +871,7 @@ Notes personnelles :
 ================================================================================
 
 Dans la section PATCH MANAGER, le module INTERNAL PATCHES pilote la
-mémoire du synthétiseur (banque / numéro selon la machine). Les fichiers
-sur l'ordinateur sont traités à part (section 13).
+mémoire du synthétiseur (banque / numéro selon la machine).
 
 --------------------------------------------------------------------------------
 12.1. Navigation et STORE
@@ -879,7 +880,7 @@ sur l'ordinateur sont traités à part (section 13).
 [ ] Les boutons < et > changent de patch ; le Matrix-Control relit le patch
     depuis le synthé
 [ ] Double-clic sur le numéro de patch : la saisie directe 0 à 99 fonctionne
-[ ] STORE enregistre dans l'emplacement courant (Matrix-1000 : surtout
+[ ] STORE enregistre dans l'emplacement courant (Matrix-1000 : uniquement
     banques 0 et 1, mémoire réinscriptible)
 [ ] Matrix-1000, banques 2 à 9 (mémoire d'usine) : INIT, PASTE et STORE
     sont grisés — c'est normal
@@ -890,13 +891,13 @@ sur l'ordinateur sont traités à part (section 13).
 
 Ici, INIT / COPY / PASTE portent sur le patch entier (pas seulement un
 module comme en section 10.2). Travaillez sur une banque réinscriptible
-(Matrix-1000 : 0 ou 1) ou sur Matrix-6/6R.
+(Matrix-1000 : 0 ou 1) ou sur un Matrix-6/6R.
 
-[ ] INIT : le patch est remis au modèle ; PATCH NAME peut afficher quelque
-    chose du type `* INIT *` — notez ce que vous voyez
+[ ] INIT : le patch est réinitialisé conformément au modèle ; PATCH NAME peut
+    afficher quelque chose du type `* INIT *` — notez ce que vous voyez
 [ ] COPY puis PASTE vers un autre emplacement : le son et l'écran restent
     cohérents
-[ ] Après PASTE, vous pouvez STORE pour figer dans la mémoire du synthé
+[ ] Après PASTE, vous pouvez utiliser STORE pour figer dans la mémoire du synthé
 
 --------------------------------------------------------------------------------
 12.3. Dialogue « Unsaved patch »
@@ -924,7 +925,7 @@ Notes personnelles :
 ================================================================================
 
 Dans la section PATCH MANAGER, le module COMPUTER PATCHES gère les
-fichiers `.syx` sur le disque (un patch par fichier). La mémoire du synthé
+fichiers .syx sur le disque (un patch par fichier). La mémoire du synthé
 est traitée à part (section 12).
 
 --------------------------------------------------------------------------------
@@ -933,12 +934,12 @@ est traitée à part (section 12).
 
 [ ] OPEN : choisissez un dossier de patches
 [ ] Après OPEN : s'il y a un mélange de fichiers, un message du type « N
-    valid, M invalid » (ou équivalent) peut apparaître en bas de fenêtre —
-    notez le texte exact
-[ ] SAVE AS : créez un nouveau `.syx` ; SAVE : enregistrez dans le fichier
+    valid, M invalid » (ou équivalent) peut apparaître dans la barre de messages
+    en bas de fenêtre — notez le texte exact
+[ ] SAVE AS : créez un nouveau .syx ; SAVE : enregistrez dans le fichier
     déjà associé
-[ ] Parcourir la liste avec < / > et recharger un `.syx`
-[ ] Charger un `.syx` externe (format classique / communauté) puis SAVE AS :
+[ ] Parcourir la liste avec < / > et recharger un .syx
+[ ] Charger un .syx externe (format classique / communauté) puis SAVE AS :
     le nouveau fichier se recharge correctement
 [ ] Si « Patch name mismatch » (nom interne ≠ nom de fichier) : Internal /
     Filename / Cancel se comportent de façon compréhensible
@@ -949,17 +950,17 @@ est traitée à part (section 12).
 13.2. Glisser-déposer des fichiers sur la fenêtre
 --------------------------------------------------------------------------------
 
-[ ] Glisser un `.syx` patch sur la fenêtre : un titre temporaire du type
+[ ] Glisser un .syx patch sur la fenêtre : un titre temporaire du type
     LOAD PATCH apparaît ; le drop charge le patch (Unsaved patch si besoin)
-[ ] Glisser plusieurs `.syx` ou un dossier de patches : la sélection est
+[ ] Glisser plusieurs .syx ou un dossier de patches : la sélection est
     acceptée ou un message clair s'affiche
 [ ] Glisser un fichier non Matrix : le fichier est refusé, un message
     s'affiche en bas de fenêtre, pas de crash
-[ ] (Matrix-1000) Glisser un fichier Master valide (`.syx` / `.m1km`) :
+[ ] (Matrix-1000) Glisser un fichier Master valide (.syx / .m1km) :
     l'overlay LOAD MASTER apparaît et le chargement fonctionne ; plusieurs
     fichiers Master d'un coup sont refusés ou un message clair s'affiche
 
-Résultat attendu : fichiers `.syx` lisibles et enregistrables ; drag-drop
+Résultat attendu : fichiers .syx lisibles et enregistrables ; drag-drop
 prévisible ; pas d'écrasement surprise.
 
 Notes personnelles :
@@ -968,9 +969,8 @@ Notes personnelles :
 14. CRÉER DES VARIATIONS DE PATCH
 ================================================================================
 
-Le module PATCH MUTATOR (dans la section PATCH MANAGER) crée des
-variations aléatoires contrôlées du patch courant — pratique pour
-explorer des timbres.
+Dans la section PATCH MANAGER, le module PATCH MUTATOR crée des variations
+aléatoires contrôlées du patch courant — pratique pour explorer des timbres.
 
 Préparez : synthé détecté, patch chargé. Sauvegardez d'abord si le son de
 départ vous est précieux.
@@ -979,12 +979,12 @@ Commutateurs de modules (choisir ce qui entre dans la mutation) :
 
   D1 = DCO 1
   D2 = DCO 2
-  F/A = filtre / VCA (VCF/VCA)
+  F/A = VCF/VCA
   F/T = FM / Track Generator
   R/P = Ramp / Portamento
   E1 / E2 / E3 = enveloppes 1, 2, 3
   L1 / L2 = LFO 1 et 2
-  MM = matrice de modulation (MATRIX MODULATION)
+  MM = MATRIX MODULATION
 
 Réglages supplémentaires :
 
@@ -998,22 +998,22 @@ Boutons principaux :
 
   MUTATE — crée une nouvelle variation et l'envoie au synthé
   RETRY — autre tirage à partir du même point de départ
-  HISTORY + `<` / `>` — parcourt les variations de la session
+  HISTORY + < / > — parcourt les variations de la session
   C (Compare) — compare au départ et verrouille le reste de l'édition tant qu'il
   est actif
   D (Delete) — supprime l'entrée sélectionnée dans l'historique
   F (Flush) — vide l'historique de la session
-  E (Export) — exporte la session en fichiers `.syx`
+  E (Export) — exporte la session en fichiers .syx
 
 --------------------------------------------------------------------------------
 14.1. Mutation de base
 --------------------------------------------------------------------------------
 
-[ ] Au moins un commutateur (D1, D2, F/A, …, MM) est activé
+[ ] Au moins un commutateur (D1, D2, F/A, etc., MM) est activé
 [ ] Réglez AMOUNT et RANDOM autrement que les défauts, puis MUTATE :
     variation audible / visible envoyée au synthé
 [ ] RETRY propose une autre variante
-[ ] HISTORY < / > parcourt la session
+[ ] HISTORY < / > parcourt la session de mutations
 [ ] C (Compare) verrouille l'édition ; un message en bas de fenêtre le
     rappelle
 [ ] Avec Compare actif : Undo/Redo patch et édition restent bloqués (rappel
@@ -1044,19 +1044,18 @@ Notes personnelles :
 15. GÉRER LES BANQUES (MATRIX-1000 UNIQUEMENT)
 ================================================================================
 
-Le Matrix-1000 organise ses patches en 10 banques (0 à 9) de 100 patches. Le
-module BANK UTILITY (dans la section PATCH MANAGER) sert à changer de
-banque et à transférer des banques entières (COPY / PASTE / IMPORT /
-EXPORT).
+Le Matrix-1000 organise ses patches en 10 banques de 100 patches, numérotées de
+0 à 9. Dans la section PATCH MANAGER, le module BANK UTILITY sert à changer de
+banque et à transférer des banques entières (COPY / PASTE / IMPORT / EXPORT).
 
-Sur Matrix-6/6R : ce module est entièrement grisé (pas de banques). C'est
+Sur un Matrix-6/6R : ce module est entièrement grisé (pas de banques). C'est
 voulu.
 
 --------------------------------------------------------------------------------
 15.1. Sélection de banque
 --------------------------------------------------------------------------------
 
-[ ] Matrix-6/6R : BANK UTILITY est grisé (sans objet sur Matrix-1000)
+[ ] Matrix-6/6R : BANK UTILITY est grisé (sans objet sur un Matrix-1000)
 [ ] Matrix-1000 : boutons 0 à 9 changent la banque ; le patch courant est
     relu
 [ ] Sur les banques 0 et 1, l'écriture est possible (STORE, etc.)
@@ -1070,7 +1069,7 @@ voulu.
 --------------------------------------------------------------------------------
 
 Attention : ces actions peuvent écraser toute une banque. Sauvegardez
-d'abord vos sons importants (EXPORT ou fichiers `.syx`). Travaillez de
+d'abord vos sons importants (EXPORT ou fichiers .syx). Travaillez de
 préférence sur les banques 0 ou 1.
 
 [ ] EXPORT de la banque sélectionnée : un dossier est créé (environ 100
@@ -1089,7 +1088,7 @@ préférence sur les banques 0 ou 1.
     progression est visible
 
 Résultat attendu : changement de banque fiable ; transferts contrôlés sur
-RAM ; banques d'usine protégées ; zone grisée sur Matrix-6/6R.
+RAM ; banques d'usine protégées ; zone grisée sur un Matrix-6/6R.
 
 Notes personnelles :
 
@@ -1097,12 +1096,12 @@ Notes personnelles :
 16. RÉGLAGES GLOBAUX « MASTER » (MATRIX-1000 UNIQUEMENT)
 ================================================================================
 
-MASTER EDIT regroupe des réglages pour tout le synthétiseur (canal MIDI,
-vibrato global, accordage…), pas pour un seul patch.
+La section MASTER EDIT regroupe des réglages pour tout le synthétiseur (canal
+MIDI, vibrato global, accordage, etc.), pas pour un seul patch.
 
 Modules : MIDI, VIBRATO, MISC.
 
-Sur Matrix-6/6R, toute cette colonne est grisée — c'est voulu. La gestion du
+Sur un Matrix-6/6R, toute cette colonne est grisée — c'est voulu. La gestion du
 Master sur ces modèles est très différente de celle du Matrix-1000, et le
 Matrix-Control ne l'édite pas encore. Une version ultérieure pourra
 éventuellement en proposer le support ; pour cette bêta, considérez MASTER
@@ -1112,7 +1111,7 @@ EDIT comme réservé au Matrix-1000.
 16.1. Édition MASTER EDIT
 --------------------------------------------------------------------------------
 
-[ ] Matrix-6/6R : MASTER EDIT est grisé (sans objet sur Matrix-1000)
+[ ] Matrix-6/6R : MASTER EDIT est grisé (sans objet sur un Matrix-1000)
 [ ] Matrix-1000 : les modules MIDI, VIBRATO et MISC sont visibles et éditables
 [ ] Changez le CHANNEL MIDI avec prudence : comportement cohérent
 [ ] Bouton I sur un module : dialogue RESET MASTER MODULE? Reset / Cancel
@@ -1134,7 +1133,7 @@ glissant un fichier sur la fenêtre.
     et le chargement fonctionne ; plusieurs fichiers Master d'un coup sont
     refusés ou un message clair s'affiche
 
-Résultat attendu : édition possible sur Matrix-1000 seulement ; Load/Save
+Résultat attendu : édition possible sur un Matrix-1000 seulement ; Load/Save
 Master sans crash.
 
 Notes personnelles :
@@ -1186,7 +1185,7 @@ Certains comportements surprennent. Confirmez ce que vous voyez.
     Matrix-6/6R — Memory Protect (arrière) et protect de patch sur la
     façade. Si actifs, STORE peut sembler cassé — vérifiez avant de
     signaler un bug.
-[ ] Sur Matrix-6/6R : MASTER EDIT et BANK UTILITY sont grisés (voulu)
+[ ] Sur un Matrix-6/6R : MASTER EDIT et BANK UTILITY sont grisés (voulu)
 [ ] Avertissements macOS / Windows au lancement : souvent normaux
     (sections 2 et 3)
 [ ] Un Matrix-6R peut s'afficher comme Matrix-6
@@ -1242,13 +1241,13 @@ Si une ligne ne s'applique pas : « sans objet ».
 [ ] 9. Un patch est chargé via INTERNAL PATCHES ; le cutoff est modifié ;
         le son change
 [ ] 10. STORE fonctionne sur un emplacement réinscriptible
-        (Matrix-1000 banque 0 ou 1, ou numéro sur Matrix-6/6R)
+        (Matrix-1000 banque 0 ou 1, ou numéro sur un Matrix-6/6R)
 [ ] 11. Un bus MATRIX MODULATION change le son
 [ ] 12. MUTATE a été lancé une fois ; Compare on puis off fonctionne
 [ ] 13. Matrix-1000 : BANK UTILITY — au moins un EXPORT (ou COPY) sans
         écraser une banque pleine d'originaux ; sinon sans objet
 [ ] 14. Matrix-1000 : un module MASTER EDIT est utilisable
-        (sans objet sur Matrix-6/6R)
+        (sans objet sur un Matrix-6/6R)
 [ ] 15. Matrix-6/6R : BANK UTILITY et MASTER EDIT sont grisés
         (sans objet si vous n'avez que le 1000)
 [ ] 16. En Standalone, vous entendez le retour audio du synthé
