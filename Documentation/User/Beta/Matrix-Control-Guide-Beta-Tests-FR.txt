@@ -21,8 +21,8 @@ SOMMAIRE
   5.  Connecter le synthétiseur
   6.  Premier lancement du Matrix-Control
   7.  Vérifier la communication MIDI
-  8.  Application autonome et plugin
-  9.  En cas d'image floue dans Ableton Live sous Windows
+  8.  Tester l'application autonome et le plugin
+  9.  Ableton Live et image floue sous Windows
   10. Éditer un patch
   11. Éditer la matrice de modulation
   12. Gérer les patches dans la mémoire du synthé
@@ -30,7 +30,7 @@ SOMMAIRE
   14. Créer des variations de patch
   15. Gérer les banques (Matrix-1000 uniquement)
   16. Réglages globaux « Master » (Matrix-1000 uniquement)
-  17. Réglages qui changent l'édition
+  17. Préférences dans la fenêtre Settings
   18. Points connus à vérifier
   19. Comment signaler un problème
   20. Parcours rapide de tests
@@ -118,13 +118,18 @@ Une fois le logiciel ouvert, la zone centrale s'organise à peu près ainsi :
   +----------------------------------------------------------------------+
 
 Vocabulaire utile (aligné sur le manuel utilisateur) :
-- Panneau = grandes régions de la fenêtre (HEADER, BODY, FOOTER, SETTINGS)
+- Fenêtre = la fenêtre principale du Matrix-Control, ou une fenêtre qui
+  s'ouvre par-dessus (Settings, About)
+- Panneau = grandes régions de la fenêtre principale (HEADER, BODY, FOOTER)
+  — Settings n'est pas un panneau
 - Section = grand bloc à l'intérieur du panneau BODY (PATCH EDIT, MATRIX
   MODULATION, PATCH MANAGER, MASTER EDIT)
 - Module = bloc à l'intérieur d'une section (DCO 1, INTERNAL PATCHES,
   PATCH MUTATOR, MIDI, VIBRATO, MISC, BANK UTILITY, etc.)
 - Groupe = sous-partie d'un module (BROWSER, MEMORY, STORAGE, etc.)
 - Bus de modulation = une des dix lignes de MATRIX MODULATION
+- Dialogue = petite boîte de confirmation ou de choix (Unsaved patch,
+  RESET MASTER, alertes du Mutator, etc.)
 
 Un manuel utilisateur plus détaillé peut être fourni avec le Matrix-Control ;
 ce guide de tests ne le remplace pas.
@@ -598,12 +603,15 @@ Pour relancer cet assistant plus tard : logo MATRIX-CONTROL → SETTINGS… → 
       clavier maître. Ensuite vient l'audio.
 
 --------------------------------------------------------------------------------
-6.3. Standalone seulement — STEP 4 / AUDIO
+6.3. Standalone seulement
 --------------------------------------------------------------------------------
+
+Cette étape correspond à STEP 4 / AUDIO dans l'assistant GETTING STARTED
+(elle n'apparaît pas en plugin).
+
 [ ] Choisissez votre interface audio
 [ ] Choisissez les canaux d'écoute du retour synthé (SYNTH FROM dans
-    l'onglet
-    AUDIO — ce n'est PAS le même « SYNTH FROM » que le port MIDI)
+    l'onglet AUDIO — ce n'est PAS le même « SYNTH FROM » que le port MIDI)
 [ ] FINISH ferme l'assistant
 
 Résultat attendu : vous pouvez terminer même si le MIDI n'est pas encore
@@ -653,12 +661,13 @@ d'erreurs si les ports sont bons.
 Notes (MIDI) :
 
 ================================================================================
-8. APPLICATION AUTONOME ET PLUGIN
+8. TESTER L'APPLICATION AUTONOME ET LE PLUGIN
 ================================================================================
 
-Deux façons d'utiliser le Matrix-Control :
-- plugin dans le DAW (VST3 partout ; AU en plus sous macOS) ;
-- application autonome (Standalone), sans DAW.
+La Matrix-Control peut s'utiliser de deux façons :
+- application autonome (Standalone), sans DAW ;
+- plugin dans le DAW (VST3 sous macOS, Windows et Linux ; AU en plus
+  sous macOS).
 
 --------------------------------------------------------------------------------
 8.1. En plugin
@@ -696,7 +705,7 @@ Standalone via les pilotes système.
 Notes (Standalone / plugin) :
 
 ================================================================================
-9. EN CAS D'IMAGE FLOUE DANS ABLETON LIVE SOUS WINDOWS
+9. ABLETON LIVE ET IMAGE FLOUE SOUS WINDOWS
 ================================================================================
 
 Uniquement sous Windows + Ableton Live + plugin VST3 du Matrix-Control.
@@ -776,8 +785,11 @@ Sur plusieurs modules, l'en-tête propose :
 [ ] Charger un autre patch efface cet historique d'annulation
 
 --------------------------------------------------------------------------------
-10.4. Nom du patch (PATCH NAME)
+10.4. Nom du patch
 --------------------------------------------------------------------------------
+
+Le nom s'affiche et s'édite dans le champ PATCH NAME (8 caractères).
+
 [ ] L'afficheur PATCH NAME montre le nom actuel (8 caractères)
 [ ] Double-clic pour renommer quand c'est autorisé :
     - Matrix-1000 : possible surtout sur les banques 0 et 1 (mémoire
@@ -839,11 +851,12 @@ l'ordinateur sont traités à part (section 13).
     grisés — c'est normal
 
 --------------------------------------------------------------------------------
-12.2. INIT / COPY / PASTE (patch entier)
+12.2. INIT / COPY / PASTE
 --------------------------------------------------------------------------------
 
-Travaillez sur une banque réinscriptible (Matrix-1000 : 0 ou 1) ou sur
-Matrix-6/6R.
+Ici, INIT / COPY / PASTE portent sur le patch entier (pas seulement un
+module comme en section 10.2). Travaillez sur une banque réinscriptible
+(Matrix-1000 : 0 ou 1) ou sur Matrix-6/6R.
 
 [ ] INIT : le patch est remis au modèle ; PATCH NAME peut afficher quelque
     chose du type `* INIT *` — notez ce que vous voyez
@@ -1064,8 +1077,11 @@ EDIT comme réservé au Matrix-1000.
     patch chargé
 
 --------------------------------------------------------------------------------
-16.2. Fichiers Master (Settings et glisser-déposer)
+16.2. Fichiers Master
 --------------------------------------------------------------------------------
+
+Vous pouvez charger ou enregistrer un Master depuis Settings, ou en
+glissant un fichier sur la fenêtre.
 
 [ ] SETTINGS → MASTER (ou UTILITY Master) : LOAD / SAVE AS d'un Master ;
     INIT global après confirmation
@@ -1079,11 +1095,11 @@ Master sans crash.
 Notes (MASTER EDIT) :
 
 ================================================================================
-17. RÉGLAGES QUI CHANGENT L'ÉDITION
+17. PRÉFÉRENCES DANS LA FENÊTRE SETTINGS
 ================================================================================
 
-Ces préférences (logo MATRIX-CONTROL → SETTINGS…) modifient le comportement
-au quotidien. Une passe suffit.
+Ces préférences (logo MATRIX-CONTROL → SETTINGS…) s'ouvrent dans la fenêtre
+Settings et modifient le comportement au quotidien. Une passe suffit.
 
 [ ] UNSAVED STATE : ALWAYS WARN vs NEVER WARN — le dialogue Unsaved patch
     apparaît ou non comme attendu

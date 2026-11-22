@@ -34,25 +34,25 @@
 - [6. Premier lancement du Matrix-Control](#6-premier-lancement-du-matrix-control)
   - [6.1. Écran d'accueil](#6-1-ecran-d-accueil)
   - [6.2. Étapes communes (plugin et Standalone)](#6-2-etapes-communes-plugin-et-standalone)
-  - [6.3. Standalone seulement — STEP 4 / AUDIO](#6-3-standalone-seulement-step-4-audio)
+  - [6.3. Standalone seulement](#6-3-standalone-seulement)
 - [7. Vérifier la communication MIDI](#7-verifier-la-communication-midi)
   - [7.1. Choisir ou confirmer les ports MIDI](#7-1-choisir-ou-confirmer-les-ports-midi)
   - [7.2. Édition verrouillée puis débloquée](#7-2-edition-verrouillee-puis-debloquee)
   - [7.3. Sous Windows : port MIDI déjà réquisitionné](#7-3-sous-windows-port-midi-deja-requisitionne)
-- [8. Application autonome et plugin](#8-application-autonome-et-plugin)
+- [8. Tester l'application autonome et le plugin](#8-tester-l-application-autonome-et-le-plugin)
   - [8.1. En plugin](#8-1-en-plugin)
   - [8.2. En Standalone](#8-2-en-standalone)
   - [8.3. Écoute audio sous Windows (Standalone)](#8-3-ecoute-audio-sous-windows-standalone)
-- [9. En cas d'image floue dans Ableton Live sous Windows](#9-en-cas-d-image-floue-dans-ableton-live-sous-windows)
+- [9. Ableton Live et image floue sous Windows](#9-ableton-live-et-image-floue-sous-windows)
 - [10. Éditer un patch](#10-editer-un-patch)
   - [10.1. Gestes représentatifs](#10-1-gestes-representatifs)
   - [10.2. Boutons I / C / P sur un module](#10-2-boutons-i-c-p-sur-un-module)
   - [10.3. Annuler / rétablir](#10-3-annuler-retablir)
-  - [10.4. Nom du patch (PATCH NAME)](#10-4-nom-du-patch-patch-name)
+  - [10.4. Nom du patch](#10-4-nom-du-patch)
 - [11. Éditer la matrice de modulation](#11-editer-la-matrice-de-modulation)
 - [12. Gérer les patches dans la mémoire du synthé](#12-gerer-les-patches-dans-la-memoire-du-synthe)
   - [12.1. Navigation et STORE](#12-1-navigation-et-store)
-  - [12.2. INIT / COPY / PASTE (patch entier)](#12-2-init-copy-paste-patch-entier)
+  - [12.2. INIT / COPY / PASTE](#12-2-init-copy-paste)
   - [12.3. Dialogue « Unsaved patch »](#12-3-dialogue-unsaved-patch)
 - [13. Gérer les patches dans des fichiers informatiques](#13-gerer-les-patches-dans-des-fichiers-informatiques)
   - [13.1. OPEN / SAVE / parcours](#13-1-open-save-parcours)
@@ -65,8 +65,8 @@
   - [15.2. COPY / PASTE / IMPORT / EXPORT](#15-2-copy-paste-import-export)
 - [16. Réglages globaux « Master » (Matrix-1000 uniquement)](#16-reglages-globaux-master-matrix-1000-uniquement)
   - [16.1. Édition MASTER EDIT](#16-1-edition-master-edit)
-  - [16.2. Fichiers Master (Settings et glisser-déposer)](#16-2-fichiers-master-settings-et-glisser-deposer)
-- [17. Réglages qui changent l'édition](#17-reglages-qui-changent-l-edition)
+  - [16.2. Fichiers Master](#16-2-fichiers-master)
+- [17. Préférences dans la fenêtre Settings](#17-preferences-dans-la-fenetre-settings)
 - [18. Points connus à vérifier](#18-points-connus-a-verifier)
 - [19. Comment signaler un problème](#19-comment-signaler-un-probleme)
 - [20. Parcours rapide de tests](#20-parcours-rapide-de-tests)
@@ -148,16 +148,13 @@ Une fois le logiciel ouvert, la zone centrale s'organise à peu près ainsi :
 
 Vocabulaire utile (aligné sur le manuel utilisateur) :
 
-- Panneau = grandes régions de la fenêtre (HEADER, BODY, FOOTER, SETTINGS)
-- Section = grand bloc à l'intérieur du panneau BODY (PATCH EDIT, MATRIX
-MODULATION, PATCH MANAGER, MASTER EDIT)
-
-- Module = bloc à l'intérieur d'une section (DCO 1, INTERNAL PATCHES,
-
-- PATCH MUTATOR, MIDI, VIBRATO, MISC, BANK UTILITY, etc.)
-
-- Groupe = sous-partie d'un module (BROWSER, MEMORY, STORAGE, etc.)
-- Bus de modulation = une des dix lignes de MATRIX MODULATION
+- **Fenêtre** = la fenêtre principale du Matrix-Control, ou une fenêtre qui s'ouvre par-dessus (Settings, About)
+- **Panneau** = grandes régions de la fenêtre principale (HEADER, BODY, FOOTER) — Settings n'est pas un panneau
+- **Section** = grand bloc à l'intérieur du panneau BODY (PATCH EDIT, MATRIX MODULATION, PATCH MANAGER, MASTER EDIT)
+- **Module** = bloc à l'intérieur d'une section (DCO 1, INTERNAL PATCHES, PATCH MUTATOR, MIDI, VIBRATO, MISC, BANK UTILITY, etc.)
+- **Groupe** = sous-partie d'un module (BROWSER, MEMORY, STORAGE, etc.)
+- **Bus de modulation** = une des dix lignes de MATRIX MODULATION
+- **Dialogue** = petite boîte de confirmation ou de choix (Unsaved patch, RESET MASTER, alertes du Mutator, etc.)
 
 Un manuel utilisateur plus détaillé peut être fourni avec le Matrix-Control ; ce guide de tests ne le remplace pas.
 
@@ -503,7 +500,9 @@ Pour relancer cet assistant plus tard : logo MATRIX-CONTROL → SETTINGS… → 
 - [ ] STEP 2 / SYNTH COMMUNICATION : choisissez SYNTH FROM / SYNTH TO, regardez le badge DEVICE, confirmez ou choisissez EPROM TYPE.
 - [ ] STEP 3 / MIDI KEYBOARD : - En plugin : les notes MIDI viennent du DAW ; pas de liste KEYBOARD FROM. L'étape se termine avec FINISH. - En Standalone : choisissez KEYBOARD FROM, ou SKIP si pas encore de clavier maître. Ensuite vient l'audio.
 
-### 6.3. Standalone seulement — STEP 4 / AUDIO
+### 6.3. Standalone seulement
+
+Cette étape correspond à STEP 4 / AUDIO dans l'assistant GETTING STARTED (elle n'apparaît pas en plugin).
 
 - [ ] Choisissez votre interface audio
 - [ ] Choisissez les canaux d'écoute du retour synthé (SYNTH FROM dans l'onglet AUDIO — ce n'est PAS le même « SYNTH FROM » que le port MIDI)
@@ -539,12 +538,12 @@ Résultat attendu : DEVICE reconnu, édition possible, pas de cascade d'erreurs 
 
 Notes (MIDI) :
 
-## 8. Application autonome et plugin
+## 8. Tester l'application autonome et le plugin
 
-Deux façons d'utiliser le Matrix-Control :
+La Matrix-Control peut s'utiliser de deux façons :
 
-- plugin dans le DAW (VST3 partout ; AU en plus sous macOS) ;
-- application autonome (Standalone), sans DAW.
+- application autonome (Standalone), sans DAW ;
+- plugin dans le DAW (VST3 sous macOS, Windows et Linux ; AU en plus sous macOS).
 
 ### 8.1. En plugin
 
@@ -573,7 +572,7 @@ Résultat attendu : plugin et Standalone utilisables ; au minimum, écoute Stand
 
 Notes (Standalone / plugin) :
 
-## 9. En cas d'image floue dans Ableton Live sous Windows
+## 9. Ableton Live et image floue sous Windows
 
 Uniquement sous Windows + Ableton Live + plugin VST3 du Matrix-Control. (Sous macOS, cette option n'existe pas : section sans objet.)
 
@@ -637,7 +636,9 @@ P = Paste  (coller depuis le presse-papiers)
 - [ ] Rétablir (Cmd+Shift+Z / Ctrl+Shift+Z) restaure
 - [ ] Charger un autre patch efface cet historique d'annulation
 
-### 10.4. Nom du patch (PATCH NAME)
+### 10.4. Nom du patch
+
+Le nom s'affiche et s'édite dans le champ PATCH NAME (8 caractères).
 
 - [ ] L'afficheur PATCH NAME montre le nom actuel (8 caractères)
 - [ ] Double-clic pour renommer quand c'est autorisé : - Matrix-1000 : possible surtout sur les banques 0 et 1 (mémoire réinscriptible) ; souvent impossible sur les banques 2 a 9 (usine) - Matrix-6/6R : en général possible (pas de banques ROM du même type)
@@ -676,9 +677,9 @@ Dans PATCH MANAGER, le module INTERNAL PATCHES pilote la mémoire du synthétise
 - [ ] STORE enregistre dans l'emplacement courant (Matrix-1000 : surtout banques 0 et 1, mémoire réinscriptible)
 - [ ] Matrix-1000, banques 2 à 9 (mémoire d'usine) : INIT, PASTE et STORE grisés — c'est normal
 
-### 12.2. INIT / COPY / PASTE (patch entier)
+### 12.2. INIT / COPY / PASTE
 
-Travaillez sur une banque réinscriptible (Matrix-1000 : 0 ou 1) ou sur Matrix-6/6R.
+Ici, INIT / COPY / PASTE portent sur le **patch entier** (pas seulement un module comme en section 10.2). Travaillez sur une banque réinscriptible (Matrix-1000 : 0 ou 1) ou sur Matrix-6/6R.
 
 - [ ] INIT : le patch est remis au modèle ; PATCH NAME peut afficher quelque chose du type `* INIT *` — notez ce que vous voyez
 - [ ] COPY puis PASTE vers un autre emplacement : son et écran cohérents
@@ -821,7 +822,9 @@ Sur Matrix-6/6R, toute cette colonne est grisée — c'est voulu. La gestion du 
 - [ ] Bouton I sur un module : dialogue RESET MASTER MODULE? Reset / Cancel fonctionnent
 - [ ] Un réglage master influence le comportement général, quel que soit le patch chargé
 
-### 16.2. Fichiers Master (Settings et glisser-déposer)
+### 16.2. Fichiers Master
+
+Vous pouvez charger ou enregistrer un Master depuis Settings, ou en glissant un fichier sur la fenêtre.
 
 - [ ] SETTINGS → MASTER (ou UTILITY Master) : LOAD / SAVE AS d'un Master ; INIT global après confirmation
 - [ ] (Optionnel) INIT TEMPLATE Master : SAVE AS INIT / DELETE
@@ -831,9 +834,9 @@ Résultat attendu : édition possible sur Matrix-1000 seulement ; Load/Save Mast
 
 Notes (MASTER EDIT) :
 
-## 17. Réglages qui changent l'édition
+## 17. Préférences dans la fenêtre Settings
 
-Ces préférences (logo MATRIX-CONTROL → SETTINGS…) modifient le comportement au quotidien. Une passe suffit.
+Ces préférences (logo MATRIX-CONTROL → SETTINGS…) s'ouvrent dans la fenêtre Settings et modifient le comportement au quotidien. Une passe suffit.
 
 - [ ] UNSAVED STATE : ALWAYS WARN vs NEVER WARN — le dialogue Unsaved patch apparaît ou non comme attendu
 - [ ] CONTEXTUAL HELP activé : survol d'un contrôle → texte HELP en bas de fenêtre
