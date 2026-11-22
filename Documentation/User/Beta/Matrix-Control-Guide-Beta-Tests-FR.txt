@@ -12,8 +12,8 @@ Date de révision : 22/11/2026
 SOMMAIRE
 --------------------------------------------------------------------------------
 
-      Bienvenue
-      À quoi sert ce guide ?
+  Bienvenue
+  À quoi sert ce guide ?
 
   Préparation
   1.  Ce dont vous aurez besoin pour tester le Matrix-Control
@@ -33,16 +33,16 @@ SOMMAIRE
   12. Gérer les patches dans la mémoire du synthé
 
   PARTIE B — Tests approfondis
-  (suite pour un parcours complet ; optionnelle si vous êtes pressé)
+  (suite optionnelle pour un parcours complet)
   13. Gérer les patches dans des fichiers informatiques
   14. Créer des variations de patch
   15. Gérer les banques (Matrix-1000 uniquement)
-  16. Réglages globaux « Master » (Matrix-1000 uniquement)
-  17. Préférences dans la fenêtre Settings
+  16. Réglages globaux du synthé (Matrix-1000 uniquement)
+  17. Réglages du Matrix-Control
 
   PARTIE C — Fin de session
   18. Points connus à vérifier
-  19. Comment signaler un problème
+  19. Comment signaler un problème au développeur
   20. Bilan de votre session de tests
 
 --------------------------------------------------------------------------------
@@ -104,8 +104,8 @@ Deux rythmes dans le même guide
 -------------------------------
 - PARTIE A — Tests essentiels : sections 4 à 12 (environ 30 à 45 minutes).
   Arrêt possible ensuite → PARTIE C (bilan).
-- PARTIE B — Tests approfondis : sections 13 à 17, si vous avez plus de
-  temps. Avec A + B, vous avez fait un parcours complet.
+- PARTIE B — Tests approfondis : sections 13 à 17 (suite optionnelle pour
+  un parcours complet). Avec A + B, vous avez fait un parcours complet.
 - PARTIE C — Fin de session : points connus, signalement, bilan.
 
 Une seule combinaison ordinateur + logiciel de MAO (DAW) + synthé Oberheim +
@@ -964,9 +964,9 @@ Sinon : continuez avec la PARTIE B ci-dessous (parcours complet).
 PARTIE B — TESTS APPROFONDIS
 ================================================================================
 
-Objectif : aller plus loin (fichiers .syx, Patch Mutator, banques, Master,
-Settings). Cette partie est optionnelle si vous avez déjà terminé la
-PARTIE A.
+Objectif : aller plus loin (fichiers .syx, Patch Mutator, banques, réglages
+globaux du synthé, réglages du Matrix-Control). Suite optionnelle pour un
+parcours complet, si vous avez déjà terminé la PARTIE A.
 
 ================================================================================
 13. GÉRER LES PATCHES DANS DES FICHIERS INFORMATIQUES
@@ -1141,7 +1141,7 @@ RAM ; banques d'usine protégées ; zone grisée sur un Matrix-6/6R.
 Notes personnelles :
 
 ================================================================================
-16. RÉGLAGES GLOBAUX « MASTER » (MATRIX-1000 UNIQUEMENT)
+16. RÉGLAGES GLOBAUX DU SYNTHÉ (MATRIX-1000 UNIQUEMENT)
 ================================================================================
 
 La section MASTER EDIT regroupe des réglages globaux au synthétiseur (canal
@@ -1187,10 +1187,10 @@ Master sans crash.
 Notes personnelles :
 
 ================================================================================
-17. PRÉFÉRENCES DANS LA FENÊTRE SETTINGS
+17. RÉGLAGES DU MATRIX-CONTROL
 ================================================================================
 
-Ces préférences (logo MATRIX-CONTROL → SETTINGS…) s'ouvrent dans la fenêtre
+Ces réglages (logo MATRIX-CONTROL → SETTINGS…) s'ouvrent dans la fenêtre
 Settings et modifient le comportement au quotidien. Une passe de tests
 suffit.
 
@@ -1250,7 +1250,7 @@ Certains comportements surprennent. Confirmez ce que vous voyez.
 Notes personnelles :
 
 ================================================================================
-19. COMMENT SIGNALER UN PROBLÈME
+19. COMMENT SIGNALER UN PROBLÈME AU DÉVELOPPEUR
 ================================================================================
 
 Adresse de contact privilégiée :
