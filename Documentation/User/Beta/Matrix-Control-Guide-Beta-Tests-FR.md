@@ -23,7 +23,7 @@
   - [2.2. Messages de sécurité de macOS ou Windows](#2-2-messages-de-securite-de-macos-ou-windows)
   - [2.3. Écoute audio Standalone sous Windows (ASIO)](#2-3-ecoute-audio-standalone-sous-windows-asio)
   - [2.4. Protégez vos patches avant de démarrer les tests](#2-4-protegez-vos-patches-avant-de-demarrer-les-tests)
-  - [2.5. Si STORE semble ne pas enregistrer (Matrix-1000)](#2-5-si-store-semble-ne-pas-enregistrer-matrix-1000)
+  - [2.5. Si STORE semble ne pas enregistrer](#2-5-si-store-semble-ne-pas-enregistrer)
 - [3. Fiche de votre session de tests](#3-fiche-de-votre-session-de-tests)
 - [4. Installer le Matrix-Control](#4-installer-le-matrix-control)
   - [4.1. Contenu de l'archive ZIP](#4-1-contenu-de-l-archive-zip)
@@ -39,6 +39,7 @@
   - [7.1. Choisir ou confirmer les ports MIDI](#7-1-choisir-ou-confirmer-les-ports-midi)
   - [7.2. Édition verrouillée puis débloquée](#7-2-edition-verrouillee-puis-debloquee)
   - [7.3. Sous Windows : port MIDI déjà réquisitionné](#7-3-sous-windows-port-midi-deja-requisitionne)
+  - [7.4. Version du Matrix-Control et EPROM TYPE](#7-4-version-du-matrix-control-et-eprom-type)
 - [8. Tester l'application autonome et le plugin](#8-tester-l-application-autonome-et-le-plugin)
   - [8.1. En plugin](#8-1-en-plugin)
   - [8.2. En Standalone](#8-2-en-standalone)
@@ -198,7 +199,7 @@ Ces points évitent de prendre pour des bugs des comportements voulus, ou des me
 
 ### 2.1. Distribution en fichier ZIP
 
-Le Matrix-Control arrive dans une archive ZIP, sans assistant d'installation. Vous extrayez l'archive, puis vous copiez vous-même l'application et/ou les plugins aux endroits habituels de votre système (détail en section 4). Ce n'est pas un oubli : pour cette version bêta, il n'y a pas encore d'assistant d'installation classique du type « Lancer > Suivant > Suivant > ... > Terminer ».
+Dans sa version bêta, le Matrix-Control est livré dans une archive ZIP, sans assistant d'installation. Vous extrayez le ZIP, puis vous copiez vous-même l'application et/ou les plugins aux endroits habituels de votre système (détail en section 4). Ce n'est pas un oubli : il n'y a pas encore d'assistant classique du type « Lancer > Suivant > Suivant > ... > Terminer ».
 
 ### 2.2. Messages de sécurité de macOS ou Windows
 
@@ -221,9 +222,13 @@ En mode Standalone (l'appli seule, hors DAW), le Matrix-Control peut écouter le
 
 Certaines étapes des tests demandent d'enregistrer un patch dans la mémoire du synthé (STORE) ou de générer des variations (PATCH MUTATOR). Si vous tenez à des patches déjà présents en mémoire dans votre Matrix-1000/6/6R, sauvegardez-les d'abord sur votre ordinateur une fois le logiciel installé (section 4) : module COMPUTER PATCHES, bouton SAVE AS, fichiers au format .syx — avant de faire des essais d'écriture dans le synthé.
 
-### 2.5. Si STORE semble ne pas enregistrer (Matrix-1000)
+### 2.5. Si STORE semble ne pas enregistrer
 
-Sur un Matrix-1000, une protection mémoire ou un verrouillage de banque (MEMORY PROTECT / BANK LOCK, sur la machine ou dans MASTER EDIT) peut empêcher l'écriture des patches. Vérifiez cela avant de conclure à un bug.
+Sur Matrix-1000, une protection mémoire ou un verrouillage de banque (MEMORY PROTECT / BANK LOCK, sur la machine ou dans MASTER EDIT) peut empêcher l'écriture des patches.
+
+Sur Matrix-6 / Matrix-6R, vérifiez surtout l'interrupteur Memory Protect à l'arrière de la machine (souvent sur Off pour pouvoir enregistrer), et éventuellement la protection par patch sur la façade. Ces réglages ne sont pas éditables dans le Matrix-Control (MASTER EDIT est grisé).
+
+Vérifiez cela avant de conclure à un bug.
 
 ## 3. Fiche de votre session de tests
 
@@ -236,8 +241,6 @@ Date de la session (format JJ/MM/AAAA) :
 Votre prénom et nom (ou pseudo) :
 
 Votre adresse mail : (facultatif, afin que le développeur puisse vous répondre)
-
-Version testée du Matrix-Control : (indiquée dans ABOUT… via le logo MATRIX-CONTROL, ou sur le message / la page qui accompagnait le téléchargement)
 
 Système d'exploitation (avec la version si possible) : (ex. macOS 27.2.1, Windows 11 26H2, Ubuntu 26.04 LTS) :
 
@@ -258,8 +261,6 @@ Synthé branché pour cette session :
 - [ ] Matrix-6R
 
 EPROM / firmware du synthé (si vous le connaissez) (ex. EPROM Oberheim d'origine, Tauntek, Untergeek v1.21, etc.) :
-
-Ce que le Matrix-Control affichait dans SETTINGS → MIDI & DEVICE → EPROM TYPE (même si c'est différent de ce que vous pensiez avoir) :
 
 Interface MIDI utilisée (modèle ou nom affiché sur l'ordinateur) :
 
@@ -339,7 +340,7 @@ Ce qui est normal :
 - après xattr, plus de message « endommagé » / « damaged » en principe ;
 - un avertissement « développeur non identifié » peut encore apparaître : clic droit → Ouvrir.
 
-Notes (installation macOS) :
+Notes personnelles :
 
 ### 4.3. Tester sous Windows
 
@@ -392,7 +393,7 @@ Ce qui est normal :
 - le plugin apparaît après un rescan dans le DAW ;
 - SmartScreen peut réapparaître au premier lancement : même procédure.
 
-Notes (installation Windows) :
+Notes personnelles :
 
 ### 4.4. Tester sous Linux
 
@@ -464,21 +465,21 @@ Ce qui est normal :
 - aucun message bloquant du type « bibliothèque manquante » (shared library / `.so` introuvable) ;
 - si un tel message apparaît quand même, copiez-le mot pour mot dans les notes — c'est utile pour le développeur.
 
-Notes (installation Linux) :
+Notes personnelles :
 
 ## 5. Connecter le synthétiseur
 
 Branchez le matériel pour que le Matrix-Control puisse dialoguer avec le synthé et que vous entendiez les changements pendant les tests.
 
-- [ ] Synthé allumé
-- [ ] Interface MIDI allumée / reconnue par l'ordinateur
-- [ ] Câble MIDI de l'ordinateur vers le synthé (MIDI OUT de l'interface → MIDI IN du synthé)
-- [ ] Câble MIDI du synthé vers l'ordinateur (MIDI OUT du synthé → MIDI IN de l'interface) Les DEUX sens en même temps sont obligatoires.
-- [ ] Sortie audio du synthé branchée vers votre interface audio, table de mixage ou enceintes
+- [ ] Le synthé est allumé
+- [ ] L'interface MIDI est allumée / reconnue par l'ordinateur
+- [ ] Le câble MIDI de l'ordinateur vers le synthé est branché (MIDI OUT de l'interface → MIDI IN du synthé)
+- [ ] Le câble MIDI du synthé vers l'ordinateur est branché (MIDI OUT du synthé → MIDI IN de l'interface). Les DEUX sens en même temps sont obligatoires.
+- [ ] La sortie audio du synthé est branchée vers votre interface audio, table de mixage ou enceintes
 
 Résultat attendu : synthé, MIDI (dans les deux sens) et écoute audio sont en place.
 
-Notes (branchement) :
+Notes personnelles :
 
 ## 6. Premier lancement du Matrix-Control
 
@@ -489,7 +490,7 @@ Si GETTING STARTED ne s'ouvre pas : logo MATRIX-CONTROL → SETTINGS… → ongl
 ### 6.1. Écran d'accueil
 
 - [ ] La fenêtre GETTING STARTED s'ouvre (au lancement, ou après RUN SETUP AGAIN)
-- [ ] CONTINUE passe à la suite
+- [ ] CONTINUE fait passer à la suite
 - [ ] (Optionnel) CONFIGURE LATER ferme sans tout marquer comme terminé
 
 ### 6.2. Étapes communes (plugin et Standalone)
@@ -508,7 +509,7 @@ Cette étape correspond à STEP 4 / AUDIO dans l'assistant GETTING STARTED (elle
 
 Résultat attendu : vous terminez GETTING STARTED jusqu'à FINISH. Les étapes « terminées » ne forcent pas à elles seules la détection du synthé.
 
-Notes (GETTING STARTED) :
+Notes personnelles :
 
 ## 7. Vérifier la communication MIDI
 
@@ -532,7 +533,17 @@ C'est l'étape la plus importante côté logiciel. Tant que le synthé n'est pas
 
 Résultat attendu : DEVICE reconnu, édition possible, pas de cascade d'erreurs si les ports sont bons.
 
-Notes (MIDI) :
+### 7.4. Version du Matrix-Control et EPROM TYPE
+
+Quand le synthé est reconnu, le Matrix-Control l'interroge en MIDI pour en déduire le modèle et le type d'EPROM / firmware. Notez ce qui s'affiche — surtout si cela diffère de ce que vous pensiez avoir.
+
+Sur Matrix-1000 comme sur Matrix-6 / 6R : regardez SETTINGS → MIDI & DEVICE (liste EPROM TYPE, et éventuellement le badge DEVICE). Un Matrix-6R peut apparaître comme Matrix-6 ; les libellés d'EPROM proposés peuvent différer selon la machine. Si la liste indique UNKNOWN, notez-le aussi.
+
+Version testée du Matrix-Control : (logo MATRIX-CONTROL → ABOUT…, ou message / page du téléchargement)
+
+EPROM TYPE affiché :
+
+Notes personnelles :
 
 ## 8. Tester l'application autonome et le plugin
 
@@ -547,26 +558,26 @@ La Matrix-Control peut s'utiliser de deux façons :
 - [ ] Les notes arrivent via la piste du DAW (KEYBOARD FROM = HOST)
 - [ ] Le son du synthé revient sur une piste audio séparée (le plugin ne génère pas l'audio du synthé)
 - [ ] GETTING STARTED n'impose pas d'étape Audio
-- [ ] SETTINGS… accessible (logo MATRIX-CONTROL ou raccourci)
+- [ ] SETTINGS… est accessible (logo MATRIX-CONTROL ou raccourci)
 
 ### 8.2. En Standalone
 
-- [ ] La fenêtre autonome s'ouvre ; SETTINGS → AUDIO disponible
+- [ ] La fenêtre autonome s'ouvre ; SETTINGS → AUDIO est disponible
 - [ ] Vous entendez le retour du synthé via l'interface choisie
-- [ ] KEYBOARD FROM sélectionnable (ou SKIP dans Getting Started)
+- [ ] KEYBOARD FROM est sélectionnable (ou SKIP dans Getting Started)
 - [ ] Si INPUT GAIN / monitoring apparaît dans le bandeau : il réagit
 
 ### 8.3. Écoute audio sous Windows (Standalone)
 
 Rappel ASIO : voir section 2 (accord de licence Steinberg en cours ; ASIO peut manquer dans les premières bêtas).
 
-- [ ] Avec le pilote système (souvent WASAPI) : entrée audible, latence acceptable pour éditer
-- [ ] Si ASIO apparaît dans la liste : périphérique sélectionnable, audio OK
+- [ ] Avec le pilote système (souvent WASAPI) : l'entrée est audible et la latence est acceptable pour éditer
+- [ ] Si ASIO apparaît dans la liste : le périphérique est sélectionnable et l'audio fonctionne
 - [ ] Si ASIO n'apparaît pas : notez-le et continuez avec le pilote système — ce n'est pas forcément un échec pour cette première bêta
 
 Résultat attendu : plugin et Standalone utilisables ; au minimum, écoute Standalone via les pilotes système.
 
-Notes (Standalone / plugin) :
+Notes personnelles :
 
 ## 9. Ableton Live et image floue sous Windows
 
@@ -584,7 +595,7 @@ Comment désactiver l'option :
 
 Ne cherchez pas cette option dans le navigateur (Browser) à gauche : un clic droit sur Matrix-Control dans la liste des plug-ins ne montre en général que le regroupement et les couleurs, pas Auto-Scale.
 
-Notes (Live Auto-Scale) :
+Notes personnelles :
 
 ## 10. Éditer un patch
 
@@ -609,8 +620,8 @@ DCO 1 / DCO 2     oscillateurs
 
 - [ ] Dans le module DCO 1, changez un paramètre (forme d'onde, désaccord…) : le son change
 - [ ] Dans VCF/VCA, bougez la fréquence de coupure ou la résonance : le son change
-- [ ] Sur une enveloppe (ENV), déplacez un point a la souris
-- [ ] Dans FM/TRACK, déplacez un point du Track Generator a la souris
+- [ ] Sur une enveloppe (ENV), déplacez un point à la souris : le son ou l'affichage réagit
+- [ ] Dans FM/TRACK, déplacez un point du Track Generator à la souris : le son ou l'affichage réagit
 
 ### 10.2. Boutons I / C / P sur un module
 
@@ -643,7 +654,7 @@ Le nom s'affiche et s'édite dans le champ PATCH NAME (8 caractères).
 
 Résultat attendu : édition audible, annulation cohérente, pas de fermeture intempestive.
 
-Notes (PATCH EDIT) :
+Notes personnelles :
 
 ## 11. Éditer la matrice de modulation
 
@@ -651,7 +662,7 @@ C'est le « câblage » interne du synthé : on relie une source (LFO, enveloppe
 
 Préparez : synthé détecté, un patch chargé.
 
-- [ ] Sur un bus : SOURCE, AMOUNT, DESTINATION (autre que NONE)
+- [ ] Sur un bus, réglez SOURCE, AMOUNT et DESTINATION (autre que NONE)
 - [ ] Jouez une note : la modulation s'entend / se sent
 - [ ] Le bouton I sur un bus remet ce bus à zéro
 - [ ] Si C / P existent au niveau de la section MATRIX MODULATION : copier / coller un bus (ou la section) se comporte de façon claire ; sinon notez « sans objet »
@@ -660,7 +671,7 @@ Préparez : synthé détecté, un patch chargé.
 
 Résultat attendu : bus éditables, réordonnancement stable.
 
-Notes (MATRIX MODULATION) :
+Notes personnelles :
 
 ## 12. Gérer les patches dans la mémoire du synthé
 
@@ -669,16 +680,16 @@ Dans PATCH MANAGER, le module INTERNAL PATCHES pilote la mémoire du synthétise
 ### 12.1. Navigation et STORE
 
 - [ ] Les boutons < et > changent de patch ; le Matrix-Control relit le patch depuis le synthé
-- [ ] Double-clic sur le numéro de patch : saisie directe 0 à 99
+- [ ] Double-clic sur le numéro de patch : la saisie directe 0 à 99 fonctionne
 - [ ] STORE enregistre dans l'emplacement courant (Matrix-1000 : surtout banques 0 et 1, mémoire réinscriptible)
-- [ ] Matrix-1000, banques 2 à 9 (mémoire d'usine) : INIT, PASTE et STORE grisés — c'est normal
+- [ ] Matrix-1000, banques 2 à 9 (mémoire d'usine) : INIT, PASTE et STORE sont grisés — c'est normal
 
 ### 12.2. INIT / COPY / PASTE
 
 Ici, INIT / COPY / PASTE portent sur le **patch entier** (pas seulement un module comme en section 10.2). Travaillez sur une banque réinscriptible (Matrix-1000 : 0 ou 1) ou sur Matrix-6/6R.
 
 - [ ] INIT : le patch est remis au modèle ; PATCH NAME peut afficher quelque chose du type `* INIT *` — notez ce que vous voyez
-- [ ] COPY puis PASTE vers un autre emplacement : son et écran cohérents
+- [ ] COPY puis PASTE vers un autre emplacement : le son et l'écran restent cohérents
 - [ ] Après PASTE, vous pouvez STORE pour figer dans la mémoire du synthé
 
 ### 12.3. Dialogue « Unsaved patch »
@@ -691,7 +702,7 @@ Ici, INIT / COPY / PASTE portent sur le **patch entier** (pas seulement un modul
 
 Résultat attendu : navigation fluide ; STORE / INIT / COPY / PASTE OK sur mémoire réinscriptible ; banques d'usine protégées ; Unsaved patch compréhensible.
 
-Notes (INTERNAL PATCHES) :
+Notes personnelles :
 
 ## 13. Gérer les patches dans des fichiers informatiques
 
@@ -699,24 +710,24 @@ Dans PATCH MANAGER, le module COMPUTER PATCHES gère les fichiers `.syx` sur le 
 
 ### 13.1. OPEN / SAVE / parcours
 
-- [ ] OPEN : choisir un dossier de patches
+- [ ] OPEN : choisissez un dossier de patches
 - [ ] Après OPEN : s'il y a un mélange de fichiers, un message du type « N valid, M invalid » (ou équivalent) peut apparaître en bas de fenêtre — notez le texte exact
-- [ ] SAVE AS : créer un nouveau `.syx` ; SAVE : enregistrer dans le fichier déjà associé
+- [ ] SAVE AS : créez un nouveau `.syx` ; SAVE : enregistrez dans le fichier déjà associé
 - [ ] Parcourir la liste avec < / > et recharger un `.syx`
 - [ ] Charger un `.syx` externe (format classique / communauté) puis SAVE AS : le nouveau fichier se recharge correctement
 - [ ] Si « Patch name mismatch » (nom interne ≠ nom de fichier) : Internal / Filename / Cancel se comportent de façon compréhensible
-- [ ] (Optionnel) SETTINGS : politiques de noms fichier vs SysEx / ASK — une passe suffit
+- [ ] (Optionnel) SETTINGS : les politiques de noms fichier vs SysEx / ASK se comportent comme prévu — une passe suffit
 
 ### 13.2. Glisser-déposer des fichiers sur la fenêtre
 
-- [ ] Glisser un `.syx` patch sur la fenêtre : titre temporaire du type LOAD PATCH ; le drop charge le patch (Unsaved patch si besoin)
-- [ ] Glisser plusieurs `.syx` ou un dossier de patches : sélection acceptée ou message clair
-- [ ] Glisser un fichier non Matrix : refus + message en bas de fenêtre, pas de crash
-- [ ] (Matrix-1000) Glisser un fichier Master valide (`.syx` / `.m1km`) : overlay LOAD MASTER, chargement ; plusieurs fichiers Master d'un coup refusés ou message clair
+- [ ] Glisser un `.syx` patch sur la fenêtre : un titre temporaire du type LOAD PATCH apparaît ; le drop charge le patch (Unsaved patch si besoin)
+- [ ] Glisser plusieurs `.syx` ou un dossier de patches : la sélection est acceptée ou un message clair s'affiche
+- [ ] Glisser un fichier non Matrix : le fichier est refusé, un message s'affiche en bas de fenêtre, pas de crash
+- [ ] (Matrix-1000) Glisser un fichier Master valide (`.syx` / `.m1km`) : l'overlay LOAD MASTER apparaît et le chargement fonctionne ; plusieurs fichiers Master d'un coup sont refusés ou un message clair s'affiche
 
 Résultat attendu : fichiers `.syx` lisibles et enregistrables ; drag-drop prévisible ; pas d'écrasement surprise.
 
-Notes (COMPUTER PATCHES) :
+Notes personnelles :
 
 ## 14. Créer des variations de patch
 
@@ -762,8 +773,8 @@ Boutons principaux :
 - [ ] Avec Compare actif : Undo/Redo patch et édition restent bloqués (rappel section 10.3)
 - [ ] Désactiver Compare restaure l'édition
 - [ ] D et F se comportent comme attendu (suppression / vidage) — avec prudence
-- [ ] E exporte la session ; rouvrir via COMPUTER PATCHES → OPEN
-- [ ] Dialogues (historique plein, mutations non exportées, dossier déjà existant) : choix clairs, pas de perte silencieuse
+- [ ] E exporte la session ; vous pouvez la rouvrir via COMPUTER PATCHES → OPEN
+- [ ] Les dialogues (historique plein, mutations non exportées, dossier déjà existant) proposent des choix clairs, sans perte silencieuse
 
 ### 14.2. MODE et PITCH
 
@@ -772,7 +783,7 @@ Boutons principaux :
 
 Résultat attendu : mutations audibles, Compare qui bloque bien, MODE/PITCH perceptibles, export rechargeable.
 
-Notes (PATCH MUTATOR) :
+Notes personnelles :
 
 ## 15. Gérer les banques (Matrix-1000 uniquement)
 
@@ -784,23 +795,23 @@ Sur Matrix-6/6R : ce module est entièrement grisé (pas de banques). C'est voul
 
 - [ ] Matrix-6/6R : BANK UTILITY est grisé (sans objet sur Matrix-1000)
 - [ ] Matrix-1000 : boutons 0 à 9 changent la banque ; le patch courant est relu
-- [ ] Banques 0 et 1 : écriture possible (STORE, etc.)
-- [ ] Banques 2 à 9 : lecture seule pour INIT / PASTE / STORE dans INTERNAL PATCHES
-- [ ] Changer de banque avec des modifications non sauvées : même logique Unsaved patch qu'un changement de patch
+- [ ] Sur les banques 0 et 1, l'écriture est possible (STORE, etc.)
+- [ ] Sur les banques 2 à 9, INIT / PASTE / STORE restent en lecture seule dans INTERNAL PATCHES
+- [ ] Changer de banque avec des modifications non sauvées suit la même logique Unsaved patch qu'un changement de patch
 
 ### 15.2. COPY / PASTE / IMPORT / EXPORT
 
 **Attention :** ces actions peuvent écraser toute une banque. Sauvegardez d'abord vos sons importants (EXPORT ou fichiers `.syx`). Travaillez de préférence sur les banques 0 ou 1.
 
-- [ ] EXPORT de la banque sélectionnée : dossier créé, environ 100 fichiers, message de succès ; Cancel propre si proposé
-- [ ] IMPORT vers banque 0 ou 1 : confirmation, barre / fenêtre de progression, résultat du type found / valid / imported (notez le texte)
-- [ ] IMPORT ou PASTE vers banque 2–9 : refusé ou grisé, avec message clair
-- [ ] COPY banque A → PASTE banque B (toutes deux en RAM, ex. 0 → 1) : confirmation, progression ; Cancel restaure ou interrompt proprement
-- [ ] Pendant un transfert : l'UI reste cohérente (pas de double-clic accidentel qui casse tout) ; message « in progress » ou titre de progression visible
+- [ ] EXPORT de la banque sélectionnée : un dossier est créé (environ 100 fichiers), un message de succès s'affiche ; Cancel reste propre si proposé
+- [ ] IMPORT vers banque 0 ou 1 : une confirmation apparaît, puis une barre / fenêtre de progression, avec un résultat du type found / valid / imported (notez le texte)
+- [ ] IMPORT ou PASTE vers banque 2–9 est refusé ou grisé, avec un message clair
+- [ ] COPY banque A → PASTE banque B (toutes deux en RAM, ex. 0 → 1) : une confirmation et une progression s'affichent ; Cancel restaure ou interrompt proprement
+- [ ] Pendant un transfert : l'UI reste cohérente (pas de double-clic accidentel qui casse tout) ; un message « in progress » ou un titre de progression est visible
 
 Résultat attendu : changement de banque fiable ; transferts contrôlés sur RAM ; banques d'usine protégées ; zone grisée sur Matrix-6/6R.
 
-Notes (BANK UTILITY) :
+Notes personnelles :
 
 ## 16. Réglages globaux « Master » (Matrix-1000 uniquement)
 
@@ -813,7 +824,7 @@ Sur Matrix-6/6R, toute cette colonne est grisée — c'est voulu. La gestion du 
 ### 16.1. Édition MASTER EDIT
 
 - [ ] Matrix-6/6R : MASTER EDIT est grisé (sans objet sur Matrix-1000)
-- [ ] Matrix-1000 : modules MIDI, VIBRATO et MISC visibles et éditables
+- [ ] Matrix-1000 : les modules MIDI, VIBRATO et MISC sont visibles et éditables
 - [ ] Changez le CHANNEL MIDI avec prudence : comportement cohérent
 - [ ] Bouton I sur un module : dialogue RESET MASTER MODULE? Reset / Cancel fonctionnent
 - [ ] Un réglage master influence le comportement général, quel que soit le patch chargé
@@ -822,27 +833,27 @@ Sur Matrix-6/6R, toute cette colonne est grisée — c'est voulu. La gestion du 
 
 Vous pouvez charger ou enregistrer un Master depuis Settings, ou en glissant un fichier sur la fenêtre.
 
-- [ ] SETTINGS → MASTER (ou UTILITY Master) : LOAD / SAVE AS d'un Master ; INIT global après confirmation
-- [ ] (Optionnel) INIT TEMPLATE Master : SAVE AS INIT / DELETE
-- [ ] Drag-drop d'un fichier Master valide : overlay LOAD MASTER, chargement ; multi-fichiers Master refusés ou message clair
+- [ ] SETTINGS → MASTER (ou UTILITY Master) : LOAD / SAVE AS d'un Master fonctionne ; INIT global demande une confirmation
+- [ ] (Optionnel) INIT TEMPLATE Master : SAVE AS INIT / DELETE fonctionne
+- [ ] Drag-drop d'un fichier Master valide : l'overlay LOAD MASTER apparaît et le chargement fonctionne ; plusieurs fichiers Master d'un coup sont refusés ou un message clair s'affiche
 
 Résultat attendu : édition possible sur Matrix-1000 seulement ; Load/Save Master sans crash.
 
-Notes (MASTER EDIT) :
+Notes personnelles :
 
 ## 17. Préférences dans la fenêtre Settings
 
 Ces préférences (logo MATRIX-CONTROL → SETTINGS…) s'ouvrent dans la fenêtre Settings et modifient le comportement au quotidien. Une passe suffit.
 
 - [ ] UNSAVED STATE : ALWAYS WARN vs NEVER WARN — le dialogue Unsaved patch apparaît ou non comme attendu
-- [ ] CONTEXTUAL HELP activé : survol d'un contrôle → texte HELP en bas de fenêtre
+- [ ] CONTEXTUAL HELP est activé : le survol d'un contrôle affiche le texte HELP en bas de fenêtre
 - [ ] INIT TEMPLATE (PATCH) : SAVE AS INIT, puis INIT dans INTERNAL PATCHES utilise le modèle
-- [ ] Plugin seulement : HARDWARE LATENCY réglable dans MIDI & DEVICE (pas besoin de mesurer la latence)
-- [ ] Logo → ABOUT… : version lisible ; Échap ferme ABOUT et/ou SETTINGS
+- [ ] Plugin seulement : HARDWARE LATENCY est réglable dans MIDI & DEVICE (pas besoin de mesurer la latence)
+- [ ] Logo → ABOUT… : la version est lisible ; Échap ferme ABOUT et/ou SETTINGS
 
 Résultat attendu : les options Settings se comportent comme leur libellé ; pas de plantage en ouvrant/fermant Settings.
 
-Notes (SETTINGS / préférences) :
+Notes personnelles :
 
 ## 18. Points connus à vérifier
 
@@ -850,13 +861,13 @@ Certains comportements surprennent. Confirmez ce que vous voyez.
 
 - [ ] Unison (surtout Matrix-1000) : dans le module RAMP/PORTAMENTO (et réglages Unison liés, y compris côté MASTER EDIT / MISC selon votre machine), activez / réglez Unison. Le rendu peut être contre-intuitif : ce que l'on croit commander à l'écran ne correspond pas toujours à ce que l'on entend. Cela vient surtout de la façon dont le Matrix-1000 gère l'Unison côté machine (plusieurs notions liées : mode clavier, Unison master, etc.), pas d'un simple bug d'affichage du Matrix-Control. Decrivez ce que vous voyez et entendez.
 - [ ] Keyboard Mode : toujours dans RAMP/PORTAMENTO, changez le mode clavier. Un comportement bizarre côté firmware du synthé est connu ; il est souvent contourné ou résolu avec une EPROM Untergeek v1.21. Notez votre EPROM et ce qui se passe (notes collées, mode qui ne « prend » pas, etc.).
-- [ ] MEMORY PROTECT / BANK LOCK : s'ils sont actifs, STORE peut sembler cassé — vérifiez avant de signaler un bug.
-- [ ] Sur Matrix-6/6R : MASTER EDIT et BANK UTILITY grisés (voulu)
-- [ ] Avertissements macOS / Windows au lancement : souvent normaux (sections 2 et 3)
+- [ ] Protections mémoire : Matrix-1000 — MEMORY PROTECT / BANK LOCK ; Matrix-6/6R — Memory Protect (arrière) et protect de patch sur la façade. Si actifs, STORE peut sembler cassé — vérifiez avant de signaler un bug.
+- [ ] Sur Matrix-6/6R : MASTER EDIT et BANK UTILITY sont grisés (voulu)
+- [ ] Les avertissements macOS / Windows au lancement sont souvent normaux (sections 2 et 3)
 - [ ] Un Matrix-6R peut s'afficher comme Matrix-6
 - [ ] ASIO peut manquer (section 2) — testez l'écoute avec le pilote système
 
-Notes (limitations / surprises) :
+Notes personnelles :
 
 ## 19. Comment signaler un problème
 
@@ -890,22 +901,22 @@ Inutile d'envoyer mots de passe, licences, ou une copie entière du disque.
 
 Cochez ici ce que vous avez déjà fait dans les sections précédentes. Si une ligne ne s'applique pas : « sans objet ».
 
-- [ ] 1. Installation ZIP + messages de sécurité gérés (section 4)
-- [ ] 2. Synthé branché (MIDI dans les deux sens + audio) (section 5)
-- [ ] 3. Standalone s'ouvre
-- [ ] 4. Plugin charge dans le DAW (après rescan si besoin)
-- [ ] 5. GETTING STARTED terminé jusqu'à FINISH (section 6)
+- [ ] 1. L'installation ZIP est faite et les messages de sécurité sont gérés (section 4)
+- [ ] 2. Le synthé est branché (MIDI dans les deux sens + audio) (section 5)
+- [ ] 3. Le Standalone s'ouvre
+- [ ] 4. Le plugin se charge dans le DAW (après rescan si besoin)
+- [ ] 5. GETTING STARTED est terminé jusqu'à FINISH (section 6)
 - [ ] 6. MIDI : badge DEVICE reconnaît le synthé (section 7)
-- [ ] 7. Cadre d'usage : Standalone et/ou plugin OK (section 8)
+- [ ] 7. Le cadre d'usage Standalone et/ou plugin est OK (section 8)
 - [ ] 8. Windows + Live : Auto-Scale si l'UI est floue (section 9 ; sinon sans objet)
-- [ ] 9. Patch chargé via INTERNAL PATCHES ; cutoff modifié ; son change
-- [ ] 10. STORE sur emplacement réinscriptible (Matrix-1000 banque 0 ou 1, ou numéro sur Matrix-6/6R)
+- [ ] 9. Un patch est chargé via INTERNAL PATCHES ; le cutoff est modifié ; le son change
+- [ ] 10. STORE fonctionne sur un emplacement réinscriptible (Matrix-1000 banque 0 ou 1, ou numéro sur Matrix-6/6R)
 - [ ] 11. Un bus MATRIX MODULATION change le son
-- [ ] 12. MUTATE une fois ; Compare on puis off
+- [ ] 12. MUTATE a été lancé une fois ; Compare on puis off fonctionne
 - [ ] 13. Matrix-1000 : BANK UTILITY — au moins un EXPORT (ou COPY) sans écraser une banque pleine d'originaux ; sinon sans objet
-- [ ] 14. Matrix-1000 : un module MASTER EDIT (sans objet sur Matrix-6/6R)
-- [ ] 15. Matrix-6/6R : BANK UTILITY et MASTER EDIT grisés (sans objet si vous n'avez que le 1000)
-- [ ] 16. Standalone : entendre le retour audio du synthé
+- [ ] 14. Matrix-1000 : un module MASTER EDIT est utilisable (sans objet sur Matrix-6/6R)
+- [ ] 15. Matrix-6/6R : BANK UTILITY et MASTER EDIT sont grisés (sans objet si vous n'avez que le 1000)
+- [ ] 16. En Standalone, vous entendez le retour audio du synthé
 - [ ] 17. Quitter et relancer : ports MIDI, apparence, Getting Started se comportent de façon raisonnable
 
 Vous pouvez vous arrêter ici et passer au bilan (section 22) : c'est déjà un très bon retour.
