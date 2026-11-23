@@ -26,7 +26,7 @@ context:
 ## Implementation Notes
 
 Agent decisions (user would not need to renegotiate these):
-- Paths: `Documentation/User/Beta/Matrix-Control-Guide-Beta-Tests-FR.txt` (working); archives `…-remaniee-Cursor.txt` + `…-remaniee-Guillaume.txt` (EN deferred until FR approved)
+- Paths: guides in `Documentation/User/Beta/` (`Matrix-Control-Guide-de-tests-beta-FR.txt` FR SSOT + `…-EN.txt` parity); bug-report companions in `Documentation/User/Support/` (`Matrix-Control-Comment-signaler-un-bug-FR.txt` + `Matrix-Control-How-to-report-a-bug-EN.txt`); archives `…-remaniee-Cursor.txt` + `…-remaniee-Guillaume.txt`
 - Format: working Markdown + delivery TXT — UPPERCASE top titles in TXT, `1.` / `1.1.` numbering, ASCII separators, `[ ]` / `[x]` checkboxes; UI labels stay English; PDF out of scope
 - Keep product UI labels in English in both languages (GETTING STARTED, PATCH EDIT, BANK UTILITY, …)
 - ASIO: cover Standalone audio with and without ASIO; never present ASIO as guaranteed for first public beta
