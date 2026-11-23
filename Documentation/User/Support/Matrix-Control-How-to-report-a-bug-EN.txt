@@ -1,0 +1,65 @@
+================================================================================
+MATRIX-CONTROL — HOW TO REPORT A BUG?
+================================================================================
+Organisation: Ten Square Software
+Author: Guillaume DUPONT
+Email: tensquaresoftware@gmail.com
+Product: Matrix-Control
+Document version: 1.0
+Revision date: 2026-11-23
+
+--------------------------------------------------------------------------------
+WHAT IS THIS DOCUMENT FOR?
+--------------------------------------------------------------------------------
+
+This text is for day-to-day product use: a bug, odd behavior or a specific
+question, outside a structured beta test session.
+
+During a beta test campaign, prefer the filled test guide
+(Matrix-Control-Guide-de-tests-beta-EN.txt): it already contains the session
+sheet, checked boxes and notes. Simply attach that file by email (see the
+"Send your results" section of the guide).
+
+--------------------------------------------------------------------------------
+HOW TO CONTACT THE DEVELOPER?
+--------------------------------------------------------------------------------
+
+Preferred contact address:
+
+  tensquaresoftware@gmail.com
+
+If you are comfortable with GitHub, you can also open an "issue" in the
+project repository:
+
+https://github.com/tensquaresoftware/matrix-control/issues
+
+Otherwise, email is more than enough.
+
+--------------------------------------------------------------------------------
+WHAT INFORMATION TO INCLUDE IN YOUR MESSAGE?
+--------------------------------------------------------------------------------
+
+Include at least:
+
+1. Short title: context and summary of the problem
+   (e.g. "Matrix-1000: STORE grayed out on bank 0")
+2. Matrix-Control version (logo → ABOUT…)
+3. System (name + version) and computer type
+4. Standalone or plugin (AU / VST3) + DAW and its version if needed
+5. Synth (Matrix-1000/6/6R) + EPROM / firmware if known
+6. Steps to reproduce, numbered
+7. What you expected, and what happened
+8. Always, or only sometimes?
+9. Exact text of the footer message or dialog
+10. If possible: a screenshot
+
+Do not send passwords, licences, or a full disk copy.
+
+--------------------------------------------------------------------------------
+THANK YOU!
+--------------------------------------------------------------------------------
+
+Your feedback helps stabilise Matrix-Control. Thank you!
+Guillaume | Ten Square Software — tensquaresoftware@gmail.com
+
+================================================================================
