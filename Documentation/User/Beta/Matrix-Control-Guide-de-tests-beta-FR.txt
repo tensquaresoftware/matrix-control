@@ -5,8 +5,9 @@ Organisation : Ten Square Software
 Auteur : Guillaume DUPONT
 Email : tensquaresoftware@gmail.com
 Produit : Matrix-Control
+Version du produit : 1.0.0-alpha.8
 Version du guide : 1.0
-Date de révision : 23/11/2026
+Date de révision : 24/11/2026
 
 --------------------------------------------------------------------------------
 SOMMAIRE
