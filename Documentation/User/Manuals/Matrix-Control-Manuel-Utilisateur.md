@@ -95,7 +95,7 @@ Ces machines partagent le même genre de « moteur » sonore (deux oscillateurs,
 | | **Matrix-1000** | **Matrix-6/6R** |
 |---|-----------------|-----------------|
 | Mémoire des patches | **10 banques** (0 à 9), **100 patches** par banque (0 à 99) | **100 patches** seulement (pas de banques) |
-| Module `BANK UTILITY` | Actif | Grisé (indisponible) |
+| Module `BANK UTILITY` | Actif (banques, `COPY` / `PASTE` / `IMPORT` / `EXPORT`) | Boutons de banque, `COPY` et `PASTE` grisés ; `IMPORT` / `EXPORT` restent utilisables |
 | Section `MASTER EDIT` | Active (réglages globaux : canal MIDI, vibrato, accordage…) | Grisée (indisponible) |
 | Façade | Très peu de boutons : l’éditeur MIDI à l’écran s’avère particulièrement utile | Clavier (Matrix-6) ou rack (Matrix-6R) avec davantage de commandes directes |
 
@@ -103,7 +103,7 @@ Ces machines partagent le même genre de « moteur » sonore (deux oscillateurs,
 
 **Reconnaissance du synthé :** Dès que les ports MIDI sont correctement sélectionnés, Matrix-Control demande au synthé de s’identifier. En bas à droite de la fenêtre, vous voyez alors le type de machine détecté, ou `NOT CONNECTED` (sous le badge `DEVICE`) s’il n’y a pas encore de dialogue.
 
-> **À noter.** Un Matrix-6R peut pour l’instant apparaître simplement comme Matrix-6. Pour éditer un patch au quotidien, cela ne change presque rien : `BANK UTILITY` et `MASTER EDIT` restent réservés au Matrix-1000.
+> **À noter.** Un Matrix-6R peut pour l’instant apparaître simplement comme Matrix-6. Pour éditer un patch au quotidien, cela ne change presque rien : la sélection de banque et `MASTER EDIT` restent propres au Matrix-1000 (détail de `BANK UTILITY` en [section 11](#11-banques-du-matrix-1000-bank-utility)).
 
 ---
 
@@ -466,11 +466,48 @@ Sur les banques en lecture seule **2–9** du Matrix-1000, `INIT`, `PASTE` et `S
 
 ## 11. Banques du Matrix-1000 (BANK UTILITY)
 
-Le module `BANK UTILITY` est réservé au **Matrix-1000**. Sur Matrix-6/6R, il est grisé : ces modèles ne disposent pas de banques.
+Le module `BANK UTILITY`, dans la section `PATCH MANAGER`, sert à **changer de banque** sur un Matrix-1000 et à **transférer une banque entière** : copie interne, collage vers une autre banque réinscriptible, import depuis un dossier de fichiers, ou export vers le disque.
+
+Sur un **Matrix-6/6R**, ces modèles n’ont pas de banques : les boutons `0`–`9`, `COPY` et `PASTE` sont grisés. Les boutons `IMPORT` et `EXPORT` restent toutefois utilisables pour échanger les 100 patches de la machine avec un dossier sur l’ordinateur (sous-dossier `PATCHES`).
+
+Pendant une session avec Matrix-Control, pilotez le synthé **via le plugin** plutôt que depuis la façade : un changement de banque ou de `BANK LOCK` sur la machine peut désynchroniser l’écran de Matrix-Control. Le réglage `BANK LOCK` lui-même se trouve dans `MASTER EDIT` → `MISC`, pas dans `BANK UTILITY`.
 
 ### Boutons de banque (`0`–`9`)
 
-Les boutons `0` à `9` sélectionnent la banque active ; le patch courant est ensuite relu depuis le synthé (avec la même logique de confirmation `Unsaved patch` que pour un changement de patch).
+Sur le Matrix-1000, les boutons `0` à `9` sélectionnent la banque active. Matrix-Control demande ensuite au synthé de basculer, puis **relit** le patch courant (avec la même logique de confirmation `Unsaved patch` qu’un changement de patch — voir [section 10](#10-choisir-un-patch-dans-le-synthé-internal-patches)).
+
+Les banques **0** et **1** sont en mémoire RAM (écriture possible). Les banques **2** à **9** sont en lecture seule (ROM) pour le collage et l’import de banque, ainsi que pour `INIT` / `PASTE` / `STORE` dans `INTERNAL PATCHES`. Vous pouvez toujours **sélectionner**, **copier** ou **exporter** une banque ROM.
+
+### Copier et coller une banque (`COPY` / `PASTE`)
+
+- `COPY` lit la banque sélectionnée depuis le synthé et la place dans le presse-papiers interne de Matrix-Control
+- `PASTE` écrit cette banque dans la banque sélectionnée **uniquement si c’est une banque RAM** (`0` ou `1`), et seulement si la destination est **différente** de la banque copiée
+
+`PASTE` reste grisé tant qu’aucune banque n’a été copiée avec succès, sur les banques ROM `2`–`9`, et lorsque la destination est la même banque que la source. Avant d’écraser la destination, Matrix-Control affiche la confirmation `Paste bank?` (`CONTINUE` / `CANCEL`). Une fenêtre de progression accompagne le transfert ; si vous annulez, le synthé est remis dans l’état précédent autant que possible.
+
+### Importer une banque (`IMPORT`)
+
+Sur le Matrix-1000, `IMPORT` remplit la banque RAM sélectionnée (`0` ou `1`). Sur un Matrix-6/6R, il écrit dans les **100 emplacements** de la machine (pas de choix de banque). Dans les deux cas, vous sélectionnez le dossier **qui contient** les fichiers patch (par exemple un sous-dossier `BANK 3` ou `PATCHES` déjà exporté), pas le dossier parent au-dessus.
+
+Matrix-Control prend jusqu’à **100** fichiers valides, dans l’ordre alphabétique. S’il y en a moins, seuls ces emplacements sont réécrits — les autres restent inchangés. S’il y en a plus, les fichiers au-delà du centième sont ignorés. Ce n’est **pas** la même chose que `OPEN` dans `COMPUTER PATCHES`, qui charge **un seul** fichier `.syx` dans l’éditeur sans écrire toute une banque dans le synthé.
+
+Une confirmation `Import bank?` précède l’écriture. Une barre de progression suit ; `CANCEL` tente de restaurer la mémoire telle qu’elle était avant l’import.
+
+Sur les banques ROM `2`–`9` du Matrix-1000, `IMPORT` est indisponible (contrôle grisé ; un message peut l’expliquer en bas de fenêtre).
+
+### Exporter une banque (`EXPORT`)
+
+`EXPORT` enregistre les 100 patches de la banque sélectionnée (ou les 100 patches du Matrix-6/6R) sur le disque :
+
+1. Vous choisissez un **dossier parent** (Matrix-Control mémorise le dernier emplacement)
+2. Il crée un sous-dossier `BANK N` (numéro de la banque) — ou `PATCHES` sur Matrix-6/6R
+3. Si ce sous-dossier existe déjà, la boîte `Replace export folder?` propose de le remplacer entièrement (`CONTINUE`) ou d’annuler (`CANCEL`)
+4. Les fichiers sont nommés `P00. NomDuPatch.syx` … `P99.…` (ou simplement `P12.syx` si le nom n’est pas utilisable)
+
+Une fenêtre de progression accompagne l’export ; en cas de succès, un message en bas de fenêtre confirme le chemin. Si vous annulez pendant l’export, les fichiers créés pour ce passage ne sont pas conservés.
+
+> **Capture d’écran — À placer ici**  
+> *Légende :* Module `BANK UTILITY` avec les boutons `0`–`9`, `COPY`, `PASTE`, `IMPORT` et `EXPORT`.
 
 ---
 
@@ -498,15 +535,15 @@ Deux emplacements distincts :
 | `SAVE AS` | Enregistrer le patch courant sous un nouveau nom `.syx` |
 | `SAVE` | Enregistrer dans le fichier déjà associé |
 
-Seul le format `.syx` est pris en charge. Il n’existe pas, dans cette version, d’import d’une banque entière d’un seul geste, ni de tags ou de favoris.
+Seul le format `.syx` est pris en charge dans `COMPUTER PATCHES`. Ce module ouvre et enregistre **un patch à la fois** : il n’y a pas de tags ni de favoris. Pour importer ou exporter **une banque entière**, utilisez `BANK UTILITY` (voir [section 11](#11-banques-du-matrix-1000-bank-utility)) — ce n’est pas le rôle de `OPEN` / `SAVE`.
 
 **Format des fichiers sauvés par Matrix-Control**
 
-Les fichiers `.syx` enregistrés par `SAVE` / `SAVE AS`, par l’export de banque (`BANK UTILITY`) ou par l’export Patch Mutator utilisent le format **Edit Buffer** (opcode SysEx `0x0D`). Sur un Matrix-1000, vous pouvez les réécouter sans risque d’écraser un emplacement RAM : rechargez-les dans Matrix-Control, ou envoyez-les avec un gestionnaire SysEx (SysEx Librarian, etc.) — le patch ira dans le **buffer d’édition**, pas dans un slot mémoire.
+Les fichiers `.syx` enregistrés par `SAVE` / `SAVE AS`, par l’export de banque (`BANK UTILITY` → `EXPORT`) ou par l’export Patch Mutator utilisent le format **Edit Buffer** (opcode SysEx `0x0D`). Sur un Matrix-1000, vous pouvez les réécouter sans risque d’écraser un emplacement RAM : rechargez-les dans Matrix-Control, ou envoyez-les avec un gestionnaire SysEx (SysEx Librarian, etc.) — le patch ira dans le **buffer d’édition**, pas dans un slot mémoire.
 
-- **Import** : Matrix-Control accepte aussi les fichiers `.syx` **externes** au format classique (opcode `0x01`, factory, communauté, etc.).
-- **Bank Import** (`BANK UTILITY`) : c’est la voie pour **écrire volontairement** une banque complète dans la mémoire du synthé, slot par slot.
-- **Fichiers tiers en `0x01`** : un renvoi direct via SysEx Librarian écrit dans un **slot Oberheim** (comportement du fichier source, pas de Matrix-Control).
+- **Import fichier par fichier** : Matrix-Control accepte aussi les fichiers `.syx` **externes** au format classique (opcode `0x01`, factory, communauté, etc.) via `COMPUTER PATCHES`
+- **Import / export de banque** (`BANK UTILITY`) : voie dédiée pour écrire volontairement une banque complète (Matrix-1000, banque RAM) ou les 100 patches du Matrix-6/6R (`IMPORT`), ou pour les sauver sur le disque (`EXPORT`)
+- **Fichiers tiers en `0x01`** : un renvoi direct via SysEx Librarian écrit dans un **slot Oberheim** (comportement du fichier source, pas de Matrix-Control)
 
 Après un parcours de dossier, le bas de fenêtre peut indiquer combien de fichiers sont valides ou invalides, ou confirmer un chargement / une sauvegarde (`Loaded…`, `Saved…`).
 
@@ -682,7 +719,8 @@ En général **non** conservé tel quel : le contenu du patch en cours d’édit
 | Les contrôles bougent mais le patch ne change pas | Vérifier `SYNTH TO` ; le canal MIDI (`MASTER EDIT` sur Matrix-1000) ; `MEMORY PROTECT` / `BANK LOCK` |
 | Changement de patch : l’écran ne se met pas à jour | Vérifier le port MIDI `SYNTH FROM` (Settings → `MIDI & DEVICE` ; le synthé doit pouvoir répondre) |
 | `STORE` ou `PASTE` grisés | Banque 2–9 sur Matrix-1000 — passer en banque 0 ou 1 |
-| `MASTER EDIT` / `BANK UTILITY` grisés | Vous êtes sur Matrix-6/6R, ou aucun appareil n’est détecté |
+| `MASTER EDIT` grisé ; banques / `COPY` / `PASTE` de `BANK UTILITY` grisés | Vous êtes sur Matrix-6/6R — `IMPORT` / `EXPORT` restent utilisables tant qu’un appareil est détecté |
+| Tout `BANK UTILITY` inutilisable, y compris `IMPORT` / `EXPORT` | Aucun appareil n’est détecté, ou un transfert de banque est déjà en cours |
 | Compare empêche toute édition | Cliquer à nouveau sur `C` dans le Mutator |
 | Plugin invisible dans le DAW | Rescanner les plugins ; vérifier le format (AU/VST3) et le dossier indiqué avec le téléchargement |
 | Pas de notes en plugin | Router le clavier maître vers la piste Matrix-Control dans le DAW ([exemples](#clavier-maître-via-le-daw-plugin)) ; `KEYBOARD FROM` reste sur `HOST` |
@@ -701,6 +739,7 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 | **Afficheur** | Région graphique ou panneau d’affichage (enveloppes et Track Generator interactifs ; `PATCH NAME` en lecture seule). |
 | **AU** | Format de plugin sur macOS (Audio Unit). |
 | **Banque (Bank)** | Sur le Matrix-1000 : regroupement de 100 patches. Il y a 10 banques (0–9). Le Matrix-6/6R n’a pas de banques. |
+| **BANK LOCK** | Dans `MASTER EDIT` → `MISC` : verrouille le changement de banque côté Matrix-1000. Ce n’est **pas** un bouton du module `BANK UTILITY`. |
 | **Bus de modulation** | Une des dix voies de la section `MATRIX MODULATION` (source, intensité, destination). |
 | **DAW** | Digital Audio Workstation — un séquenceur / studio logiciel (Live, Logic, Reaper…). On dit *un* DAW. |
 | **DCO** | Oscillateur : source qui produit la forme d’onde de base du patch. |
@@ -732,7 +771,6 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 | **VCA** | Étage de volume du patch. |
 | **VCF** | Filtre qui sculpte le timbre dans le domaine fréquentiel (grave / aigu, résonance). |
 | **VST3** | Format de plugin très répandu (Windows, macOS, Linux…). |
-| **Unlock** | Déverrouille la banque côté Matrix-1000 pour certaines saisies sur la façade. |
 
 ---
 
