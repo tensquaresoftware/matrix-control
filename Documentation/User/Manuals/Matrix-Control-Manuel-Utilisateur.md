@@ -246,11 +246,13 @@ Il n’existe **pas** de bouton de connexion automatique. En pratique :
 - Il tente de les rouvrir au prochain lancement
 - Dès que les ports vers / depuis le synthé sont ouverts, il demande au synthé de s’identifier
 
+**Plusieurs instances Matrix-Control.** Si vous ouvrez plusieurs Matrix-Control en même temps (plusieurs pistes plugin, ou plugin + Standalone), **ne partagez pas les mêmes ports MIDI** entre deux instances. En pratique, chaque instance doit avoir sa propre paire `SYNTH FROM` / `SYNTH TO` vers **un** Matrix (1000 ou 6/6R). En Standalone, `KEYBOARD FROM` fait partie du même jeu de ports pour cette instance ; en plugin, `KEYBOARD FROM` reste figé sur `HOST` (le DAW fournit les notes). Si vous pilotez **deux** synthés, prévoyez un jeu de ports distinct par machine. Sinon : messages mélangés, détection instable, édition peu fiable.
+
 ### Tant que le synthé n’est pas détecté
 
 Si aucun appareil n’est reconnu, le bas de la fenêtre affiche un message du type :
 
-> *No synth detected - check MIDI cables, Settings > MIDI SYNTH FROM / SYNTH TO, and power-cycle your Matrix synth.*
+> *No synth detected - check MIDI cables, Settings > MIDI & DEVICE, and power-cycle your Matrix.*
 
 Les sections d’édition restent alors verrouillées jusqu’à détection. Ce comportement est voulu : Matrix-Control n’envoie pas de changements à l’aveugle.
 
@@ -268,6 +270,10 @@ Voici des exemples concrets pour trois hôtes courants. L’idée est la même d
 4. Sélectionnez votre clavier maître comme entrée MIDI de la piste (liste déroulante d’entrée), ou laissez « All Ins » si un seul clavier est branché
 5. Jouez : les notes doivent atteindre Matrix-Control (`KEYBOARD FROM` reste sur `HOST`)
 6. Pour **entendre** le synthé, créez une piste audio (ou utilisez une entrée déjà routée) branchée sur la sortie du Matrix via votre interface audio — ce n’est pas Matrix-Control qui génère le son
+
+**Windows et image floue (VST3).** Sous Windows, Ableton Live propose une option **Auto-Scale Plugin Window**. Quand elle est activée, l’interface du Matrix-Control en **VST3** peut apparaître floue, **quel que soit** le réglage `UI SCALE` dans Matrix-Control. Ce n’est pas un défaut de l’échelle interne du plugin : Live redimensionne l’image à sa façon. L’application **Standalone** reste en général nette sur la même machine. Sous macOS, cette option n’existe pas dans Live. (Rappel aussi dans [Settings / `UI SCALE`](#fenêtre-settings) et [Dépannage](#17-dépannage-rapide).)
+
+Pour les plugins VST3 librement redimensionnables (dont Matrix-Control), le conseil Ableton est de **désactiver** Auto-Scale Plugin Window, puis de **recharger** le device. En pratique : chargez d’abord Matrix-Control sur une piste, faites un clic droit sur la barre de titre du device **en bas, dans la vue Device** (pas seulement sur la fenêtre flottante du plugin) pour décocher l’option, rechargez le device, et vérifiez que l’interface est nette.
 
 #### Reason
 
@@ -327,7 +333,7 @@ Dans ce manuel, nous désignons les grands blocs de l’interface comme suit :
 - **Module** — par exemple `DCO 1`, `BANK UTILITY`, `PATCH MUTATOR`
 - **Bus de modulation** — chacune des dix voies de `MATRIX MODULATION`
 - **Groupe** — sous-partie d’un module, par exemple `BROWSER` ou `MEMORY` 
-- **Afficheur** — représentations graphiques (enveloppes, Track Generator) ou panneau de nom de patch
+- **Afficheur** — représentations graphiques (enveloppes et Track Generator, éditables à la souris) ou panneau `PATCH NAME` (renommable par double-clic quand l’édition est autorisée — voir [`PATCH NAME`](#nom-du-patch-patch-name))
 
 | Colonne | Contenu |
 |---------|---------|
@@ -386,7 +392,13 @@ Sur plusieurs modules, l’en-tête propose trois actions :
 | `C` | Copy | Copie les valeurs des paramètres du module |
 | `P` | Paste | Colle les valeurs précédemment copiées dans ce module |
 
-Le bouton `P` n’est actif que lorsque le contenu du presse-papiers est compatible avec le module cible. Dans le cas contraire, il apparaît grisé ; un clic sur ce bouton grisé affiche en bas de fenêtre un message indiquant que le presse-papiers n’est pas compatible.
+Le bouton `P` n’est actif que lorsque le contenu du presse-papiers est compatible avec le module cible. Dans le cas contraire, il apparaît grisé ; un clic sur ce bouton grisé affiche en bas de fenêtre un message du type *Clipboard contents are not compatible with this module.* Ce message concerne l’**incompatibilité totale** (mauvais type de module) : ce n’est pas une explication des subtilités de collage décrites juste en dessous.
+
+**Collage entre modules du même type, avec nuances.** Quand `P` est actif, un collage d’un `LFO` vers l’autre `LFO`, ou d’un `DCO` vers l’autre `DCO`, copie en général les réglages communs (`SPEED`, `AMPLITUDE`, `WAVEFORM` / `WAVE SELECT`, etc.). En revanche, certains réglages n’existent que d’un côté, ou ne se correspondent pas vraiment : Matrix-Control les **laisse alors tels quels** sur le module cible. Il n’y a **pas** de message dédié en bas de fenêtre pour ces exceptions — le collage se termine normalement, et vous pouvez vérifier les contrôles concernés à l’œil.
+
+Pour les LFO, ce sont surtout les modulations locales propres à chaque module (par exemple `SPEED < PRESSURE` et `AMP < RAMP 1` sur `LFO 1`, ou `SPEED < KEYBD` et `AMP < RAMP 2` sur `LFO 2`) qui restent inchangées lors d’un collage croisé. Pour les DCO, des contrôles propres à un oscillateur (comme `SYNC` sur `DCO 1` ou `DETUNE` sur `DCO 2`) restent inchangés ; une forme d’onde sans équivalent — notamment `NOISE` sur `WAVE SELECT` de `DCO 2` vers `DCO 1` — n’est pas reportée. Le contrôle `KEYBD/PORTA` peut, lui, être **adapté** quand les options des deux DCO se correspondent (ce n’est pas un simple « laisser tel quel »).
+
+Un collage **dans le même module** (copier `LFO 1` puis coller dans `LFO 1`, idem pour un DCO) reprend **tous** les paramètres de ce module.
 
 ### Nom du patch (`PATCH NAME`)
 
@@ -416,15 +428,15 @@ Pour un fichier `.m1kp`, le nom affiché vient **toujours** du nom de fichier (v
 
 La section `PATCH EDIT` regroupe les briques classiques de la synthèse soustractive Oberheim. Les libellés à l’écran sont en anglais ; le [lexique](#lexique) précise les sigles (DCO, VCF, VCA, LFO, ENV, etc.).
 
-- **`DCO 1` et `DCO 2`** — Les oscillateurs produisent les formes d’onde de base à l’origine du patch (hauteur, largeur d’impulsion, forme d’onde, synchronisation, etc.)
-- **`VCF/VCA`** — Le filtre (`VCF`) sculpte le timbre dans le domaine fréquentiel (fréquence de coupure, résonance, balance des oscillateurs…) ; le `VCA` pilote le volume et sa réponse à la vélocité ou aux enveloppes
+- **`DCO 1` et `DCO 2`** — Les oscillateurs produisent les formes d’onde de base à l’origine du patch (hauteur, largeur d’impulsion, forme d’onde, etc.). `SYNC` n’existe que sur `DCO 1` ; `DETUNE` et la forme `NOISE` sont propres à `DCO 2`
+- **`VCF/VCA`** — Le filtre (`VCF`) sculpte le timbre dans le domaine fréquentiel (fréquence de coupure, résonance, mélange des oscillateurs via le curseur `DCO 2 | DCO 1 MIX`…) ; le `VCA` pilote le volume et sa réponse à la vélocité ou aux enveloppes
 - **`FM/TRACK`** — Module de modulation de fréquence du filtre et générateur de tracking : cinq points définissent une courbe selon la note jouée. L’afficheur du Track Generator est **interactif** : vous pouvez déplacer les points à la souris
 - **`RAMP/PORTAMENTO`** — Rampes de modulation et glissando entre les notes (portamento), ainsi que le mode clavier. Si `LEGATO PORTA` et le mode clavier `UNISON` sont incompatibles, un message l’indique en bas de fenêtre
 - **`ENV 1`, `ENV 2` et `ENV 3`** — Les trois enveloppes façonnent l’évolution du patch dans le temps (attaque, decay, sustain, release…). Leurs **afficheurs sont éditables à la souris** : vous pouvez manipuler directement la forme graphique
 - **`LFO 1` et `LFO 2`** — Oscillateurs lents qui animent hauteur, filtre, amplitude ou d’autres destinations, selon la matrice de modulation et les routages locaux
 
 > **Capture d’écran — À placer ici**  
-> *Légende :* Section `PATCH EDIT` avec les modules DCO, VCF/VCA et un afficheur d’enveloppe.
+> *Légende :* Section `PATCH EDIT` avec les modules DCO, `VCF/VCA` (curseur `DCO 2 | DCO 1 MIX`), et un afficheur d’enveloppe éditable.
 
 ---
 
@@ -694,7 +706,7 @@ L’onglet **`USER INTERFACE`** contient, dans cet ordre :
 
 | Réglage | Détail |
 |---------|--------|
-| `UI SCALE` | Taille de l’interface (50 % à 200 %), aussi accessible depuis le menu logo |
+| `UI SCALE` | Taille de l’interface (50 % à 200 %), aussi accessible depuis le menu logo. Si l’interface VST3 paraît floue **notamment** dans Ableton Live sous Windows, voyez plutôt l’option Auto-Scale Plugin Window de Live ([Ableton Live](#ableton-live)) — ce n’est pas le même réglage que `UI SCALE` |
 | `SKIN` | Six variantes de base (`BLACK/GREEN`, `BLACK/CHROMA`, `BLACK/MINIMAL`, `CREAM/GREEN`, `CREAM/CHROMA`, `CREAM/MINIMAL`) plus quinze `TONES/…` (`TONES/CHERRY` … `TONES/FUCHSIA`) ; aussi accessible depuis le menu logo |
 | `INFO MESSAGE` | Comportement des messages d’information en bas de fenêtre (`KEEP` / `AUTO CLEAR`) |
 | `CONTEXTUAL HELP` | Affiche ou masque l’aide contextuelle furtive (`HELP`) dans le bandeau du bas |
@@ -704,7 +716,7 @@ Autres réglages utiles :
 | Réglage | Disponible ? | Détail |
 |---------|--------------|--------|
 | Onglet `MIDI & DEVICE` | Oui | Ports `SYNTH FROM` / `SYNTH TO` (`KEYBOARD FROM` en Standalone), badge `DEVICE` (modèle + version EPROM en lecture seule), `EPROM TYPE` ; `HARDWARE LATENCY` (**plugin seulement**, 0 à 200 ms) pour indiquer au DAW le retard du chemin matériel (synthé + câbles + interface audio) |
-| Onglet `AUDIO` | **Standalone seulement** | Interface, entrées / sorties, canaux d’écoute `SYNTH FROM` (audio — pas le port MIDI), fréquence d’échantillonnage, buffer… |
+| Onglet `AUDIO` | **Standalone seulement** | Interface / type de pilote (`DRIVER TYPE`), entrées / sorties, canaux d’écoute `SYNTH FROM` (audio — pas le port MIDI), fréquence d’échantillonnage, buffer… Selon votre système, la liste peut proposer par exemple **ASIO** sous Windows ou **JACK** sous Linux, en plus des pilotes audio habituels de la plateforme. Toutes les options ne sont pas présentes partout : ce qui apparaît dépend de l’ordinateur, des pilotes installés et de la version de Matrix-Control que vous utilisez |
 | `MATRIX-1000 PATCHES` | Oui | `DISPLAY MUSICAL NAMES` / `DISPLAY HARDWARE NAMES` |
 | `COMPUTER PATCHES` | Oui | `DISPLAY SYSEX NAMES` / `DISPLAY FILE NAMES` / `ASK ONCE PER LOAD` |
 | `UNSAVED STATE` | Oui | `ALWAYS WARN` / `NEVER WARN` |
@@ -717,10 +729,10 @@ Les fichiers modèles (`PatchInit.syx`, `MasterInit.syx`) vivent dans un dossier
 
 `UTILITY` → `INIT` (MASTER) demande une confirmation avant de réinitialiser tous les modules Master.
 
-Après un `INIT` Internal Patches, le Patch Name affiche `* INIT *` : il faut choisir un nom Matrix valide avant `STORE`, et avant `SAVE` / `SAVE AS` dans Computer Patches (voir [Nom du patch](#nom-du-patch-patch-name)).
+Après un `INIT` Internal Patches, l’afficheur `PATCH NAME` montre `* INIT *` : il faut choisir un nom Matrix valide avant `STORE`, et avant `SAVE` / `SAVE AS` dans Computer Patches (voir [Nom du patch](#nom-du-patch-patch-name)).
 
 > **Capture d’écran — À placer ici**  
-> *Légende :* Onglets Settings `GETTING STARTED` / `USER INTERFACE` et menu du logo.
+> *Légende :* Onglets Settings (`GETTING STARTED`, `USER INTERFACE`, `MIDI & DEVICE`…) et menu du logo (`UI SCALE`, `SKIN`, six variantes de base + `TONES`).
 
 ---
 
@@ -730,7 +742,7 @@ Après un `INIT` Internal Patches, le Patch Name affiche `* INIT *` : il faut ch
 |----------|--------------------|------------|
 | Assistant `GETTING STARTED` | Étapes 0–3 (pas d’Audio) ; clavier = info hôte | Étapes 0–4 (Scale → Synth → Keyboard → Audio) |
 | `KEYBOARD FROM` | Fixé à `HOST` — notes via le DAW ([exemples](#clavier-maître-via-le-daw-plugin)) | Choix d’un port MIDI clavier (ou `SKIP` dans l’assistant) |
-| Écoute audio du synthé | Via le DAW / l’interface audio (pistes audio) | Onglet `AUDIO` des Settings + monitoring dans l’application |
+| Écoute audio du synthé | Via le DAW / l’interface audio (pistes audio) | Onglet `AUDIO` des Settings + monitoring dans l’application (`DRIVER TYPE` — par ex. ASIO sous Windows ou JACK sous Linux quand disponibles ; voir [Settings](#fenêtre-settings)) |
 | `INPUT GAIN` / monitoring bandeau | Masqués | Visibles (niveau d’écoute du retour synthé dans l’application) |
 | `HARDWARE LATENCY` (Settings → `MIDI & DEVICE`) | Visible | Masqué |
 | Notes jouées | Depuis le DAW / le clavier routé vers la piste | Depuis le port `KEYBOARD FROM` |
@@ -759,7 +771,9 @@ En général **non** conservé tel quel : le contenu du patch en cours d’édit
 | Plugin invisible dans le DAW | Rescanner les plugins ; vérifier le format (AU/VST3) et le dossier indiqué avec le téléchargement |
 | Pas de notes en plugin | Router le clavier maître vers la piste Matrix-Control dans le DAW ([exemples](#clavier-maître-via-le-daw-plugin)) ; `KEYBOARD FROM` reste sur `HOST` |
 | Assistant `GETTING STARTED` ne s’ouvre plus | Dans Settings → `GETTING STARTED` → `SETUP WIZARD`, choisir `SHOW WHEN INCOMPLETE` ou cliquer `RUN SETUP AGAIN` |
-| Pas de son en Standalone | Vérifier Settings → `AUDIO` (interface, entrée, canaux d’écoute `SYNTH FROM` — pas le port MIDI) et le câblage vers l’interface audio |
+| Pas de son en Standalone | Vérifier Settings → `AUDIO` (`DRIVER TYPE` / interface, entrée, canaux d’écoute `SYNTH FROM` — pas le port MIDI) et le câblage vers l’interface audio |
+| Interface VST3 floue dans Ableton Live (Windows) | Désactiver **Auto-Scale Plugin Window** pour Matrix-Control, recharger le device ; comparer avec le Standalone (voir [Ableton Live](#ableton-live)) |
+| Deux instances se marchent sur les pieds (détection / édition bizarre) | Ne pas partager les mêmes ports : une paire `SYNTH FROM` / `SYNTH TO` distincte par instance (et par machine si vous en avez plusieurs) — voir [section 6](#6-brancher-le-synthé-et-établir-le-dialogue-midi) |
 | Audio en retard dans le DAW | Ajuster `HARDWARE LATENCY` dans Settings → `MIDI & DEVICE` (plugin) ; et la taille de buffer du DAW / de l’interface audio |
 
 ---
@@ -770,17 +784,21 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 
 | Terme | Définition |
 |-------|------------|
-| **Afficheur** | Région graphique ou panneau d’affichage (enveloppes et Track Generator interactifs ; `PATCH NAME` renommable par double-clic quand l’édition est autorisée). |
+| **Afficheur** | Région graphique ou panneau d’affichage : enveloppes et Track Generator (éditables à la souris) ; `PATCH NAME` (renommable par double-clic quand l’édition est autorisée — voir [section 8](#nom-du-patch-patch-name)). |
+| **ASIO** | Sous Windows, type de pilote audio souvent utilisé en MAO (latence en général plus basse). Peut apparaître dans Settings → `AUDIO` → `DRIVER TYPE` en Standalone, selon votre installation. |
 | **AU** | Format de plugin sur macOS (Audio Unit). |
 | **Banque (Bank)** | Sur le Matrix-1000 : regroupement de 100 patches. Il y a 10 banques (0–9). Le Matrix-6/6R n’a pas de banques. |
 | **BANK LOCK** | Dans `MASTER EDIT` → `MISC` : verrouille le changement de banque côté Matrix-1000. Ce n’est **pas** un bouton du module `BANK UTILITY`. |
+| **DRIVER TYPE** | Dans Settings → `AUDIO` (Standalone) : liste du type de pilote / interface audio (pilote système, ASIO, JACK… selon la plateforme). |
 | **Bus de modulation** | Une des dix voies de la section `MATRIX MODULATION` (source, intensité, destination). |
 | **DAW** | Digital Audio Workstation — un séquenceur / studio logiciel (Live, Logic, Reaper…). On dit *un* DAW. |
 | **DCO** | Oscillateur : source qui produit la forme d’onde de base du patch. |
+| **`DCO 2 \| DCO 1 MIX`** | Curseur du module `VCF/VCA` qui dose le mélange entre les deux oscillateurs (libellé à l’écran). |
 | **ENV** | Envelope — enveloppe (attaque, decay, sustain, release…) qui façonne l’évolution du patch dans le temps. |
 | **FM** | Modulation de fréquence du filtre par l’oscillateur, pour des timbres plus riches ou métalliques. |
 | **GETTING STARTED** | Assistant de premier lancement (apparence, MIDI synthé, clavier, audio Standalone). Se relance depuis Settings → `GETTING STARTED` → `SETUP WIZARD`. |
 | **Groupe** | Sous-partie d’un module (`BROWSER`, `MEMORY`, `STORAGE`, etc.). |
+| **JACK** | Sous Linux, serveur / pilote audio souvent utilisé en MAO. Peut apparaître dans Settings → `AUDIO` → `DRIVER TYPE` en Standalone, selon votre installation. |
 | **LFO** | Oscillateur lent : fait vibrer, trembler ou balayer un paramètre. |
 | **MASTER** | Réglages globaux de la machine (canal MIDI, vibrato, accordage…), distincts d’un patch. |
 | **Matrice de modulation** | Centre nerveux du synthé : tableau de « câbles virtuels » reliant sources et destinations. |
@@ -789,13 +807,15 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 | **Modulation** | Faire évoluer automatiquement un paramètre (filtre, volume, hauteur…) à partir d’une source. |
 | **Mutator** | Outil qui crée des variations aléatoires contrôlées d’un patch. |
 | **Patch** | Ensemble des réglages qui définissent un timbre mémorisé (vocabulaire Oberheim). |
+| **`PATCH NAME`** | Afficheur du nom de patch (8 caractères). Renommable par double-clic lorsque le contexte l’autorise (voir [section 8](#nom-du-patch-patch-name)). |
 | **Plugin** | Logiciel qui s’ouvre *dans* un DAW. |
 | **Portamento** | Glissando de hauteur entre deux notes. |
 | **Presse-papiers** | Mémoire temporaire Copy / Paste *interne* à Matrix-Control (modules ou patches). |
 | **Ramp** | Montée progressive utilisable comme source de modulation. |
 | **RAM** | Mémoire en lecture/écriture (*Random Access Memory*) dans laquelle on peut stocker ses propres données puis les relire. |
-| **ROM** | Mémoire en lecture seule (*Read-Only Memory*) , dans laquelle on ne peut pas stocker ses propres données. Sur Matrix-1000, banques 2–9 : pas de `STORE` / `PASTE` / `INIT` depuis l’éditeur. |
+| **ROM** | Mémoire en lecture seule (*Read-Only Memory*), dans laquelle on ne peut pas stocker ses propres données. Sur Matrix-1000, banques 2–9 : pas de `STORE` / `PASTE` / `INIT` depuis l’éditeur. |
 | **Section** | Grand ensemble de l’interface (`PATCH EDIT`, `MATRIX MODULATION`, `PATCH MANAGER`, `MASTER EDIT`). |
+| **`SKIN`** | Apparence visuelle de l’interface (six variantes de base `BLACK/…` et `CREAM/…`, plus la famille `TONES/…` — menu logo et Settings → `USER INTERFACE`). |
 | **Standalone** | Application autonome, sans DAW. |
 | **STORE** | Enregistrer le patch courant dans la mémoire du synthé. |
 | **SYNTH FROM / SYNTH TO** | **Ports MIDI** dans Settings → `MIDI & DEVICE` et l’étape synthé de l’assistant (ce qui arrive du synthé / part vers le synthé) ; bandeau `FROM SYNTH` / `TO SYNTH`. **Aussi** canaux d’écoute audio `SYNTH FROM` dans Settings → `AUDIO` / étape Audio Standalone — ne pas confondre avec le port MIDI. |
