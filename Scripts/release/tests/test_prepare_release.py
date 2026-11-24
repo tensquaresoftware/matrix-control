@@ -308,7 +308,7 @@ def test_release_workflow_structure():
     assert "tags" in triggers["push"]
     assert "v*.*.*" in triggers["push"]["tags"]
     assert "branches" not in triggers["push"]
-    assert workflow["env"]["JUCE_VERSION"] == "9.0.5"
+    assert workflow["env"]["JUCE_VERSION"] == "9.0.6"
     assert workflow["permissions"]["contents"] == "write"
     assert workflow["concurrency"]["cancel-in-progress"] is False
 
