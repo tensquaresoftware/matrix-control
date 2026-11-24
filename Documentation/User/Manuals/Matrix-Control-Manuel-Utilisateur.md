@@ -6,7 +6,7 @@ Titre: Matrix-Control — Manuel utilisateur
 Version: 1.0
 Version-Produit: 1.0.0-alpha.8
 Created: 2026-07-20
-Updated: 2026-11-24
+Updated: 2026-11-25
 References:
   - Documentation/User/Manuals/ (EN user manual à venir)
   - CONTRIBUTING.md
@@ -317,44 +317,53 @@ Sous Windows, un port MIDI est souvent réservé à une seule application à la 
 
 ## 7. Premier contact : l’écran principal
 
-L’écran s’organise en trois bandes :
+Une fois le logiciel ouvert, l’interface s’organise à peu près ainsi :
 
 ```
-┌─ En haut ─────────────────────────────────────────────────────────┐
-│  Logo MATRIX-CONTROL · FROM SYNTH · TO SYNTH · FROM KEYBOARD · (audio) │
-├─ Au centre ───────────────────────────────────────────────────────┤
-│  PATCH EDIT  │  MATRIX MODULATION + PATCH MANAGER  │ MASTER EDIT  │
-├─ En bas ──────────────────────────────────────────────────────────┤
-│  Messages                                        Type de machine  │
-└───────────────────────────────────────────────────────────────────┘
++--------------------------------------------------------------------+
+| Logo MATRIX-CONTROL | Undo/Redo, LEDs MIDI (FROM/TO SYNTH, etc.)   | <- HEADER
++--------------------------------------------------------------------+
+|                     |                        |                     |
+| PATCH EDIT          | MATRIX MODULATION      | MASTER EDIT         |
+| - 10 modules son :  | (10 bus de modulation) | (Matrix-1000        |
+|   DCO, VCF, ENV…    |------------------------|  uniquement ; grisé |
+| - 5 afficheurs :    | PATCH MANAGER          |  sur Matrix-6/6R)   | <- BODY
+|   - 3 Enveloppes    | - INTERNAL PATCHES     |                     |
+|   - 1 Track Gen.    | - COMPUTER PATCHES     |                     |
+|   - 1 PATCH NAME    | - BANK UTILITY         |                     |
+|                     | - PATCH MUTATOR        |                     |
++--------------------------------------------------------------------+
+| Messages/aide utilisateur            Badge DEVICE (type de synthé) | <- FOOTER
++--------------------------------------------------------------------+
 ```
 
-### En haut
+### En haut (`HEADER`)
 
 - Logo `MATRIX-CONTROL` (clic → menu : `UI SCALE`, `SKIN`, `SETTINGS...`, `ABOUT...`)
-- Sélection des ports MIDI (section précédente)
+- Undo / Redo, et les voyants MIDI à côté des listes `FROM SYNTH` / `TO SYNTH` / `FROM KEYBOARD`
 - En Standalone uniquement : `INPUT GAIN` et le monitoring audio du bandeau ; la source d’écoute et l’interface se règlent dans `SETTINGS...` → `AUDIO`
 
-### Au centre — trois colonnes
+### Au centre (`BODY`) — trois colonnes
 
 Dans ce manuel, nous désignons les grands blocs de l’interface comme suit :
 
+- **Panneau** — grandes régions de la fenêtre principale (`HEADER`, `BODY`, `FOOTER`)
 - **Section** — `PATCH EDIT`, `MATRIX MODULATION`, `PATCH MANAGER`, `MASTER EDIT`
 - **Module** — par exemple `DCO 1`, `BANK UTILITY`, `PATCH MUTATOR`
 - **Bus de modulation** — chacune des dix voies de `MATRIX MODULATION`
-- **Groupe** — sous-partie d’un module, par exemple `BROWSER` ou `MEMORY` 
+- **Groupe** — sous-partie d’un module, par exemple `BROWSER` ou `MEMORY`
 - **Afficheur** — représentations graphiques (enveloppes et Track Generator, éditables à la souris) ou panneau `PATCH NAME` (renommable par double-clic quand l’édition est autorisée — voir [`PATCH NAME`](#nom-du-patch-patch-name))
 
 | Colonne | Contenu |
 |---------|---------|
-| **Gauche — section `PATCH EDIT`** | Les modules de synthèse du patch : oscillateurs, filtre, enveloppes, LFO, etc. |
-| **Centre** | Section `MATRIX MODULATION` (dix bus de modulation) + section `PATCH MANAGER` (banques, patches du synthé, fichiers sur l’ordinateur, mutateur) |
+| **Gauche — section `PATCH EDIT`** | Dix modules de synthèse (DCO, VCF, ENV…) et cinq afficheurs (trois enveloppes, Track Generator, `PATCH NAME`) |
+| **Centre** | Section `MATRIX MODULATION` (dix bus) au-dessus de `PATCH MANAGER` (`INTERNAL PATCHES`, `COMPUTER PATCHES`, `BANK UTILITY`, `PATCH MUTATOR`) |
 | **Droite — section `MASTER EDIT`** | Réglages globaux du Matrix-1000 (grisée sur Matrix-6/6R) |
 
-### En bas
+### En bas (`FOOTER`)
 
-- **À gauche :** messages d’information, de succès, d’avertissement ou d’erreur (icônes ℹ ✓ ⚠ ✗)
-- **À droite :** machine détectée (par ex. Matrix-1000) ou `NOT CONNECTED`
+- **À gauche :** messages d’information, de succès, d’avertissement ou d’erreur (icônes ℹ ✓ ⚠ ✗), et l’aide contextuelle le cas échéant
+- **À droite :** badge `DEVICE` — machine détectée (par ex. Matrix-1000) ou `NOT CONNECTED`
 
 > **Capture d’écran — À placer ici**  
 > *Légende :* Vue d’ensemble des trois colonnes et du bandeau du bas.
@@ -838,6 +847,7 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 | **Module** | Bloc fonctionnel de l’interface (`DCO 1`, `BANK UTILITY`, `PATCH MUTATOR`, etc.). |
 | **Modulation** | Faire évoluer automatiquement un paramètre (filtre, volume, hauteur…) à partir d’une source. |
 | **Mutator** | Outil qui crée des variations aléatoires contrôlées d’un patch. |
+| **Panneau** | Grande région de la fenêtre principale : `HEADER` (bandeau du haut), `BODY` (trois colonnes du centre), `FOOTER` (bandeau du bas). |
 | **Patch** | Ensemble des réglages qui définissent un timbre mémorisé (vocabulaire Oberheim). |
 | **`PATCH NAME`** | Afficheur du nom de patch (8 caractères). Renommable par double-clic lorsque le contexte l’autorise (voir [section 8](#nom-du-patch-patch-name)). |
 | **Plugin** | Logiciel qui s’ouvre *dans* un DAW. |

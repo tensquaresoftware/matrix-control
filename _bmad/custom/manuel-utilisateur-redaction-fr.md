@@ -89,7 +89,8 @@ Utiliser de façon cohérente :
 
 | Terme | Désigne |
 |-------|---------|
-| **Section** | Grands blocs : `PATCH EDIT`, `MATRIX MODULATION`, `PATCH MANAGER`, `MASTER EDIT` |
+| **Panneau** | Grandes régions de la fenêtre principale : `HEADER`, `BODY`, `FOOTER` (schéma ASCII §7 aligné sur le guide de tests bêta) |
+| **Section** | Grands blocs dans le `BODY` : `PATCH EDIT`, `MATRIX MODULATION`, `PATCH MANAGER`, `MASTER EDIT` |
 | **Module** | Blocs fonctionnels : `DCO 1`, `BANK UTILITY`, `PATCH MUTATOR`, etc. |
 | **Bus de modulation** | Une des dix voies de `MATRIX MODULATION` |
 | **Groupe** | Sous-partie d’un module : `BROWSER`, `MEMORY`, `STORAGE`, etc. (même sens que « Zone » dans d’anciennes notes) |
