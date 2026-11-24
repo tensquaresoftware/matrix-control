@@ -60,7 +60,7 @@ Ne **pas** parler au lecteur de :
 
 Référence de style pour l’intro d’installation (à conserver / imiter) :
 
-> Matrix-Control se télécharge sous la forme de fichiers ZIP comprenant une application autonome et les plugins compatibles avec votre système, accompagnés de la documentation utilisateur.
+> Le Matrix-Control se télécharge sous la forme de fichiers ZIP comprenant une application autonome et les plugins compatibles avec votre système, accompagnés de la documentation utilisateur.
 
 ---
 
@@ -71,6 +71,7 @@ Référence de style pour l’intro d’installation (à conserver / imiter) :
 | **synthé** | « Matrix » seul pour désigner la machine |
 | **Matrix-1000**, **Matrix-6**, **Matrix-6R**, **Matrix-6/6R** | `Matrix-6 / 6R` (espaces autour du slash) |
 | **Matrix-Control** / logo **`MATRIX-CONTROL`** (majuscules comme dans la GUI) | « logo Matrix-Control » sans casse GUI |
+| **le / du / au Matrix-Control** (article comme pour le Matrix-1000 : *À quoi sert le…*, *fenêtre du…*) | « À quoi sert Matrix-Control », « fenêtre de Matrix-Control » (sans article) |
 | **patch** (vocabulaire Oberheim) | « son » quand on parle d’un programme mémorisé |
 | **un / le DAW** | une / la DAW |
 | **interface audio** | carte son |
@@ -104,7 +105,7 @@ Contrôles GUI mentionnés dans le texte : toujours en **`backticks`** (`STORE`,
 
 Aligné sur la table des matières du manuel FR (ne pas renuméroter « pour le plaisir ») :
 
-1. À quoi sert Matrix-Control  
+1. À quoi sert le Matrix-Control  
 2. Ce dont vous aurez besoin  
 3. Matrix-1000 vs Matrix-6/6R  
 4. Installer et ouvrir  
