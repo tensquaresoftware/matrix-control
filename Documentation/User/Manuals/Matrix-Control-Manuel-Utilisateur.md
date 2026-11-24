@@ -3,12 +3,12 @@ Organisation: Ten Square Software
 Auteur: Guillaume DUPONT
 Projet: Matrix-Control
 Titre: Matrix-Control — Manuel utilisateur
-Version: 0.1
-Version-Produit: 0.1.2-alpha
+Version: 1.0
+Version-Produit: 1.0.0-alpha.8
 Created: 2026-07-20
-Updated: 2026-10-08
+Updated: 2026-11-24
 References:
-  - Documentation/User/user-manual.md (à venir)
+  - Documentation/User/Manuals/ (EN user manual à venir)
   - CONTRIBUTING.md
   - README.md
 ---
@@ -390,7 +390,27 @@ Le bouton `P` n’est actif que lorsque le contenu du presse-papiers est compati
 
 ### Nom du patch (`PATCH NAME`)
 
-L’afficheur `PATCH NAME` présente le nom du patch courant (8 caractères). Il est en **lecture seule** : vous ne pouvez pas le modifier à l’écran. Il se met à jour lorsqu’un patch est reçu depuis le synthé, lorsqu’un fichier de patch est ouvert depuis votre ordinateur, ou lorsque vous créez des variantes à l’aide du Patch Mutator.
+L’afficheur `PATCH NAME` présente le nom du patch courant (8 caractères). Il se met à jour lorsqu’un patch est reçu depuis le synthé, lorsqu’un fichier de patch est ouvert depuis votre ordinateur, ou lorsque vous créez des variantes à l’aide du Patch Mutator.
+
+Quand le renommage est autorisé, un **double-clic** sur l’afficheur ouvre l’édition en place (toujours 8 caractères). Ce n’est **pas** toujours possible : Matrix-Control n’autorise le renommage que dans certains contextes. Si l’édition est interdite, le double-clic ne démarre pas la saisie — ce n’est pas un bug, c’est une règle liée au contexte du patch.
+
+Hors mode **Compare** du Patch Mutator, vous pouvez en général renommer lorsque :
+
+- Le patch vient d’un **fichier** sur l’ordinateur (Computer Patches)
+- Ou le patch vient de la **mémoire du synthé** sur Matrix-6/6R (pas de banques)
+- Ou le patch vient de la **mémoire du synthé** sur Matrix-1000, banques **0** ou **1**, et Settings → `MATRIX-1000 PATCHES` n’est pas sur `DISPLAY HARDWARE NAMES`
+
+Le renommage est **bloqué** lorsque :
+
+- Le mode **Compare** du Patch Mutator est actif (cliquer à nouveau sur `C` pour quitter Compare)
+- Le patch courant est en mémoire machine sur une banque **ROM 2–9** du Matrix-1000
+- Sur un Matrix-1000 (avec banques), Settings → `MATRIX-1000 PATCHES` est sur `DISPLAY HARDWARE NAMES` et le patch vient de la mémoire machine — les noms matériels ne sont pas durables via SysEx dans ce mode
+
+Le double-clic met à jour le nom **dans l’éditeur** (et peut l’envoyer au synthé pour écoute). Pour le **garder** : utilisez `STORE` si le patch vient de la mémoire machine, ou `SAVE` / `SAVE AS` dans Computer Patches s’il vient d’un fichier. Le nom affiché dans `PATCH NAME` (8 caractères Oberheim) n’est pas le même objet que le nom de fichier `.syx` choisi à l’enregistrement sur l’ordinateur.
+
+Après un `INIT` dans `INTERNAL PATCHES`, l’afficheur montre `* INIT *`. Ce marqueur n’est pas un nom Matrix valide : vous devez le remplacer **avant** un `STORE` dans le synthé, et **avant** un `SAVE` / `SAVE AS` sur l’ordinateur. Un `STORE` dans cet état ouvre directement la saisie du nom ; un `SAVE` / `SAVE AS` refuse l’enregistrement tant que le marqueur reste affiché.
+
+Pour un fichier `.m1kp`, le nom affiché vient **toujours** du nom de fichier (voir [Computer Patches](#module-computer-patches)). Les préférences `DISPLAY…` se règlent dans [section 15](#15-apparence-échelle-et-settings).
 
 ### Modules de synthèse
 
@@ -457,6 +477,8 @@ Lorsque vous changez de banque ou de patch, Matrix-Control :
 | `PASTE` | Colle un patch précédemment copié |
 | `STORE` | Enregistre le patch dans l’emplacement courant **du synthé** |
 
+Après `INIT`, le nom devient `* INIT *` : renommez le patch avant `STORE`, et avant `SAVE` / `SAVE AS` (voir [Nom du patch](#nom-du-patch-patch-name)).
+
 Sur les banques en lecture seule **2–9** du Matrix-1000, `INIT`, `PASTE` et `STORE` sont indisponibles (contrôles grisés).
 
 > **Capture d’écran — À placer ici**  
@@ -518,7 +540,7 @@ Deux emplacements distincts :
 | Où | Comment | Ce que cela conserve |
 |----|---------|----------------------|
 | **Mémoire du synthé** | `STORE` dans `INTERNAL PATCHES` | Le patch dans un emplacement de la machine (banque + numéro, ou numéro 0–99 sur Matrix-6/6R) |
-| **Ordinateur** | Module `COMPUTER PATCHES` | Des fichiers `.syx` (un patch par fichier) dans un dossier que vous choisissez |
+| **Ordinateur** | Module `COMPUTER PATCHES` | Des fichiers `.syx` ou `.m1kp` pour **charger** un patch ; la sauvegarde native Matrix-Control écrit toujours un `.syx` |
 
 ### Module `COMPUTER PATCHES`
 
@@ -531,11 +553,15 @@ Deux emplacements distincts :
 
 | Bouton | Rôle |
 |--------|------|
-| `OPEN` | Choisir / ouvrir le dossier de patches sur le disque (liste triée : `INITIAL`, chaque `Mxx` puis ses `Mxx-Ryy`, sinon alphabétique) |
+| `OPEN` | Choisir / ouvrir le dossier de patches sur le disque (liste des `.syx` et `.m1kp`, triée : `INITIAL`, chaque `Mxx` puis ses `Mxx-Ryy`, sinon alphabétique) |
 | `SAVE AS` | Enregistrer le patch courant sous un nouveau nom `.syx` |
-| `SAVE` | Enregistrer dans le fichier déjà associé |
+| `SAVE` | Enregistrer le patch courant en `.syx` (fichier déjà associé, ou même nom de base après un chargement `.m1kp`) |
 
-Seul le format `.syx` est pris en charge dans `COMPUTER PATCHES`. Ce module ouvre et enregistre **un patch à la fois** : il n’y a pas de tags ni de favoris. Pour importer ou exporter **une banque entière**, utilisez `BANK UTILITY` (voir [section 11](#11-banques-du-matrix-1000-bank-utility)) — ce n’est pas le rôle de `OPEN` / `SAVE`.
+`OPEN` liste les fichiers `.syx` **et** `.m1kp` du dossier. Vous pouvez aussi **glisser-déposer** un `.syx` ou un `.m1kp` sur la fenêtre pour le charger. `SAVE` et `SAVE AS` écrivent **toujours** un `.syx` au format Edit Buffer (voir ci-dessous) — jamais une réécriture du fichier `.m1kp` d’origine. Ce module ouvre et enregistre **un patch à la fois** : il n’y a pas de tags ni de favoris. Pour importer ou exporter **une banque entière**, utilisez `BANK UTILITY` (voir [section 11](#11-banques-du-matrix-1000-bank-utility)) — ce n’est pas le rôle de `OPEN` / `SAVE`.
+
+Après le chargement d’un `.m1kp`, `SAVE` crée ou met à jour un `.syx` du **même nom de base** dans le dossier. S’il existe déjà, Matrix-Control demande confirmation (`Overwrite existing .syx?`) : `CONTINUE` remplace ce `.syx` ; `CANCEL` annule la sauvegarde. Le fichier `.m1kp` d’origine n’est pas modifié.
+
+Lors du chargement d’un `.m1kp`, le nom affiché dans `PATCH NAME` vient **toujours** du nom de fichier (les préférences Computer Patches `DISPLAY SYSEX NAMES` / `DISPLAY FILE NAMES` ne s’appliquent pas à ce format).
 
 **Format des fichiers sauvés par Matrix-Control**
 
@@ -549,16 +575,16 @@ Après un parcours de dossier, le bas de fenêtre peut indiquer combien de fichi
 
 ### Lorsque le nom du fichier et le nom interne du patch divergent
 
-La boîte de dialogue `Patch name mismatch` peut proposer :
+Pour un chargement **`.syx`**, la boîte de dialogue `Patch name mismatch` peut proposer :
 
 - `Internal` — conserver le nom contenu dans le fichier `.syx` 
 - `Filename` — utiliser le nom du fichier 
 - `Cancel` — annuler le chargement
 
-Le comportement par défaut se règle dans `SETTINGS` (voir [section 15](#15-apparence-échelle-et-settings)).
+Ce dialogue ne s’applique **pas** au chargement d’un `.m1kp` (le nom vient toujours du fichier). Le comportement par défaut pour les `.syx` se règle dans `SETTINGS` (voir [section 15](#15-apparence-échelle-et-settings)).
 
 > **Capture d’écran — À placer ici**  
-> *Légende :* Module `COMPUTER PATCHES` avec `OPEN` / `SAVE AS` / `SAVE` et une liste de fichiers `.syx`.
+> *Légende :* Module `COMPUTER PATCHES` avec `OPEN` / `SAVE AS` / `SAVE` et une liste de fichiers `.syx` / `.m1kp`.
 
 ---
 
@@ -625,7 +651,7 @@ Un clic sur le logo (en haut à gauche) ouvre le menu suivant :
 | Entrée | Contenu |
 |--------|---------|
 | `UI SCALE` | Taille de l’interface : 50 % à 200 % (raccourci ; même réglage que dans Settings) |
-| `SKIN` | Apparence `BLACK` ou `CREAM` (petit clin d’œil aux versions Black et Cream du Matrix-1000) |
+| `SKIN` | Familles `BLACK`, `CREAM` et `TONES` : sous-menus pour choisir une variante (même réglage que dans Settings) |
 | `SETTINGS...` | Préférences (onglets `GETTING STARTED`, `USER INTERFACE`, `MIDI & DEVICE`, `AUDIO` en Standalone, etc.) |
 | `ABOUT...` | Version, crédits, liens |
 
@@ -645,8 +671,16 @@ Raccourcis clavier (quand l’éditeur a le focus, hors saisie de texte) :
 | `UI SCALE` plus grand (cran suivant, 50–200 %) | ⌘+ (aussi ⌘=) | Ctrl+Plus (aussi Ctrl+=) |
 | `UI SCALE` plus petit (cran précédent) | ⌘- | Ctrl+- |
 | `UI SCALE` à 100 % | ⌘ 0 | Ctrl+0 |
-| Skin `BLACK` | ⌘ 1 | Ctrl+1 |
-| Skin `CREAM` | ⌘ 2 | Ctrl+2 |
+| Skin `BLACK/GREEN` | ⌘ 1 | Ctrl+1 |
+| Skin `BLACK/CHROMA` | ⌘ 2 | Ctrl+2 |
+| Skin `BLACK/MINIMAL` | ⌘ 3 | Ctrl+3 |
+| Skin `CREAM/GREEN` | ⌘ 4 | Ctrl+4 |
+| Skin `CREAM/CHROMA` | ⌘ 5 | Ctrl+5 |
+| Skin `CREAM/MINIMAL` | ⌘ 6 | Ctrl+6 |
+| Cycle skin dans la famille active (haut / gauche = précédente ; bas / droite = suivante) | ⌘ + flèches | Ctrl+flèches |
+| Cycle toutes les skins (même sens de flèches) | ⌘ Shift + flèches | Ctrl+Shift+flèches |
+
+Les six raccourcis numériques suivent l’ordre du menu déroulant `SKIN` dans Settings (liste plate). Dans le menu logo, les mêmes variantes apparaissent sous les familles `BLACK` et `CREAM`, avec le raccourci rappelé à côté. La famille `TONES` propose quinze variantes nommées (`TONES/CHERRY` … `TONES/FUCHSIA`) sans raccourci chiffre : choisissez-les dans le sous-menu `TONES`, via le cycle global (⌘/Ctrl+Shift+flèches), ou via le cycle de famille une fois une skin `TONES` déjà active (⌘/Ctrl+flèches).
 
 Ces raccourcis sont aussi rappelés dans le menu du logo.
 
@@ -661,7 +695,7 @@ L’onglet **`USER INTERFACE`** contient, dans cet ordre :
 | Réglage | Détail |
 |---------|--------|
 | `UI SCALE` | Taille de l’interface (50 % à 200 %), aussi accessible depuis le menu logo |
-| `SKIN` | `BLACK` ou `CREAM`, aussi accessible depuis le menu logo |
+| `SKIN` | Six variantes de base (`BLACK/GREEN`, `BLACK/CHROMA`, `BLACK/MINIMAL`, `CREAM/GREEN`, `CREAM/CHROMA`, `CREAM/MINIMAL`) plus quinze `TONES/…` (`TONES/CHERRY` … `TONES/FUCHSIA`) ; aussi accessible depuis le menu logo |
 | `INFO MESSAGE` | Comportement des messages d’information en bas de fenêtre (`KEEP` / `AUTO CLEAR`) |
 | `CONTEXTUAL HELP` | Affiche ou masque l’aide contextuelle furtive (`HELP`) dans le bandeau du bas |
 
@@ -683,7 +717,7 @@ Les fichiers modèles (`PatchInit.syx`, `MasterInit.syx`) vivent dans un dossier
 
 `UTILITY` → `INIT` (MASTER) demande une confirmation avant de réinitialiser tous les modules Master.
 
-Après un `INIT` Internal Patches, le Patch Name affiche `* INIT *` : il faut choisir un nom Matrix valide avant `SAVE` / `SAVE AS` dans Computer Patches.
+Après un `INIT` Internal Patches, le Patch Name affiche `* INIT *` : il faut choisir un nom Matrix valide avant `STORE`, et avant `SAVE` / `SAVE AS` dans Computer Patches (voir [Nom du patch](#nom-du-patch-patch-name)).
 
 > **Capture d’écran — À placer ici**  
 > *Légende :* Onglets Settings `GETTING STARTED` / `USER INTERFACE` et menu du logo.
@@ -736,7 +770,7 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 
 | Terme | Définition |
 |-------|------------|
-| **Afficheur** | Région graphique ou panneau d’affichage (enveloppes et Track Generator interactifs ; `PATCH NAME` en lecture seule). |
+| **Afficheur** | Région graphique ou panneau d’affichage (enveloppes et Track Generator interactifs ; `PATCH NAME` renommable par double-clic quand l’édition est autorisée). |
 | **AU** | Format de plugin sur macOS (Audio Unit). |
 | **Banque (Bank)** | Sur le Matrix-1000 : regroupement de 100 patches. Il y a 10 banques (0–9). Le Matrix-6/6R n’a pas de banques. |
 | **BANK LOCK** | Dans `MASTER EDIT` → `MISC` : verrouille le changement de banque côté Matrix-1000. Ce n’est **pas** un bouton du module `BANK UTILITY`. |
@@ -766,6 +800,7 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 | **STORE** | Enregistrer le patch courant dans la mémoire du synthé. |
 | **SYNTH FROM / SYNTH TO** | **Ports MIDI** dans Settings → `MIDI & DEVICE` et l’étape synthé de l’assistant (ce qui arrive du synthé / part vers le synthé) ; bandeau `FROM SYNTH` / `TO SYNTH`. **Aussi** canaux d’écoute audio `SYNTH FROM` dans Settings → `AUDIO` / étape Audio Standalone — ne pas confondre avec le port MIDI. |
 | **SysEx** | Messages MIDI détaillés propres à une marque / un modèle, utilisés pour éditer le synthé en profondeur. |
+| **`.m1kp`** | Fichier de patch Matrix-Control (chargement via Computer Patches / glisser-déposer). La sauvegarde native reste un `.syx` ; le `.m1kp` d’origine n’est pas réécrit. |
 | **`.syx`** | Fichier qui contient un patch au format SysEx. |
 | **Track Generator** | Courbe qui transforme la position sur le clavier en valeur de modulation (afficheur interactif). |
 | **VCA** | Étage de volume du patch. |

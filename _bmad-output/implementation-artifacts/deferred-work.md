@@ -3499,3 +3499,6 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-diagnostic-logging-support.md`
   summary: MidiLogger file I/O from MIDI consumer paths remains non-RT-safe when logging is enabled.
   evidence: Pre-existing call sites; SUPPORT toggle does not introduce new audio-thread logging.
+- source_spec: `_bmad-output/implementation-artifacts/spec-manual-fr-patch-name-skins.md`
+  summary: Align `_bmad/custom/manuel-utilisateur-redaction-fr.md` so Afficheur / PATCH NAME no longer say read-only (otherwise later manual passes may reintroduce the old wording).
+  evidence: Blind Hunter; redaction SSOT left intentionally out of this oneshot (single target file was the FR manual).
