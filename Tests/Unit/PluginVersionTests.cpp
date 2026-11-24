@@ -39,9 +39,9 @@ private:
         // Pin the display string so a forgotten CMake version bump fails the suite.
         // Debug builds append " (Debug)" for About / support clarity; Release stays bare.
 #if JUCE_DEBUG
-        expectEquals(version, juce::String("1.0.0-alpha.7 (Debug)"));
+        expectEquals(version, juce::String("1.0.0-alpha.8 (Debug)"));
 #else
-        expectEquals(version, juce::String("1.0.0-alpha.7"));
+        expectEquals(version, juce::String("1.0.0-alpha.8"));
 #endif
     }
 

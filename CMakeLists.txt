@@ -48,8 +48,16 @@ endif()
 project(Matrix-Control VERSION 1.0.0)
 
 string(TIMESTAMP MATRIX_CONTROL_BUILD_DATE "%Y-%m-%d" UTC)
-set(MATRIX_CONTROL_PRERELEASE_SUFFIX "alpha.7"
-    CACHE STRING "Pre-release suffix appended to version (empty string for release builds)")
+# FORCE: CMakeLists is SSOT for the prerelease label; without FORCE a stale cache keeps the old suffix.
+set(MATRIX_CONTROL_PRERELEASE_SUFFIX "alpha.8"
+    CACHE STRING "Pre-release suffix appended to version (empty string for release builds)" FORCE)
+
+# Windows ASIO (Steinberg): keep OFF until written licence countersignature is on file.
+# Flip to ON + reconfigure to re-enable; no source deletion required.
+# Override: cmake -DMATRIX_CONTROL_ENABLE_ASIO=ON ...
+option(MATRIX_CONTROL_ENABLE_ASIO
+    "Enable Steinberg ASIO in Windows builds (requires written Steinberg licence)"
+    OFF)
 
 # BUILD_DATE must stay on PluginVersion.cpp only. Putting it on the Matrix-Control
 # target invalidates every TU (including amalgamated JUCE modules) whenever CMake
@@ -1154,26 +1162,50 @@ target_compile_definitions(Matrix-Control
 )
 
 # Windows Standalone Settings AUDIO: register JUCE ASIO device type (GH-42).
+# Gated by MATRIX_CONTROL_ENABLE_ASIO (default OFF until Steinberg written licence).
 # Shared-target PUBLIC so juce_audio_devices compiles with ASIO; Standalone-only is insufficient.
 # Tests link juce_audio_devices separately and need the same flag to assert ASIO registration.
 # Uses JUCE bundled Steinberg headers (JUCE_ASIO_USE_EXTERNAL_SDK stays off).
 if(WIN32)
-    target_compile_definitions(Matrix-Control PUBLIC JUCE_ASIO=1)
-    if(TARGET Matrix-Control_Tests)
-        target_compile_definitions(Matrix-Control_Tests PRIVATE JUCE_ASIO=1)
-    endif()
+    if(MATRIX_CONTROL_ENABLE_ASIO)
+        target_compile_definitions(Matrix-Control
+            PUBLIC
+                JUCE_ASIO=1
+                MATRIX_CONTROL_ENABLE_ASIO=1)
+        if(TARGET Matrix-Control_Tests)
+            target_compile_definitions(Matrix-Control_Tests
+                PRIVATE
+                    JUCE_ASIO=1
+                    MATRIX_CONTROL_ENABLE_ASIO=1)
+        endif()
 
-    # Product target must compile with ASIO (COMPILE_DEFINITIONS). INTERFACE-only would leave
-    # Standalone without ASIO while Matrix-Control_Tests could still pass via its PRIVATE define.
-    get_property(_matrix_control_compile_defs TARGET Matrix-Control PROPERTY COMPILE_DEFINITIONS)
-    string(FIND "${_matrix_control_compile_defs}" "JUCE_ASIO=1" _matrix_control_asio_pos)
-    if(_matrix_control_asio_pos EQUAL -1)
-        message(FATAL_ERROR
-            "Matrix-Control must define JUCE_ASIO=1 on Windows COMPILE_DEFINITIONS (GH-42); "
-            "Standalone would lack ASIO while Matrix-Control_Tests could still pass.")
+        # Product target must compile with ASIO (COMPILE_DEFINITIONS). INTERFACE-only would leave
+        # Standalone without ASIO while Matrix-Control_Tests could still pass via its PRIVATE define.
+        get_property(_matrix_control_compile_defs TARGET Matrix-Control PROPERTY COMPILE_DEFINITIONS)
+        string(FIND "${_matrix_control_compile_defs}" "JUCE_ASIO=1" _matrix_control_asio_pos)
+        if(_matrix_control_asio_pos EQUAL -1)
+            message(FATAL_ERROR
+                "Matrix-Control must define JUCE_ASIO=1 on Windows COMPILE_DEFINITIONS (GH-42); "
+                "Standalone would lack ASIO while Matrix-Control_Tests could still pass.")
+        endif()
+        unset(_matrix_control_compile_defs)
+        unset(_matrix_control_asio_pos)
+        message(STATUS "ASIO enabled (MATRIX_CONTROL_ENABLE_ASIO=ON)")
+    else()
+        target_compile_definitions(Matrix-Control
+            PUBLIC
+                JUCE_ASIO=0
+                MATRIX_CONTROL_ENABLE_ASIO=0)
+        if(TARGET Matrix-Control_Tests)
+            target_compile_definitions(Matrix-Control_Tests
+                PRIVATE
+                    JUCE_ASIO=0
+                    MATRIX_CONTROL_ENABLE_ASIO=0)
+        endif()
+        message(STATUS
+            "ASIO disabled (MATRIX_CONTROL_ENABLE_ASIO=OFF); "
+            "re-enable with -DMATRIX_CONTROL_ENABLE_ASIO=ON after Steinberg written licence")
     endif()
-    unset(_matrix_control_compile_defs)
-    unset(_matrix_control_asio_pos)
 endif()
 
 # Linux Standalone Settings AUDIO: register JUCE JACK device type (alongside ALSA).
