@@ -1,0 +1,65 @@
+================================================================================
+MATRIX-CONTROL — COMMENT SIGNALER UN BUG ?
+================================================================================
+Organisation : Ten Square Software
+Auteur : Guillaume DUPONT
+Email : tensquaresoftware@gmail.com
+Produit : Matrix-Control
+Version du document : 1.0
+Date de révision : 23/11/2026
+
+--------------------------------------------------------------------------------
+À QUOI SERT CE DOCUMENT ?
+--------------------------------------------------------------------------------
+
+Ce texte sert pour la vie courante du produit : un bug, un comportement
+étrange ou une question précise, hors session de tests bêta structurée.
+
+Pendant une campagne de tests bêta, préférez le guide de tests rempli
+(Matrix-Control-Guide-de-tests-beta-FR.txt) : il contient déjà la fiche de
+session, les cases cochées et les notes. Joignez simplement ce fichier
+par email (voir la section « Envoyer vos résultats » du guide).
+
+--------------------------------------------------------------------------------
+COMMENT CONTACTER LE DÉVELOPPEUR ?
+--------------------------------------------------------------------------------
+
+Adresse de contact privilégiée :
+
+  tensquaresoftware@gmail.com
+
+Si vous êtes à l'aise avec GitHub, vous pouvez aussi ouvrir une « issue »
+dans le dépôt du projet :
+
+https://github.com/tensquaresoftware/matrix-control/issues
+
+Sinon, l'email suffit largement.
+
+--------------------------------------------------------------------------------
+QUELLES INFORMATIONS INDIQUER DANS VOTRE MESSAGE ?
+--------------------------------------------------------------------------------
+
+Indiquez au minimum :
+
+1. Titre court : contexte et résumé du problème
+   (ex. « Matrix-1000 : STORE grisé sur banque 0 »)
+2. Version du Matrix-Control (logo → ABOUT…)
+3. Système (nom + version) et type d'ordinateur
+4. Standalone ou plugin (AU / VST3) + DAW et sa version si besoin
+5. Synthé (Matrix-1000 / 6 / 6R) + EPROM / firmware si connu
+6. Étapes pour reproduire, numérotées
+7. Ce que vous attendiez, et ce qui s'est passé
+8. Toujours, ou seulement parfois ?
+9. Texte exact du message en bas de fenêtre ou du dialogue
+10. Si possible : une capture d'écran
+
+Inutile d'envoyer mots de passe, licences, ou une copie entière du disque.
+
+--------------------------------------------------------------------------------
+MERCI !
+--------------------------------------------------------------------------------
+
+Vos retours aident à stabiliser le Matrix-Control. Merci à vous !
+Guillaume | Ten Square Software — tensquaresoftware@gmail.com
+
+================================================================================

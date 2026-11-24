@@ -84,7 +84,7 @@ Sans ces deux directions, l’éditeur ne pourra pas piloter le synthé correcte
 
 - Savoir brancher des ports et câbles MIDI IN / MIDI OUT (ou USB-MIDI)
 - Savoir ouvrir un instrument virtuel dans votre DAW, **ou** lancer une application comme n’importe quel autre programme sur votre ordinateur
-- L’interface de Matrix-Control est en **anglais** : ce manuel traduit et explique chaque section, module et zone
+- L’interface de Matrix-Control est en **anglais** : ce manuel traduit et explique chaque section, module et groupe
 
 ---
 
@@ -323,10 +323,10 @@ L’écran s’organise en trois bandes :
 
 Dans ce manuel, nous désignons les grands blocs de l’interface comme suit :
 
-- **Section** — `PATCH EDIT`, `MATRIX MODULATION`, `PATCH MANAGER`, `MASTER EDIT` 
-- **Module** — par exemple `DCO 1`, `BANK UTILITY`, `PATCH MUTATOR` 
-- **Bus de modulation** — chacune des dix voies de `MATRIX MODULATION` 
-- **Zone** — sous-ensembles comme `BROWSER` ou `MEMORY` 
+- **Section** — `PATCH EDIT`, `MATRIX MODULATION`, `PATCH MANAGER`, `MASTER EDIT`
+- **Module** — par exemple `DCO 1`, `BANK UTILITY`, `PATCH MUTATOR`
+- **Bus de modulation** — chacune des dix voies de `MATRIX MODULATION`
+- **Groupe** — sous-partie d’un module, par exemple `BROWSER` ou `MEMORY` 
 - **Afficheur** — représentations graphiques (enveloppes, Track Generator) ou panneau de nom de patch
 
 | Colonne | Contenu |
@@ -435,7 +435,7 @@ Vous pouvez également :
 
 Dans `PATCH MANAGER` → module `INTERNAL PATCHES` :
 
-### Zone `BROWSER`
+### Groupe `BROWSER`
 
 - Boutons `<` et `>` pour passer au patch précédent / suivant
 - Numéro de **patch** (0–99) : affiché ; un double-clic permet de saisir directement un numéro
@@ -448,7 +448,7 @@ Lorsque vous changez de banque ou de patch, Matrix-Control :
 3. **Lit** le patch depuis le synthé et l’affiche dans l’éditeur 
 4. **N’écrit pas** automatiquement ce patch en retour juste après cette lecture
 
-### Zone `MEMORY`
+### Groupe `MEMORY`
 
 | Bouton | Rôle |
 |--------|------|
@@ -460,7 +460,7 @@ Lorsque vous changez de banque ou de patch, Matrix-Control :
 Sur les banques en lecture seule **2–9** du Matrix-1000, `INIT`, `PASTE` et `STORE` sont indisponibles (contrôles grisés).
 
 > **Capture d’écran — À placer ici**  
-> *Légende :* Module `INTERNAL PATCHES` avec les zones `BROWSER` et `MEMORY`.
+> *Légende :* Module `INTERNAL PATCHES` avec les groupes `BROWSER` et `MEMORY`.
 
 ---
 
@@ -485,12 +485,12 @@ Deux emplacements distincts :
 
 ### Module `COMPUTER PATCHES`
 
-**Zone `BROWSER`**
+**Groupe `BROWSER`**
 
 - Liste déroulante (`SELECT A PATCH`, noms de fichiers, ou `<EMPTY!>`)
 - Boutons `<` / `>` pour parcourir les fichiers du dossier
 
-**Zone `STORAGE`**
+**Groupe `STORAGE`**
 
 | Bouton | Rôle |
 |--------|------|
@@ -698,7 +698,7 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 
 | Terme | Définition |
 |-------|------------|
-| **Afficheur** | Zone graphique ou panneau d’affichage (enveloppes et Track Generator interactifs ; `PATCH NAME` en lecture seule). |
+| **Afficheur** | Région graphique ou panneau d’affichage (enveloppes et Track Generator interactifs ; `PATCH NAME` en lecture seule). |
 | **AU** | Format de plugin sur macOS (Audio Unit). |
 | **Banque (Bank)** | Sur le Matrix-1000 : regroupement de 100 patches. Il y a 10 banques (0–9). Le Matrix-6/6R n’a pas de banques. |
 | **Bus de modulation** | Une des dix voies de la section `MATRIX MODULATION` (source, intensité, destination). |
@@ -707,6 +707,7 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 | **ENV** | Envelope — enveloppe (attaque, decay, sustain, release…) qui façonne l’évolution du patch dans le temps. |
 | **FM** | Modulation de fréquence du filtre par l’oscillateur, pour des timbres plus riches ou métalliques. |
 | **GETTING STARTED** | Assistant de premier lancement (apparence, MIDI synthé, clavier, audio Standalone). Se relance depuis Settings → `GETTING STARTED` → `SETUP WIZARD`. |
+| **Groupe** | Sous-partie d’un module (`BROWSER`, `MEMORY`, `STORAGE`, etc.). |
 | **LFO** | Oscillateur lent : fait vibrer, trembler ou balayer un paramètre. |
 | **MASTER** | Réglages globaux de la machine (canal MIDI, vibrato, accordage…), distincts d’un patch. |
 | **Matrice de modulation** | Centre nerveux du synthé : tableau de « câbles virtuels » reliant sources et destinations. |
@@ -731,7 +732,6 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 | **VCA** | Étage de volume du patch. |
 | **VCF** | Filtre qui sculpte le timbre dans le domaine fréquentiel (grave / aigu, résonance). |
 | **VST3** | Format de plugin très répandu (Windows, macOS, Linux…). |
-| **Zone** | Sous-ensemble d’un module (`BROWSER`, `MEMORY`, `STORAGE`, etc.). |
 | **Unlock** | Déverrouille la banque côté Matrix-1000 pour certaines saisies sur la façade. |
 
 ---
