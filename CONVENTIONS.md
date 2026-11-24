@@ -206,7 +206,7 @@ It runs the same `lint_touched.py` logic as CI **plus** the
 - **Compiler:** Xcode 26
 - **Build system:** CMake
 - **Build directory:** `Builds/` (subfolders `macOS/`, `Windows/`, `Linux/`) — do not use `build/` at root
-- **Audio framework:** JUCE 9.0.5
+- **Audio framework:** JUCE 9.0.6
 
 ### 5.2 JUCE reference
 

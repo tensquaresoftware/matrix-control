@@ -144,7 +144,7 @@ Also see **[Luthier](https://github.com/tensquaresoftware/luthier)** — a Proju
 - **Cursor** or **VS Code** (with the CMake Tools and C/C++ extensions)
 - CMake 3.22+
 - Ninja build system
-- JUCE 9.0.5 installed (set `JUCE_DIR` to your JUCE checkout, e.g. `/Volumes/Guillaume/Dev/SDKs/JUCE-9`)
+- JUCE 9.0.6 installed (set `JUCE_DIR` to your JUCE checkout, e.g. `/Volumes/Guillaume/Dev/SDKs/JUCE-9`)
 
 #### Windows
 
@@ -152,7 +152,7 @@ Also see **[Luthier](https://github.com/tensquaresoftware/luthier)** — a Proju
 - **Cursor** or **VS Code** (with the CMake Tools and C/C++ extensions)
 - CMake 3.22+ (add to system PATH during installation)
 - Visual Studio 2022 with "Desktop development with C++" workload
-- JUCE 9.0.5 installed (set `JUCE_DIR` to your JUCE checkout, e.g. `C:\Users\Guillaume\Dev\SDKs\JUCE-9\JUCE`)
+- JUCE 9.0.6 installed (set `JUCE_DIR` to your JUCE checkout, e.g. `C:\Users\Guillaume\Dev\SDKs\JUCE-9\JUCE`)
 
 ### Environment Setup
 
