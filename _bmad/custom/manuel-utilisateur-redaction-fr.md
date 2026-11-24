@@ -1,10 +1,10 @@
 # Manuel utilisateur Matrix-Control — conventions de rédaction (SSOT)
 
-**Public de ce document :** agents BMad, en particulier **Paige** (Technical Writer), et tout agent qui met à jour `Documentation/User/manuel-utilisateur.md`.
+**Public de ce document :** agents BMad, en particulier **Paige** (Technical Writer), et tout agent qui met à jour `Documentation/User/Manuals/Matrix-Control-Manuel-Utilisateur.md`.
 
 **Public du manuel lui-même :** utilisateurs débutants en MAO qui découvrent aussi le Matrix-1000 et le Matrix-6/6R — **pas** des développeurs.
 
-**Fichier cible (unique) :** `Documentation/User/manuel-utilisateur.md`
+**Fichier cible (unique) :** `Documentation/User/Manuals/Matrix-Control-Manuel-Utilisateur.md`
 
 **Langue du manuel :** français.  
 **Langue de l’UI du produit :** anglais (libellés d’écran conservés tels quels, souvent en `backticks`).
@@ -91,8 +91,8 @@ Utiliser de façon cohérente :
 | **Section** | Grands blocs : `PATCH EDIT`, `MATRIX MODULATION`, `PATCH MANAGER`, `MASTER EDIT` |
 | **Module** | Blocs fonctionnels : `DCO 1`, `BANK UTILITY`, `PATCH MUTATOR`, etc. |
 | **Bus de modulation** | Une des dix voies de `MATRIX MODULATION` |
-| **Zone** | Sous-ensembles : `BROWSER`, `MEMORY`, `STORAGE`, etc. |
-| **Afficheur** | Graphiques / panneaux : enveloppes et Track Generator (**interactifs**) ; `PATCH NAME` (**lecture seule**) |
+| **Groupe** | Sous-partie d’un module : `BROWSER`, `MEMORY`, `STORAGE`, etc. (même sens que « Zone » dans d’anciennes notes) |
+| **Afficheur** | Graphiques / panneaux : enveloppes et Track Generator (**interactifs**) ; `PATCH NAME` (**renommable par double-clic** quand le contexte l’autorise — pas toujours éditable) |
 
 Contrôles GUI mentionnés dans le texte : toujours en **`backticks`** (`STORE`, `<` / `>`, `MUTATE`, etc.).
 
@@ -102,23 +102,26 @@ Contrôles GUI mentionnés dans le texte : toujours en **`backticks`** (`STORE`,
 
 ### Parcours type (ordre logique)
 
+Aligné sur la table des matières du manuel FR (ne pas renuméroter « pour le plaisir ») :
+
 1. À quoi sert Matrix-Control  
 2. Ce dont vous aurez besoin  
 3. Matrix-1000 vs Matrix-6/6R  
 4. Installer et ouvrir  
-5. Brancher MIDI / détection  
-6. Tour de l’écran  
-7. Éditer un patch (`PATCH EDIT`)  
-8. Matrice de modulation  
-9. Patches internes  
-10. Banques (M-1000)  
-11. Sauvegarde synthé / ordinateur  
-12. Patch Mutator  
-13. Master Edit  
-14. Apparence / Settings  
-15. Standalone vs plugin  
-16. Dépannage  
-17. Lexique  
+5. Premier lancement : `GETTING STARTED`  
+6. Brancher MIDI / détection  
+7. Tour de l’écran  
+8. Éditer un patch (`PATCH EDIT`)  
+9. Matrice de modulation  
+10. Patches internes  
+11. Banques (M-1000)  
+12. Sauvegarde synthé / ordinateur  
+13. Patch Mutator  
+14. Master Edit  
+15. Apparence / Settings  
+16. Standalone vs plugin  
+17. Dépannage  
+18. Lexique 
 
 ### Ce qu’il ne faut plus faire
 
@@ -143,7 +146,7 @@ Format type :
 - Expliquer le **rôle** des briques (DCO = formes d’onde de base ; VCF = sculpture fréquentielle du timbre ; etc.)
 - **Ne pas** lister tous les paramètres de chaque module
 - Conserver que les **afficheurs d’enveloppes** (et le Track Generator) sont **éditables à la souris**
-- `PATCH NAME` : lecture seule à l’écran
+- `PATCH NAME` : renommable par double-clic **quand le contexte l’autorise** (fichier ordinateur ; mémoire machine selon banque / Hardware Names / Compare — ne pas écrire « toujours » ni « jamais » éditable)
 
 ### Coller (`P`)
 
@@ -211,7 +214,7 @@ Les phrases hors liste gardent une ponctuation normale.
 - [ ] Aucun jargon de build / dépôt / compile
 - [ ] `synthé` à la place de « Matrix » seul ; `Matrix-6/6R` orthographié correctement
 - [ ] Logo `MATRIX-CONTROL` ; contrôles en backticks
-- [ ] Section / Module / Bus / Zone / Afficheur utilisés correctement
+- [ ] Section / Module / Bus / Groupe / Afficheur utilisés correctement
 - [ ] « patch » plutôt que « son » (contexte Oberheim)
 - [ ] « un DAW » ; « interface audio »
 - [ ] Modules de synthèse et MASTER EDIT sans inventaires de paramètres
@@ -228,7 +231,7 @@ Les phrases hors liste gardent une ponctuation normale.
 
 | Fichier | Rôle |
 |---------|------|
-| `Documentation/User/manuel-utilisateur.md` | Manuel utilisateur (livrable) |
+| `Documentation/User/Manuals/Matrix-Control-Manuel-Utilisateur.md` | Manuel utilisateur FR (livrable) |
 | `_bmad/custom/manuel-utilisateur-redaction-fr.md` | Ce SSOT (conventions de rédaction) |
 | `_bmad/custom/bmad-agent-tech-writer.toml` | Charge ce SSOT pour Paige à l’activation |
 | `Source/Shared/Definitions/PluginDisplayNames.h` | Libellés UI (référence) |
