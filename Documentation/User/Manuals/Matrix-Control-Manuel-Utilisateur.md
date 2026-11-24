@@ -408,6 +408,10 @@ Le renommage est **bloqué** lorsque :
 
 Le double-clic met à jour le nom **dans l’éditeur** (et peut l’envoyer au synthé pour écoute). Pour le **garder** : utilisez `STORE` si le patch vient de la mémoire machine, ou `SAVE` / `SAVE AS` dans Computer Patches s’il vient d’un fichier. Le nom affiché dans `PATCH NAME` (8 caractères Oberheim) n’est pas le même objet que le nom de fichier `.syx` choisi à l’enregistrement sur l’ordinateur.
 
+Après un `INIT` dans `INTERNAL PATCHES`, l’afficheur montre `* INIT *`. Ce marqueur n’est pas un nom Matrix valide : vous devez le remplacer **avant** un `STORE` dans le synthé, et **avant** un `SAVE` / `SAVE AS` sur l’ordinateur. Un `STORE` dans cet état ouvre directement la saisie du nom ; un `SAVE` / `SAVE AS` refuse l’enregistrement tant que le marqueur reste affiché.
+
+Pour un fichier `.m1kp`, le nom affiché vient **toujours** du nom de fichier (voir [Computer Patches](#module-computer-patches)). Les préférences `DISPLAY…` se règlent dans [section 15](#15-apparence-échelle-et-settings).
+
 ### Modules de synthèse
 
 La section `PATCH EDIT` regroupe les briques classiques de la synthèse soustractive Oberheim. Les libellés à l’écran sont en anglais ; le [lexique](#lexique) précise les sigles (DCO, VCF, VCA, LFO, ENV, etc.).
@@ -473,6 +477,8 @@ Lorsque vous changez de banque ou de patch, Matrix-Control :
 | `PASTE` | Colle un patch précédemment copié |
 | `STORE` | Enregistre le patch dans l’emplacement courant **du synthé** |
 
+Après `INIT`, le nom devient `* INIT *` : renommez le patch avant `STORE`, et avant `SAVE` / `SAVE AS` (voir [Nom du patch](#nom-du-patch-patch-name)).
+
 Sur les banques en lecture seule **2–9** du Matrix-1000, `INIT`, `PASTE` et `STORE` sont indisponibles (contrôles grisés).
 
 > **Capture d’écran — À placer ici**  
@@ -497,7 +503,7 @@ Deux emplacements distincts :
 | Où | Comment | Ce que cela conserve |
 |----|---------|----------------------|
 | **Mémoire du synthé** | `STORE` dans `INTERNAL PATCHES` | Le patch dans un emplacement de la machine (banque + numéro, ou numéro 0–99 sur Matrix-6/6R) |
-| **Ordinateur** | Module `COMPUTER PATCHES` | Des fichiers `.syx` (un patch par fichier) dans un dossier que vous choisissez |
+| **Ordinateur** | Module `COMPUTER PATCHES` | Des fichiers `.syx` ou `.m1kp` pour **charger** un patch ; la sauvegarde native Matrix-Control écrit toujours un `.syx` |
 
 ### Module `COMPUTER PATCHES`
 
@@ -510,11 +516,15 @@ Deux emplacements distincts :
 
 | Bouton | Rôle |
 |--------|------|
-| `OPEN` | Choisir / ouvrir le dossier de patches sur le disque (liste triée : `INITIAL`, chaque `Mxx` puis ses `Mxx-Ryy`, sinon alphabétique) |
+| `OPEN` | Choisir / ouvrir le dossier de patches sur le disque (liste des `.syx` et `.m1kp`, triée : `INITIAL`, chaque `Mxx` puis ses `Mxx-Ryy`, sinon alphabétique) |
 | `SAVE AS` | Enregistrer le patch courant sous un nouveau nom `.syx` |
-| `SAVE` | Enregistrer dans le fichier déjà associé |
+| `SAVE` | Enregistrer le patch courant en `.syx` (fichier déjà associé, ou même nom de base après un chargement `.m1kp`) |
 
-Seul le format `.syx` est pris en charge. Il n’existe pas, dans cette version, d’import d’une banque entière d’un seul geste, ni de tags ou de favoris.
+`OPEN` liste les fichiers `.syx` **et** `.m1kp` du dossier. Vous pouvez aussi **glisser-déposer** un `.syx` ou un `.m1kp` sur la fenêtre pour le charger. `SAVE` et `SAVE AS` écrivent **toujours** un `.syx` au format Edit Buffer (voir ci-dessous) — jamais une réécriture du fichier `.m1kp` d’origine. Il n’existe pas, dans cette version, d’import d’une banque entière d’un seul geste via Computer Patches, ni de tags ou de favoris.
+
+Après le chargement d’un `.m1kp`, `SAVE` crée ou met à jour un `.syx` du **même nom de base** dans le dossier. S’il existe déjà, Matrix-Control demande confirmation (`Overwrite existing .syx?`) : `CONTINUE` remplace ce `.syx` ; `CANCEL` annule la sauvegarde. Le fichier `.m1kp` d’origine n’est pas modifié.
+
+Lors du chargement d’un `.m1kp`, le nom affiché dans `PATCH NAME` vient **toujours** du nom de fichier (les préférences Computer Patches `DISPLAY SYSEX NAMES` / `DISPLAY FILE NAMES` ne s’appliquent pas à ce format).
 
 **Format des fichiers sauvés par Matrix-Control**
 
@@ -528,16 +538,16 @@ Après un parcours de dossier, le bas de fenêtre peut indiquer combien de fichi
 
 ### Lorsque le nom du fichier et le nom interne du patch divergent
 
-La boîte de dialogue `Patch name mismatch` peut proposer :
+Pour un chargement **`.syx`**, la boîte de dialogue `Patch name mismatch` peut proposer :
 
 - `Internal` — conserver le nom contenu dans le fichier `.syx` 
 - `Filename` — utiliser le nom du fichier 
 - `Cancel` — annuler le chargement
 
-Le comportement par défaut se règle dans `SETTINGS` (voir [section 15](#15-apparence-échelle-et-settings)).
+Ce dialogue ne s’applique **pas** au chargement d’un `.m1kp` (le nom vient toujours du fichier). Le comportement par défaut pour les `.syx` se règle dans `SETTINGS` (voir [section 15](#15-apparence-échelle-et-settings)).
 
 > **Capture d’écran — À placer ici**  
-> *Légende :* Module `COMPUTER PATCHES` avec `OPEN` / `SAVE AS` / `SAVE` et une liste de fichiers `.syx`.
+> *Légende :* Module `COMPUTER PATCHES` avec `OPEN` / `SAVE AS` / `SAVE` et une liste de fichiers `.syx` / `.m1kp`.
 
 ---
 
@@ -670,7 +680,7 @@ Les fichiers modèles (`PatchInit.syx`, `MasterInit.syx`) vivent dans un dossier
 
 `UTILITY` → `INIT` (MASTER) demande une confirmation avant de réinitialiser tous les modules Master.
 
-Après un `INIT` Internal Patches, le Patch Name affiche `* INIT *` : il faut choisir un nom Matrix valide avant `SAVE` / `SAVE AS` dans Computer Patches.
+Après un `INIT` Internal Patches, le Patch Name affiche `* INIT *` : il faut choisir un nom Matrix valide avant `STORE`, et avant `SAVE` / `SAVE AS` dans Computer Patches (voir [Nom du patch](#nom-du-patch-patch-name)).
 
 > **Capture d’écran — À placer ici**  
 > *Légende :* Onglets Settings `GETTING STARTED` / `USER INTERFACE` et menu du logo.
@@ -751,6 +761,7 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 | **STORE** | Enregistrer le patch courant dans la mémoire du synthé. |
 | **SYNTH FROM / SYNTH TO** | **Ports MIDI** dans Settings → `MIDI & DEVICE` et l’étape synthé de l’assistant (ce qui arrive du synthé / part vers le synthé) ; bandeau `FROM SYNTH` / `TO SYNTH`. **Aussi** canaux d’écoute audio `SYNTH FROM` dans Settings → `AUDIO` / étape Audio Standalone — ne pas confondre avec le port MIDI. |
 | **SysEx** | Messages MIDI détaillés propres à une marque / un modèle, utilisés pour éditer le synthé en profondeur. |
+| **`.m1kp`** | Fichier de patch Matrix-Control (chargement via Computer Patches / glisser-déposer). La sauvegarde native reste un `.syx` ; le `.m1kp` d’origine n’est pas réécrit. |
 | **`.syx`** | Fichier qui contient un patch au format SysEx. |
 | **Track Generator** | Courbe qui transforme la position sur le clavier en valeur de modulation (afficheur interactif). |
 | **VCA** | Étage de volume du patch. |

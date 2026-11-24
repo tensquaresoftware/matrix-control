@@ -92,7 +92,7 @@ Utiliser de façon cohérente :
 | **Module** | Blocs fonctionnels : `DCO 1`, `BANK UTILITY`, `PATCH MUTATOR`, etc. |
 | **Bus de modulation** | Une des dix voies de `MATRIX MODULATION` |
 | **Zone** | Sous-ensembles : `BROWSER`, `MEMORY`, `STORAGE`, etc. |
-| **Afficheur** | Graphiques / panneaux : enveloppes et Track Generator (**interactifs**) ; `PATCH NAME` (**lecture seule**) |
+| **Afficheur** | Graphiques / panneaux : enveloppes et Track Generator (**interactifs**) ; `PATCH NAME` (**éditable** par double-clic lorsque le contexte le permet) |
 
 Contrôles GUI mentionnés dans le texte : toujours en **`backticks`** (`STORE`, `<` / `>`, `MUTATE`, etc.).
 
@@ -143,7 +143,8 @@ Format type :
 - Expliquer le **rôle** des briques (DCO = formes d’onde de base ; VCF = sculpture fréquentielle du timbre ; etc.)
 - **Ne pas** lister tous les paramètres de chaque module
 - Conserver que les **afficheurs d’enveloppes** (et le Track Generator) sont **éditables à la souris**
-- `PATCH NAME` : lecture seule à l’écran
+- `PATCH NAME` : éditable par double-clic lorsque le contexte le permet ; après `INIT`, marqueur `* INIT *` à remplacer avant `STORE` / `SAVE` / `SAVE AS`
+- Computer Patches : `OPEN` / liste / glisser-déposer acceptent `.syx` **et** `.m1kp` ; `SAVE` / `SAVE AS` écrivent toujours un `.syx` (jamais réécrire le `.m1kp` source) ; après un `.m1kp`, confirmer l’écrasement d’un `.syx` homonyme si présent
 
 ### Coller (`P`)
 
