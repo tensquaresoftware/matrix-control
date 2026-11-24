@@ -146,7 +146,8 @@ Format type :
 - Expliquer le **rôle** des briques (DCO = formes d’onde de base ; VCF = sculpture fréquentielle du timbre ; etc.)
 - **Ne pas** lister tous les paramètres de chaque module
 - Conserver que les **afficheurs d’enveloppes** (et le Track Generator) sont **éditables à la souris**
-- `PATCH NAME` : renommable par double-clic **quand le contexte l’autorise** (fichier ordinateur ; mémoire machine selon banque / Hardware Names / Compare — ne pas écrire « toujours » ni « jamais » éditable)
+- `PATCH NAME` : renommable par double-clic **quand le contexte l’autorise** (fichier ordinateur ; mémoire machine selon banque / Hardware Names / Compare — ne pas écrire « toujours » ni « jamais » éditable) ; après `INIT`, marqueur `* INIT *` à remplacer avant `STORE` / `SAVE` / `SAVE AS`
+- Computer Patches : `OPEN` / liste / glisser-déposer acceptent `.syx` **et** `.m1kp` ; `SAVE` / `SAVE AS` écrivent toujours un `.syx` (jamais réécrire le `.m1kp` source) ; après un `.m1kp`, confirmer l’écrasement d’un `.syx` homonyme si présent
 
 ### Coller (`P`)
 
