@@ -167,17 +167,26 @@ Format type :
 
 - Philosophie : **paramètres globaux** qui affectent **tous les patches**
 - **Ne pas** lister tous les paramètres ; indiquer les modules (`MIDI`, `VIBRATO`, `MISC`) et l’intention
+- Expliquer clairement `MEMORY PROTECT` / `BANK LOCK` (et le cas Matrix-6/6R : interrupteur arrière, `MASTER EDIT` grisé) — `STORE` « qui semble cassé » n’est souvent pas un bug
 
 ### Patch Mutator
 
 - `AMOUNT` / `RANDOM` : plage **1–100 %** (pas de consigne du type « au-dessus de 0 »)
 - Modules ciblés = **commutateurs**, pas « cases »
 - Condition utile : au moins un commutateur de module activé
+- Rappel de sauvegarde avant les gestes qui écrivent dans le synthé (`MUTATE`, etc.)
+
+### Prérequis (§2) et câblage (§6)
+
+- Inclure un **chemin audio** (sortie synthé → interface / table / enceintes) dès les prérequis — pas seulement le MIDI
+- Préciser **deux câbles MIDI** (deux sens) ; DAW **optionnel** si Standalone seul
+- Câblage type : MIDI **et** audio ; idéalement avant / pendant le premier lancement
 
 ### Plateformes
 
-- macOS : AU, VST3, Standalone  
-- Windows / Linux : VST3, Standalone  
+- macOS (Apple Silicon ou Intel) : AU, VST3, Standalone  
+- Windows 10 / 11 : VST3, Standalone  
+- Linux (Ubuntu 24.x / 26.x ou proche) : VST3, Standalone  
 - (Ne plus marquer Linux comme indisponible)
 
 ---
