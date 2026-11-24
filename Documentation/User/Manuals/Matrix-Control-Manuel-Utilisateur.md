@@ -3,12 +3,12 @@ Organisation: Ten Square Software
 Auteur: Guillaume DUPONT
 Projet: Matrix-Control
 Titre: Matrix-Control — Manuel utilisateur
-Version: 0.1
-Version-Produit: 0.1.2-alpha
+Version: 1.0
+Version-Produit: 1.0.0-alpha.8
 Created: 2026-07-20
-Updated: 2026-10-08
+Updated: 2026-11-24
 References:
-  - Documentation/User/user-manual.md (à venir)
+  - Documentation/User/Manuals/ (EN user manual à venir)
   - CONTRIBUTING.md
   - README.md
 ---
@@ -390,7 +390,23 @@ Le bouton `P` n’est actif que lorsque le contenu du presse-papiers est compati
 
 ### Nom du patch (`PATCH NAME`)
 
-L’afficheur `PATCH NAME` présente le nom du patch courant (8 caractères). Il est en **lecture seule** : vous ne pouvez pas le modifier à l’écran. Il se met à jour lorsqu’un patch est reçu depuis le synthé, lorsqu’un fichier de patch est ouvert depuis votre ordinateur, ou lorsque vous créez des variantes à l’aide du Patch Mutator.
+L’afficheur `PATCH NAME` présente le nom du patch courant (8 caractères). Il se met à jour lorsqu’un patch est reçu depuis le synthé, lorsqu’un fichier de patch est ouvert depuis votre ordinateur, ou lorsque vous créez des variantes à l’aide du Patch Mutator.
+
+Quand le renommage est autorisé, un **double-clic** sur l’afficheur ouvre l’édition en place (toujours 8 caractères). Ce n’est **pas** toujours possible : Matrix-Control n’autorise le renommage que dans certains contextes. Si l’édition est interdite, le double-clic ne démarre pas la saisie — ce n’est pas un bug, c’est une règle liée au contexte du patch.
+
+Hors mode **Compare** du Patch Mutator, vous pouvez en général renommer lorsque :
+
+- Le patch vient d’un **fichier** sur l’ordinateur (Computer Patches)
+- Ou le patch vient de la **mémoire du synthé** sur Matrix-6/6R (pas de banques)
+- Ou le patch vient de la **mémoire du synthé** sur Matrix-1000, banques **0** ou **1**, et Settings → `MATRIX-1000 PATCHES` n’est pas sur `DISPLAY HARDWARE NAMES`
+
+Le renommage est **bloqué** lorsque :
+
+- Le mode **Compare** du Patch Mutator est actif (cliquer à nouveau sur `C` pour quitter Compare)
+- Le patch courant est en mémoire machine sur une banque **ROM 2–9** du Matrix-1000
+- Sur un Matrix-1000 (avec banques), Settings → `MATRIX-1000 PATCHES` est sur `DISPLAY HARDWARE NAMES` et le patch vient de la mémoire machine — les noms matériels ne sont pas durables via SysEx dans ce mode
+
+Le double-clic met à jour le nom **dans l’éditeur** (et peut l’envoyer au synthé pour écoute). Pour le **garder** : utilisez `STORE` si le patch vient de la mémoire machine, ou `SAVE` / `SAVE AS` dans Computer Patches s’il vient d’un fichier. Le nom affiché dans `PATCH NAME` (8 caractères Oberheim) n’est pas le même objet que le nom de fichier `.syx` choisi à l’enregistrement sur l’ordinateur.
 
 ### Modules de synthèse
 
@@ -588,7 +604,7 @@ Un clic sur le logo (en haut à gauche) ouvre le menu suivant :
 | Entrée | Contenu |
 |--------|---------|
 | `UI SCALE` | Taille de l’interface : 50 % à 200 % (raccourci ; même réglage que dans Settings) |
-| `SKIN` | Apparence `BLACK` ou `CREAM` (petit clin d’œil aux versions Black et Cream du Matrix-1000) |
+| `SKIN` | Familles `BLACK`, `CREAM` et `TONES` : sous-menus pour choisir une variante (même réglage que dans Settings) |
 | `SETTINGS...` | Préférences (onglets `GETTING STARTED`, `USER INTERFACE`, `MIDI & DEVICE`, `AUDIO` en Standalone, etc.) |
 | `ABOUT...` | Version, crédits, liens |
 
@@ -608,8 +624,16 @@ Raccourcis clavier (quand l’éditeur a le focus, hors saisie de texte) :
 | `UI SCALE` plus grand (cran suivant, 50–200 %) | ⌘+ (aussi ⌘=) | Ctrl+Plus (aussi Ctrl+=) |
 | `UI SCALE` plus petit (cran précédent) | ⌘- | Ctrl+- |
 | `UI SCALE` à 100 % | ⌘ 0 | Ctrl+0 |
-| Skin `BLACK` | ⌘ 1 | Ctrl+1 |
-| Skin `CREAM` | ⌘ 2 | Ctrl+2 |
+| Skin `BLACK/GREEN` | ⌘ 1 | Ctrl+1 |
+| Skin `BLACK/CHROMA` | ⌘ 2 | Ctrl+2 |
+| Skin `BLACK/MINIMAL` | ⌘ 3 | Ctrl+3 |
+| Skin `CREAM/GREEN` | ⌘ 4 | Ctrl+4 |
+| Skin `CREAM/CHROMA` | ⌘ 5 | Ctrl+5 |
+| Skin `CREAM/MINIMAL` | ⌘ 6 | Ctrl+6 |
+| Cycle skin dans la famille active (haut / gauche = précédente ; bas / droite = suivante) | ⌘ + flèches | Ctrl+flèches |
+| Cycle toutes les skins (même sens de flèches) | ⌘ Shift + flèches | Ctrl+Shift+flèches |
+
+Les six raccourcis numériques suivent l’ordre du menu déroulant `SKIN` dans Settings (liste plate). Dans le menu logo, les mêmes variantes apparaissent sous les familles `BLACK` et `CREAM`, avec le raccourci rappelé à côté. La famille `TONES` propose quinze variantes nommées (`TONES/CHERRY` … `TONES/FUCHSIA`) sans raccourci chiffre : choisissez-les dans le sous-menu `TONES`, via le cycle global (⌘/Ctrl+Shift+flèches), ou via le cycle de famille une fois une skin `TONES` déjà active (⌘/Ctrl+flèches).
 
 Ces raccourcis sont aussi rappelés dans le menu du logo.
 
@@ -624,7 +648,7 @@ L’onglet **`USER INTERFACE`** contient, dans cet ordre :
 | Réglage | Détail |
 |---------|--------|
 | `UI SCALE` | Taille de l’interface (50 % à 200 %), aussi accessible depuis le menu logo |
-| `SKIN` | `BLACK` ou `CREAM`, aussi accessible depuis le menu logo |
+| `SKIN` | Six variantes de base (`BLACK/GREEN`, `BLACK/CHROMA`, `BLACK/MINIMAL`, `CREAM/GREEN`, `CREAM/CHROMA`, `CREAM/MINIMAL`) plus quinze `TONES/…` (`TONES/CHERRY` … `TONES/FUCHSIA`) ; aussi accessible depuis le menu logo |
 | `INFO MESSAGE` | Comportement des messages d’information en bas de fenêtre (`KEEP` / `AUTO CLEAR`) |
 | `CONTEXTUAL HELP` | Affiche ou masque l’aide contextuelle furtive (`HELP`) dans le bandeau du bas |
 
@@ -698,7 +722,7 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 
 | Terme | Définition |
 |-------|------------|
-| **Afficheur** | Région graphique ou panneau d’affichage (enveloppes et Track Generator interactifs ; `PATCH NAME` en lecture seule). |
+| **Afficheur** | Région graphique ou panneau d’affichage (enveloppes et Track Generator interactifs ; `PATCH NAME` renommable par double-clic quand l’édition est autorisée). |
 | **AU** | Format de plugin sur macOS (Audio Unit). |
 | **Banque (Bank)** | Sur le Matrix-1000 : regroupement de 100 patches. Il y a 10 banques (0–9). Le Matrix-6/6R n’a pas de banques. |
 | **Bus de modulation** | Une des dix voies de la section `MATRIX MODULATION` (source, intensité, destination). |
