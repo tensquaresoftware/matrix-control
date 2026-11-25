@@ -148,16 +148,16 @@ Format type — **placeholder** (tant que l’image n’est pas prête) :
 > *…légende provisoire…*
 ```
 
-Format type — **image placée** (centrage + italique ; pas de préfixe « Légende : ») :
+Format type — **image placée** (centrage + italique ; pas de préfixe « Légende : »).
 
-```markdown
-<p align="center">
+**Typora :** ne pas mélanger `![…](…)` Markdown *à l’intérieur* d’un `<p>` — Typora ferme le paragraphe avant l’image et affiche un `</p>` orphelin. Utiliser un bloc HTML pur :
 
-![Same caption as below, for accessibility.](Screenshots/NN-english-slug.png)
-
-*Caption in French, italic, no “Légende :” prefix.*
-
-</p>
+```html
+<div align="center">
+<img src="Screenshots/NN-english-slug.png" alt="Same caption as below, for accessibility." />
+<br />
+<em>Caption in French, italic, no “Légende :” prefix.</em>
+</div>
 ```
 
 ---

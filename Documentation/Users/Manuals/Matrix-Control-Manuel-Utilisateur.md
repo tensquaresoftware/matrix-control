@@ -59,13 +59,12 @@ Vous pouvez l’utiliser :
 
 Pour les crédits et les contacts, ouvrez `ABOUT...` depuis le menu du logo `MATRIX-CONTROL`.
 
-<p align="center">
+<div align="center">
+<img src="Screenshots/01-main-window-matrix-1000.png" alt="Fenêtre principale du Matrix-Control avec un Matrix-1000 détecté." />
+<br />
+<em>Fenêtre principale du Matrix-Control avec un synthé Oberheim Matrix-1000 détecté.</em>
+</div>
 
-![Fenêtre principale du Matrix-Control avec un Matrix-1000 détecté.](Screenshots/01-main-window-matrix-1000.png)
-
-*Fenêtre principale du Matrix-Control avec un Matrix-1000 détecté.*
-
-</p>
 
 ---
 
