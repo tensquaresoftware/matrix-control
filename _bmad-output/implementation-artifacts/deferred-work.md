@@ -1,5 +1,14 @@
 # Deferred Work
 
+## Deferred from: oneshot review of spec-contextual-help-control-names.md (2026-11-25)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-contextual-help-control-names.md`
+  summary: No automated assertion that every control HELP string embeds its face label (beyond golden Mutator / Wave 2 samples).
+  evidence: Blind Hunter; ship risk covered by existing copy-pin tests; exhaustive generator test is follow-up.
+- source_spec: `_bmad-output/implementation-artifacts/spec-contextual-help-control-names.md`
+  summary: `inventory-contextual-help-messages.md` still lists pre-label HELP copy.
+  evidence: Blind Hunter; PluginDisplayNames.h is production SSOT; inventory refresh is docs hygiene.
+
 ## Deferred from: code review of spec-unify-logs-application-support.md (2026-11-19)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-unify-logs-application-support.md`
