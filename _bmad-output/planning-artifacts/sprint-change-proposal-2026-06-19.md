@@ -5,7 +5,7 @@
 **Prepared for:** Guillaume  
 **Status:** Approved  
 **Approved by:** Guillaume — 2026-06-19  
-**Trigger document:** `Documentation/Development/Plans/2026/06/2026-06-18-Correct-Course-Bank-Utility-UNLOCK-Handoff.md`  
+**Trigger document:** `Documentation/Devs/Plans/2026/06/2026-06-18-Correct-Course-Bank-Utility-UNLOCK-Handoff.md`  
 **Supersedes:** D-022 (BANK LOCK toggle); partial U-IDs harmonization (`bankUtilityLockBank` / `kLockBank`)
 
 ---
@@ -273,7 +273,7 @@ void handleUnlockBank(const DeviceMemoryLimits& limits)
 
 ### 4.7 Spike annotation
 
-**File:** `Documentation/Development/Plans/2026/06/2026-06-18-Matrix-1000-Bank-Lock-MIDI-Spike.md`
+**File:** `Documentation/Devs/Plans/2026/06/2026-06-18-Matrix-1000-Bank-Lock-MIDI-Spike.md`
 
 **ADD header note:**
 > **Status:** Not required for v1 — superseded by D-022-R1 (UNLOCK-only Bank Utility, 2026-06-19).

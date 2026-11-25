@@ -74,7 +74,7 @@ context:
 - `Tests/Unit/UndoManagerEditorialUndoApiTests.cpp` — Compare guard pattern for harness reuse.
 - `Tests/Unit/UndoManagerModuleBulkTestSupport.h` — ProcessorPathHarness / UndoManager wiring reference.
 - `Tests/Unit/UndoManagerModuleBulkTests.cpp` — bulk undo harness pattern for checkpoint tests.
-- `Documentation/User/manuel-utilisateur.md:236-248` — §7: add checkpoint clears (load/paste/mutate reset undo baseline).
+- `Documentation/Users/manuel-utilisateur.md:236-248` — §7: add checkpoint clears (load/paste/mutate reset undo baseline).
 - `_bmad-output/specs/spec-undo-redo-patch-editing/undo-policy.md:48-73,92-101` — canonical checkpoint + dirty matrix (CAP-6).
 
 ## Tasks & Acceptance
@@ -89,7 +89,7 @@ context:
 - [x] `Tests/Unit/UndoManagerCheckpointPolicyTests.cpp` — stack clear on load/paste/mutate harness paths — CAP-6 policy proof without GUI.
 - [x] `Tests/Unit/UndoManagerDirtyStateTests.cpp` — edit→undo→clean and edit→undo→redo dirty matrix — CAP-6 dirty coherence.
 - [x] `Tests/CMakeLists.txt` — register new test files.
-- [x] `Documentation/User/manuel-utilisateur.md` — §7 checkpoint paragraph (load/paste/mutate clear undo history) — deferred from 12-4.
+- [x] `Documentation/Users/manuel-utilisateur.md` — §7 checkpoint paragraph (load/paste/mutate clear undo history) — deferred from 12-4.
 - [x] `python3 Scripts/quality/lint_touched.py` — zero findings on touched C++.
 
 **Acceptance Criteria:**

@@ -285,7 +285,7 @@ Execute **7-3b** before **7.5**.
 
 **Input to paste:**
 
-> Use handoff: `Documentation/Development/Plans/2026/06/2026-06-18-Correct-Course-Bank-Utility-UNLOCK-Handoff.md`  
+> Use handoff: `Documentation/Devs/Plans/2026/06/2026-06-18-Correct-Course-Bank-Utility-UNLOCK-Handoff.md`  
 > Produce Sprint Change Proposal, update PRD/epics/decision-log, then recommend story 7-3b creation.
 
 After Correct Course approval:
@@ -312,4 +312,4 @@ rg 'bankUtilityUnlockBank|kUnlockBank|patchManagerBanksLocked|unlockBankButton_|
 
 - Oberheim: `_local/Documents/References/MD/oberheim-matrix-1000-midi-sysex-implementation.md` — §0AH, §0CH, master byte 165
 - Implemented (to fix): Story 7.3 `PatchManagerActionHandler` toggle at `kLockBank`
-- Deferred spike: `Documentation/Development/Plans/2026/06/2026-06-18-Matrix-1000-Bank-Lock-MIDI-Spike.md`
+- Deferred spike: `Documentation/Devs/Plans/2026/06/2026-06-18-Matrix-1000-Bank-Lock-MIDI-Spike.md`

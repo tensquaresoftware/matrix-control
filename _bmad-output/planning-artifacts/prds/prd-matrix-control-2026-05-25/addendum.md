@@ -439,7 +439,7 @@ Amount, Random, module toggles = APVTS prefs (persisted). History = session-only
 
 ## Getting Started wizard (Correct Course 2026-10-08)
 
-Product SSOT: `Documentation/Development/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md`.
+Product SSOT: `Documentation/Devs/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md`.
 
 - Multi-step **GETTING STARTED** assistant (Previous/Next) replaces the Device Setup one-shot for first useful configuration.
 - Unlocks edit / play / hear by **format**: plugin omits Audio step; Keyboard From is Standalone-only (plugin STEP 3 is host/DAW informative).

@@ -226,7 +226,7 @@ Workflows target the **Node.js 24** runtime on GitHub-hosted runners. GitHub dep
 
 **Self-hosted runners:** Not used today. If added later, require Actions Runner **≥ 2.327.1** for Node 24 actions.
 
-Correct-course archive: `Documentation/Development/Plans/2026/07/2026-07-14-Correct-Course-GitHub-Actions-Node-24-Migration.md` (decision **D-047-T**).
+Correct-course archive: `Documentation/Devs/Plans/2026/07/2026-07-14-Correct-Course-GitHub-Actions-Node-24-Migration.md` (decision **D-047-T**).
 
 ------
 

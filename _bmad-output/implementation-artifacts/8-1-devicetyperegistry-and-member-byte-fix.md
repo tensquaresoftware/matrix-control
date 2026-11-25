@@ -272,7 +272,7 @@ Composer (Cursor agent router)
 ### Review Findings
 
 - [x] [Review][Decision] StereoPing / UAT reference docs in the same 8-1 changeset — resolved: option 2 (keep only 8-1 fix; remove docs from this lot)
-- [x] [Review][Patch] Revert StereoPing notes + UAT/index/lecture cross-links out of the 8-1 working tree [`_bmad-output/reference-docs/oberheim/`, `Documentation/Development/Plans/2026/06/2026-06-19-Matrix-6-6R-User-Acceptance-Test-Grid.md`]
+- [x] [Review][Patch] Revert StereoPing notes + UAT/index/lecture cross-links out of the 8-1 working tree [`_bmad-output/reference-docs/oberheim/`, `Documentation/Devs/Plans/2026/06/2026-06-19-Matrix-6-6R-User-Acceptance-Test-Grid.md`]
 - [x] [Review][Patch] Fix stale SysExDelayProfile.h comment claiming independence from SysExConstants [`Source/Core/MIDI/Queue/SysExDelayProfile.h:25`]
 - [x] [Review][Patch] Fix decodeDeviceId failure log still saying "not a Matrix-1000" after M-6 acceptance [`Source/Core/MIDI/SysEx/SysExDecoder.cpp:83`]
 - [x] [Review][Patch] Deduplicate Member comment and clarify provisional 6 vs 6R inquiry wording in SysExConstants.h [`Source/Core/MIDI/SysEx/SysExConstants.h:80`]

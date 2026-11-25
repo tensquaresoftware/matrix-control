@@ -124,7 +124,7 @@ Pour chaque case : look Matrix (chrome, corps Montserrat lisible en minuscules, 
 
 ### GETTING STARTED (wizard multi-étapes — remplace Device Setup one-shot)
 
-SSOT produit : `Documentation/Development/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md`
+SSOT produit : `Documentation/Devs/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md`
 
 - [ ] Chrome Matrix monochrome, largeur = Settings, hauteur revue à la baisse (peu de contrôles / étape)
 - [ ] Étapes : 0 intro → 1 UI Scale + Skin → 2 Synth From/To + DEVICE + EPROM → 3 Keyboard (Standalone : combo + Skip ; plugin : informatif, pas de combo) → 4 Audio Standalone only (driver / I/O / SYNTH FROM ; FE+buffer si place)

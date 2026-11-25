@@ -11,7 +11,7 @@ companions:
   - ../../../CONVENTIONS.md
   - ../../project-context.md
 sources:
-  - ../../../Documentation/Development/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md
+  - ../../../Documentation/Devs/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md
   - ../../planning-artifacts/sprint-change-proposal-2026-10-08-getting-started.md
   - ../../planning-artifacts/epics.md
   - ../../implementation-artifacts/deferred-work.md

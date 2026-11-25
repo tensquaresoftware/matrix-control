@@ -229,7 +229,7 @@ Alternatively single **7-3c** with thin GUI footer if scope stays small.
 
 **Input to paste:**
 
-> Use handoff: `Documentation/Development/Plans/2026/06/2026-06-19-Correct-Course-Bank-Utility-Unlock-Simplify-Handoff.md`  
+> Use handoff: `Documentation/Devs/Plans/2026/06/2026-06-19-Correct-Course-Bank-Utility-Unlock-Simplify-Handoff.md`  
 > Produce Sprint Change Proposal, update PRD / epics / `.decision-log.md`, recommend story **7-3c** (or merged scope).  
 > Investigation context: `_bmad-output/implementation-artifacts/investigations/next-patch-after-unlock-missing-set-bank-investigation.md`
 
@@ -267,7 +267,7 @@ rg 'wrapsAcrossBanks|unlock_thenNext|unlock_onBank1_nextSameBank' Tests/
 
 ## 11. Reference
 
-- Prior handoff: `Documentation/Development/Plans/2026/06/2026-06-18-Correct-Course-Bank-Utility-UNLOCK-Handoff.md`
+- Prior handoff: `Documentation/Devs/Plans/2026/06/2026-06-18-Correct-Course-Bank-Utility-UNLOCK-Handoff.md`
 - Investigation: `_bmad-output/implementation-artifacts/investigations/next-patch-after-unlock-missing-set-bank-investigation.md`
-- Spike (hardware asymmetry): `Documentation/Development/Plans/2026/06/2026-06-18-Matrix-1000-Bank-Lock-MIDI-Spike.md`
+- Spike (hardware asymmetry): `Documentation/Devs/Plans/2026/06/2026-06-18-Matrix-1000-Bank-Lock-MIDI-Spike.md`
 - Implemented baseline: Story **7-3b** (`_bmad-output/implementation-artifacts/7-3b-bank-utility-unlock-semantics-and-id-rename.md`)

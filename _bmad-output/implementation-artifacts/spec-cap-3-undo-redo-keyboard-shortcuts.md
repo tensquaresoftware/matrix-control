@@ -129,7 +129,7 @@ const auto redo = juce::KeyPress('z', ModifierKeys::commandModifier | ModifierKe
 **Docs**
 
 - User-facing note that the plugin asks the host for the keyboard
-  [`manuel-utilisateur.md:253`](../../Documentation/User/manuel-utilisateur.md#L253)
+  [`manuel-utilisateur.md:253`](../../Documentation/Users/manuel-utilisateur.md#L253)
 
 - Spec companion: KeyPress match + EDITOR_WANTS_KEYBOARD_FOCUS
   [`keyboard-shortcuts.md:34`](../specs/spec-undo-redo-patch-editing/keyboard-shortcuts.md#L34)

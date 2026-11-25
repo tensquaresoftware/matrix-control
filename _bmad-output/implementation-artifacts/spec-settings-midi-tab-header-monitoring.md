@@ -7,7 +7,7 @@ route: 'dispatch'
 baseline_commit: 'b7d7a236096c674dce26193a01e5e0de8aaa44f8'
 review_loop_iteration: 0
 context:
-  - '{project-root}/Documentation/Development/Plans/2026/10/2026-10-04-Unified-Settings-Window-And-Header.md'
+  - '{project-root}/Documentation/Devs/Plans/2026/10/2026-10-04-Unified-Settings-Window-And-Header.md'
   - '{project-root}/_bmad-output/implementation-artifacts/spec-settings-tabs-shell.md'
   - '{project-root}/_bmad-output/implementation-artifacts/spec-settings-audio-tab.md'
   - '{project-root}/_bmad-output/implementation-artifacts/guide-matrix-modal-design.md'

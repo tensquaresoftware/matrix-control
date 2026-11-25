@@ -8,7 +8,7 @@ Version-Produit: 1.0.0-alpha.8
 Created: 2026-07-20
 Updated: 2026-11-25
 References:
-  - Documentation/User/Manuals/ (EN user manual à venir)
+  - Documentation/Users/Manuals/ (EN user manual à venir)
   - CONTRIBUTING.md
   - README.md
 ---
@@ -59,8 +59,9 @@ Vous pouvez l’utiliser :
 
 Pour les crédits et les contacts, ouvrez `ABOUT...` depuis le menu du logo `MATRIX-CONTROL`.
 
-> **Capture d’écran — À placer ici**  
-> *Légende :* Fenêtre principale du Matrix-Control avec un Matrix-1000 détecté.
+![Fenêtre principale du Matrix-Control avec un Matrix-1000 détecté.](Screenshots/01-main-window-matrix-1000.png)
+
+*Légende :* Fenêtre principale du Matrix-Control avec un Matrix-1000 détecté.
 
 ---
 

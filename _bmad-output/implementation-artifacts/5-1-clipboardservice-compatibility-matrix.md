@@ -299,7 +299,7 @@ Recent commits confirm Epic 3 closure and Core service patterns:
 
 - `_bmad-output/project-context.md` — dependency direction, descriptor SSOT, Clean Code limits, test pyramid
 - `CONVENTIONS.md` §8.5 — AAA / F.I.R.S.T. tests
-- `Documentation/Development/software-development-quality-principles.md` — design principles
+- `Documentation/Devs/software-development-quality-principles.md` — design principles
 
 ### References
 

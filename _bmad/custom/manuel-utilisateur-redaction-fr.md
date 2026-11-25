@@ -1,10 +1,10 @@
 # Manuel utilisateur Matrix-Control — conventions de rédaction (SSOT)
 
-**Public de ce document :** agents BMad, en particulier **Paige** (Technical Writer), et tout agent qui met à jour `Documentation/User/Manuals/Matrix-Control-Manuel-Utilisateur.md`.
+**Public de ce document :** agents BMad, en particulier **Paige** (Technical Writer), et tout agent qui met à jour `Documentation/Users/Manuals/Matrix-Control-Manuel-Utilisateur.md`.
 
 **Public du manuel lui-même :** utilisateurs débutants en MAO qui découvrent aussi le Matrix-1000 et le Matrix-6/6R — **pas** des développeurs.
 
-**Fichier cible (unique) :** `Documentation/User/Manuals/Matrix-Control-Manuel-Utilisateur.md`
+**Fichier cible (unique) :** `Documentation/Users/Manuals/Matrix-Control-Manuel-Utilisateur.md`
 
 **Langue du manuel :** français.  
 **Langue de l’UI du produit :** anglais (libellés d’écran conservés tels quels, souvent en `backticks`).
@@ -18,7 +18,7 @@ Ce document capture les exigences de Guillaume pour un manuel **utilisable**, **
 1. Produire un manuel **complet et utilisable de bout en bout**, pas un plan ni un squelette.
 2. Organiser le texte comme un **parcours d’usage** (brancher, ouvrir, éditer un patch, sauvegarder, banques, mutateur, réglages…), **jamais** comme une architecture logicielle.
 3. Le **code et l’UI** (`Source/`) sont la source de vérité. PRD / UX / stories servent seulement à vérifier la cohérence — **ne rien inventer** côté produit.
-4. Ne pas recopier de prose technique depuis `Documentation/Development/`.
+4. Ne pas recopier de prose technique depuis `Documentation/Devs/`.
 5. Prévoir des **emplacements pour captures d’écran** (légendes / placeholders), sans inventer d’images.
 6. Annoncer dès l’introduction qu’un **lexique** des termes et acronymes se trouve en fin de manuel ; terminer par ce lexique (définitions courtes et concrètes).
 
@@ -53,7 +53,7 @@ Ne **pas** parler au lecteur de :
 
 - compilation, build local, presets CMake, chemins de dépôt
 - « release GitHub » comme jargon d’installateur interne (parler plutôt de **téléchargement** de ZIP / paquets prêts à l’emploi)
-- chemins vers `Documentation/Development/…`
+- chemins vers `Documentation/Devs/…`
 - détails d’implémentation (octets, Device Inquiry brut, NumberBox, inquiry auto, APVTS, etc.) dans le parcours
 
 **Installation :** l’utilisateur télécharge des **exécutables** (Standalone + plugins) et la doc — il ne compile rien. Décrire le geste d’install, pas la chaîne de build.
@@ -133,11 +133,25 @@ Aligné sur la table des matières du manuel FR (ne pas renuméroter « pour le 
 
 ### Captures d’écran
 
-Format type :
+Dossier : `Documentation/Users/Manuals/Screenshots/`.
+
+Nommage des fichiers (ASCII, stable) :
+
+`NN-english-slug.png` — `NN` = section number in the manual; **English** slug (project primary language), e.g. `01-main-window-matrix-1000.png`.
+
+Format type — **placeholder** (tant que l’image n’est pas prête) :
 
 ```markdown
 > **Capture d’écran — À placer ici**  
 > *Légende :* …
+```
+
+Format type — **image placée** :
+
+```markdown
+![Légende courte.](Screenshots/NN-english-slug.png)
+
+*Légende :* …
 ```
 
 ---
@@ -244,7 +258,7 @@ Les phrases hors liste gardent une ponctuation normale.
 
 | Fichier | Rôle |
 |---------|------|
-| `Documentation/User/Manuals/Matrix-Control-Manuel-Utilisateur.md` | Manuel utilisateur FR (livrable) |
+| `Documentation/Users/Manuals/Matrix-Control-Manuel-Utilisateur.md` | Manuel utilisateur FR (livrable) |
 | `_bmad/custom/manuel-utilisateur-redaction-fr.md` | Ce SSOT (conventions de rédaction) |
 | `_bmad/custom/bmad-agent-tech-writer.toml` | Charge ce SSOT pour Paige à l’activation |
 | `Source/Shared/Definitions/PluginDisplayNames.h` | Libellés UI (référence) |

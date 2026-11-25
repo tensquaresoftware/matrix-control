@@ -5,7 +5,7 @@ title: Sprint Change Proposal — Bank Utility UNLOCK Simplify (MIDI-only)
 author: BMad Agent
 status: draft
 sources:
-  - Documentation/Development/Plans/2026/06/2026-06-19-Correct-Course-Bank-Utility-Unlock-Simplify-Handoff.md
+  - Documentation/Devs/Plans/2026/06/2026-06-19-Correct-Course-Bank-Utility-Unlock-Simplify-Handoff.md
   - implementation-artifacts/investigations/next-patch-after-unlock-missing-set-bank-investigation.md
   - planning-artifacts/sprint-change-proposal-2026-06-19.md
   - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
@@ -20,7 +20,7 @@ updated: 2026-06-19
 **Author:** BMad Agent (Correct Course workflow)  
 **Prepared for:** Guillaume  
 **Status:** Approved (2026-06-19 — Guillaume)  
-**Trigger document:** `Documentation/Development/Plans/2026/06/2026-06-19-Correct-Course-Bank-Utility-Unlock-Simplify-Handoff.md`  
+**Trigger document:** `Documentation/Devs/Plans/2026/06/2026-06-19-Correct-Course-Bank-Utility-Unlock-Simplify-Handoff.md`  
 **Investigation:** `_bmad-output/implementation-artifacts/investigations/next-patch-after-unlock-missing-set-bank-investigation.md`  
 **Supersedes (partial):** Sprint Change Proposal 2026-06-19 §D-022-R2 navigation coupling, D-023 cross-bank wrap  
 **Does NOT supersede:** Story 7-3b ID renames; UNLOCK label; Set Bank 0–9 paths; D-022-R3; **lock dot on Current Bank NumberBox** (revised semantics per D-023a-R3)
@@ -49,7 +49,7 @@ Story **7-3b** implemented Bank Utility UNLOCK as a **stateful** control: send `
 ### Evidence
 
 - Investigation case file (Concluded 2026-06-19, confidence High)
-- Hardware spike: `Documentation/Development/Plans/2026/06/2026-06-18-Matrix-1000-Bank-Lock-MIDI-Spike.md`
+- Hardware spike: `Documentation/Devs/Plans/2026/06/2026-06-18-Matrix-1000-Bank-Lock-MIDI-Spike.md`
 - Handoff: `2026-06-19-Correct-Course-Bank-Utility-Unlock-Simplify-Handoff.md`
 
 ---

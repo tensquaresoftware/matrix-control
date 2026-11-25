@@ -294,7 +294,7 @@ Per NFR-1 and architecture AD-8:
 
 - `_bmad-output/project-context.md` — Core/GUI boundary, descriptor SSOT, no French in code
 - `CONVENTIONS.md` — widget factory, scaled layout, CMake registration
-- `Documentation/Development/software-development-quality-principles.md`
+- `Documentation/Devs/software-development-quality-principles.md`
 
 ### References
 
@@ -343,7 +343,7 @@ claude-4.6-sonnet-medium-thinking
 
 ### Review Findings
 
-- [x] [Review][Patch] Exclude `Documentation/Development/bmad-method.md` from the story 5.3 commit — out-of-scope BMad workflow doc (+43 lines); split into a separate commit
+- [x] [Review][Patch] Exclude `Documentation/Devs/bmad-method.md` from the story 5.3 commit — out-of-scope BMad workflow doc (+43 lines); split into a separate commit
 - [x] [Review][Patch] Reuse `pasteButtonWidth` in `pasteX` calculation [`MatrixModulationPanel.cpp:349`] — avoids redundant `scaledInt` call; no behaviour change today
 - [x] [Review][Defer] `valueTreePropertyChanged` without `treeWhosePropertyHasChanged != state_` guard [`MatrixModulationPanel.cpp:35-41`] — deferred, pre-existing (same pattern as `ModuleHeader.cpp`)
 - [x] [Review][Defer] Millisecond timestamp collision on rapid clicks [`MatrixModulationPanel.cpp:288-319`] — deferred, pre-existing (project-wide APVTS trigger pattern)

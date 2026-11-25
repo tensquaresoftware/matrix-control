@@ -15,7 +15,7 @@ context:
 
 **Problem:** The French user manual still describes `PATCH NAME` as read-only and only two skins (`BLACK` / `CREAM`), which no longer matches Matrix-Control 1.0.0-alpha.8.
 
-**Approach:** Update only `Documentation/User/Manuals/Matrix-Control-Manuel-Utilisateur.md` from the live product (code/UI): document when `PATCH NAME` is editable via double-click and the six shipping skins with shortcuts ⌘/Ctrl+1…6 and arrow cycling. Keep existing frontmatter version fields unchanged.
+**Approach:** Update only `Documentation/Users/Manuals/Matrix-Control-Manuel-Utilisateur.md` from the live product (code/UI): document when `PATCH NAME` is editable via double-click and the six shipping skins with shortcuts ⌘/Ctrl+1…6 and arrow cycling. Keep existing frontmatter version fields unchanged.
 
 </frozen-after-approval>
 

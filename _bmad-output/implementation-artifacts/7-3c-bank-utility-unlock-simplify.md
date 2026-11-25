@@ -10,7 +10,7 @@ sources:
   - planning-artifacts/epics.md
   - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
   - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
-  - Documentation/Development/Plans/2026/06/2026-06-19-Correct-Course-Bank-Utility-Unlock-Simplify-Handoff.md
+  - Documentation/Devs/Plans/2026/06/2026-06-19-Correct-Course-Bank-Utility-Unlock-Simplify-Handoff.md
   - implementation-artifacts/7-3b-bank-utility-unlock-semantics-and-id-rename.md
   - implementation-artifacts/investigations/next-patch-after-unlock-missing-set-bank-investigation.md
   - project-context.md
@@ -218,7 +218,7 @@ Manual smoke (handoff §8):
 
 - `project-context.md` — C++17, builds under `Builds/`, English source only, no GUI in Core except indicator read in panel (preserve).
 - `CONVENTIONS.md` — authoritative style.
-- Handoff: `Documentation/Development/Plans/2026/06/2026-06-19-Correct-Course-Bank-Utility-Unlock-Simplify-Handoff.md`
+- Handoff: `Documentation/Devs/Plans/2026/06/2026-06-19-Correct-Course-Bank-Utility-Unlock-Simplify-Handoff.md`
 
 ### References
 

@@ -17,7 +17,7 @@ context:
 
 **Problem:** After lots 1–4, the FR user manual still has lexicon leftovers (Unlock as a façade action, MIX under-defined), no multi-instance MIDI guidance, a few stale contradictions (e.g. footer quote vs live copy), and screenshot placeholders that need a clean inventory — without inventing images.
 
-**Approach:** One finishing pass on `Documentation/User/Manuals/Matrix-Control-Manuel-Utilisateur.md` (FR only): align Afficheur / PATCH NAME / skins / MIX / remove or reframe Unlock; add a short multi-instance port recommendation; re-check TOC/cross-refs and §16–17 for obsolete remnants; leave or refresh `Capture d’écran — À placer ici` captions; optionally sync local debts in `_bmad/custom/manuel-utilisateur-redaction-fr.md` (path + PATCH NAME not read-only). No EN translation, no real screenshots, no Skin Designer, no commit/PR unless asked.
+**Approach:** One finishing pass on `Documentation/Users/Manuals/Matrix-Control-Manuel-Utilisateur.md` (FR only): align Afficheur / PATCH NAME / skins / MIX / remove or reframe Unlock; add a short multi-instance port recommendation; re-check TOC/cross-refs and §16–17 for obsolete remnants; leave or refresh `Capture d’écran — À placer ici` captions; optionally sync local debts in `_bmad/custom/manuel-utilisateur-redaction-fr.md` (path + PATCH NAME not read-only). No EN translation, no real screenshots, no Skin Designer, no commit/PR unless asked.
 
 **Decisions:**
 - FR only; EN is a later pass.
@@ -38,7 +38,7 @@ context:
 - Lexicon: Afficheur / PATCH NAME / SKIN / `DCO 2 | DCO 1 MIX`; Afficheur bullet in §7 aligned; two screenshot captions refreshed.
 - Local lot debt: `_bmad/custom/manuel-utilisateur-redaction-fr.md` path → `Manuals/…` and PATCH NAME no longer “lecture seule”.
 - Frontmatter left at Version 1.0 / 1.0.0-alpha.8 / Updated 2026-11-24.
-- Files: `Documentation/User/Manuals/Matrix-Control-Manuel-Utilisateur.md`, `_bmad/custom/manuel-utilisateur-redaction-fr.md`, this spec.
+- Files: `Documentation/Users/Manuals/Matrix-Control-Manuel-Utilisateur.md`, `_bmad/custom/manuel-utilisateur-redaction-fr.md`, this spec.
 - Commit/PR deferred per user hors-scope unless later asked.
 - Placeholders remaining: 13 (inventory delivered in Build chat Present only — intentional).
 - Review patches: clarified multi-instance (no opaque “triplet”; distinct `SYNTH FROM`/`SYNTH TO`; KEYBOARD/HOST; Matrix-6/6R); unified Afficheur deep-link; `PATCH NAME` casing in §15; redaction Groupe vs Zone + parcours TOC alignment.

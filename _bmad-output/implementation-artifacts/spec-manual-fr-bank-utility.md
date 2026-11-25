@@ -53,9 +53,9 @@ context:
 
 ## Code Map
 
-- `Documentation/User/Manuals/Matrix-Control-Manuel-Utilisateur.md` — §11 (~467–475), §12 bank I/O (~501–509), Lexique `Unlock` (~735); primary edit target
+- `Documentation/Users/Manuals/Matrix-Control-Manuel-Utilisateur.md` — §11 (~467–475), §12 bank I/O (~501–509), Lexique `Unlock` (~735); primary edit target
 - `_bmad/custom/manuel-utilisateur-redaction-fr.md` — FR manual redaction SSOT (tone, labels, lists, no invented behavior)
-- `Documentation/User/Beta/Matrix-Control-Guide-de-tests-beta-FR.txt` — validated Bank Utility journeys (facts only; do not copy verbatim); beta “fully grey on 6/6R” is stronger than code — prefer code
+- `Documentation/Users/Beta/Matrix-Control-Guide-de-tests-beta-FR.txt` — validated Bank Utility journeys (facts only; do not copy verbatim); beta “fully grey on 6/6R” is stronger than code — prefer code
 - `Source/GUI/Panels/.../BankUtilityPanel.{h,cpp}` — `setBankUtilityGrayed`, `refreshImportBankEnabled`, `refreshUtilityEnabled` (grey banks/COPY/PASTE; IMPORT/EXPORT stay)
 - `Source/Shared/Definitions/PluginDisplayNames.h` — `BankUtilityModule` help / dialog strings (`BankImportConfirm`, `BankPasteConfirm`, `BankExportOverwriteConfirm`)
 - `Source/Core/...` / PatchManager bank handlers — copy/paste/import/export limits; `DeviceMemoryLimits::{isRomBank,isPasteStoreAllowed,hasBankConcept}`
@@ -67,9 +67,9 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [x] `Documentation/User/Manuals/Matrix-Control-Manuel-Utilisateur.md` — Rewrite/extend §11 for full Bank Utility module (buttons, clipboard, import/export, RAM/ROM, Matrix-6/6R grey rules, EXPORT parent-folder flow + overwrite confirm, useful paste/import confirms, short D-022-R6 session note) — closes the coverage gap
-- [x] `Documentation/User/Manuals/Matrix-Control-Manuel-Utilisateur.md` — Fix §12 sentences that deny whole-bank import and orphan Bank Utility export so §11 and §12 agree — removes contradiction
-- [x] `Documentation/User/Manuals/Matrix-Control-Manuel-Utilisateur.md` — Replace Lexique `Unlock` with correct `BANK LOCK` (Master Edit / machine lock; not Bank Utility) — stops false UI vocabulary
+- [x] `Documentation/Users/Manuals/Matrix-Control-Manuel-Utilisateur.md` — Rewrite/extend §11 for full Bank Utility module (buttons, clipboard, import/export, RAM/ROM, Matrix-6/6R grey rules, EXPORT parent-folder flow + overwrite confirm, useful paste/import confirms, short D-022-R6 session note) — closes the coverage gap
+- [x] `Documentation/Users/Manuals/Matrix-Control-Manuel-Utilisateur.md` — Fix §12 sentences that deny whole-bank import and orphan Bank Utility export so §11 and §12 agree — removes contradiction
+- [x] `Documentation/Users/Manuals/Matrix-Control-Manuel-Utilisateur.md` — Replace Lexique `Unlock` with correct `BANK LOCK` (Master Edit / machine lock; not Bank Utility) — stops false UI vocabulary
 
 **Acceptance Criteria:**
 - Given a Matrix-1000 reader, when they read §11, then they understand `0`–`9`, `COPY`, `PASTE`, `IMPORT`, `EXPORT`, that paste/import target only RAM `0`–`1`, and that ROM `2`–`9` remain selectable/copyable/exportable.

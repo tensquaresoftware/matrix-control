@@ -16,11 +16,11 @@ context:
 
 **Problem:** The FR user manual still says Computer Patches only supports `.syx`, documents `PATCH NAME` as read-only, and says a post-`INIT` rename is required only before `SAVE` / `SAVE AS`. Live product also loads `.m1kp`, can require rename before `STORE`, and may confirm before `SAVE` overwrites a sibling `.syx` after a `.m1kp` load.
 
-**Approach:** Update `Documentation/User/Manuals/Matrix-Control-Manuel-Utilisateur.md` (§10 / `PATCH NAME`, §12, §15, lexicon as needed) from code truth so readers understand `.m1kp` load vs `.syx` save, the overwrite confirm, and the name gate after `INIT` for both `STORE` and file save. Integrate only the minimum editable-`PATCH NAME` wording needed for that gate to make sense; FR only.
+**Approach:** Update `Documentation/Users/Manuals/Matrix-Control-Manuel-Utilisateur.md` (§10 / `PATCH NAME`, §12, §15, lexicon as needed) from code truth so readers understand `.m1kp` load vs `.syx` save, the overwrite confirm, and the name gate after `INIT` for both `STORE` and file save. Integrate only the minimum editable-`PATCH NAME` wording needed for that gate to make sense; FR only.
 
 **Decisions:**
 - FR only; EN later.
-- Target file: `Documentation/User/Manuals/Matrix-Control-Manuel-Utilisateur.md`.
+- Target file: `Documentation/Users/Manuals/Matrix-Control-Manuel-Utilisateur.md`.
 - Lot 1 (editable `PATCH NAME`) is a logical prerequisite: if the manual still says read-only, replace with the minimum needed so STORE-after-INIT is understandable — do not reopen the skins lot.
 - Native Matrix-Control save remains Edit Buffer `.syx`; never promise editing/rewriting the source `.m1kp`.
 - Distinguish displayed name (Settings DISPLAY… / `.m1kp` always uses filename stem) from SysEx / file naming.

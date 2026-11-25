@@ -6,7 +6,7 @@ status: 'done'
 baseline_commit: 'a7cd217a92ab464709fa020d02799d82dec5f03b'
 review_loop_iteration: 0
 context:
-  - '{project-root}/Documentation/Development/Plans/2026/08/2026-08-03-Dirty-Vs-Unsaved-Patch-UX.md'
+  - '{project-root}/Documentation/Devs/Plans/2026/08/2026-08-03-Dirty-Vs-Unsaved-Patch-UX.md'
   - '{project-root}/_bmad-output/implementation-artifacts/spec-dirty-unsaved-patch-ux-chantier-1.md'
   - '{project-root}/_bmad-output/implementation-artifacts/spec-dirty-unsaved-patch-ux-chantier-2.md'
   - '{project-root}/_bmad-output/project-context.md'

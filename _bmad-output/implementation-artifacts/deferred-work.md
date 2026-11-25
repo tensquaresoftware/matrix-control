@@ -132,7 +132,7 @@
 ## Deferred from: Windows alpha.3 Live 12 smoke (2026-10-28)
 
 - source_spec: none (user-manual follow-up)
-  summary: Document Ableton Live (Windows) **Auto-Scale Plugin Window** in `Documentation/User/manuel-utilisateur.md` — default ON bitmap-scales the VST3 UI and looks blurry at every Matrix-Control UI Scale; Standalone stays sharp. Ableton’s own guidance: for freely scalable VST3 UIs, disable Auto-Scale (Browser → right-click plug-in icon), then reload the device. Natural homes: Ableton Live subsection under master-keyboard / plugin routing, and/or §15 Apparence / UI Scale, and/or §16 Standalone vs plugin. Confirmed on Lenovo Windows + Live 12 with alpha.3 CI builds.
+  summary: Document Ableton Live (Windows) **Auto-Scale Plugin Window** in `Documentation/Users/manuel-utilisateur.md` — default ON bitmap-scales the VST3 UI and looks blurry at every Matrix-Control UI Scale; Standalone stays sharp. Ableton’s own guidance: for freely scalable VST3 UIs, disable Auto-Scale (Browser → right-click plug-in icon), then reload the device. Natural homes: Ableton Live subsection under master-keyboard / plugin routing, and/or §15 Apparence / UI Scale, and/or §16 Standalone vs plugin. Confirmed on Lenovo Windows + Live 12 with alpha.3 CI builds.
   evidence: Owner smoke 2026-10-28; Ableton help “Recommended Graphics Settings (Windows)” Auto-Scale exception for freely scalable VST3.
 
 ## Deferred from: code review of spec-device-setup-assistant.md (2026-09-18)
@@ -1453,7 +1453,7 @@ Original review bullets below remain for history; status for U-10-owned residual
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-vcf-vca-dco-mix-balance-ui.md`
   summary: User manual VCF/VCA bullet still says generic "balance des oscillateurs" without the new on-screen label.
-  evidence: Blind Hunter; Documentation/User/manuel-utilisateur.md; docs pass optional after UAT.
+  evidence: Blind Hunter; Documentation/Users/manuel-utilisateur.md; docs pass optional after UAT.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-vcf-vca-dco-mix-balance-ui.md`
   summary: ~~No automated or TestSliders harness coverage for reverseHorizontalUi fill and left/right key mapping.~~ **Superseded 2026-08-27**: reverseHorizontalUi removed after UAT; gesture stayed normal.
@@ -1508,7 +1508,7 @@ Original review bullets below remain for history; status for U-10-owned residual
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-version-0-2-0-alpha-and-ci-green.md`
   summary: User manual still declares Version-Produit 0.1.2-alpha after product SSOT moved to 0.2.0-alpha.
-  evidence: Documentation/User/manuel-utilisateur.md front matter not in this story's Always; docs drift surfaced in review.
+  evidence: Documentation/Users/manuel-utilisateur.md front matter not in this story's Always; docs drift surfaced in review.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-version-0-2-0-alpha-and-ci-green.md`
   summary: Standalone getApplicationVersion may show bare CMake version (0.2.0) while About shows PluginVersion with alpha suffix.
@@ -1600,7 +1600,7 @@ Original review bullets below remain for history; status for U-10-owned residual
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-version-0-3-0-alpha.md`
   summary: User manual still declares Version-Produit 0.1.2-alpha after product SSOT moved to 0.3.0-alpha.
-  evidence: Documentation/User/manuel-utilisateur.md front matter out of bump scope; prior 0.2.0 deferred entry remains and this bump widens the drift.
+  evidence: Documentation/Users/manuel-utilisateur.md front matter out of bump scope; prior 0.2.0 deferred entry remains and this bump widens the drift.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-version-0-3-0-alpha.md`
   summary: CONTRIBUTING.md still uses v0.2.0-alpha as the worked alpha release example.
@@ -2341,7 +2341,7 @@ Original review bullets below remain for history; status for U-10-owned residual
 ## Deferred from: smoke follow-up audio safety scene (2026-10-02)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-audio-safety-scene.md`
-  summary: GETTING STARTED multi-step wizard (absorbs Device Setup one-shot): steps 0 intro → 1 UI Scale/Skin → 2 Synth MIDI/DEVICE/EPROM → 3 Keyboard (Standalone combo / plugin informative) → 4 Audio (Standalone only); per-step flags + Settings UI block (SHOW WHEN INCOMPLETE / NEVER AT LAUNCH + RUN SETUP AGAIN); Settings User Interface also exposes UI SCALE + SKIN. Product SSOT: Documentation/Development/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md. Tracked as Epic GS stories — not a single mega-modal.
+  summary: GETTING STARTED multi-step wizard (absorbs Device Setup one-shot): steps 0 intro → 1 UI Scale/Skin → 2 Synth MIDI/DEVICE/EPROM → 3 Keyboard (Standalone combo / plugin informative) → 4 Audio (Standalone only); per-step flags + Settings UI block (SHOW WHEN INCOMPLETE / NEVER AT LAUNCH + RUN SETUP AGAIN); Settings User Interface also exposes UI SCALE + SKIN. Product SSOT: Documentation/Devs/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md. Tracked as Epic GS stories — not a single mega-modal.
   evidence: Smoke 2026-10-02 deferred First-run; Correct Course 2026-10-08 superseded vague First-run / Device Setup-only scope; UltraWide Scale remains STEP 1, not a overloaded one-shot modal.
 
 ## Deferred from: review of spec-audio-device-profiles.md (2026-10-02)
@@ -2409,7 +2409,7 @@ Original review bullets below remain for history; status for U-10-owned residual
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-tab.md`
   summary: User manual still documents Audio/MIDI door, AUDIO FROM, Alt/Option+logo, and Cmd/Ctrl+Alt+, shortcuts.
-  evidence: Cutover is complete in code; Documentation/User/manuel-utilisateur.md is a separate docs pass outside this delivery.
+  evidence: Cutover is complete in code; Documentation/Users/manuel-utilisateur.md is a separate docs pass outside this delivery.
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-tab.md`
   summary: headerAudioProductCopy only asserts display-name constants, not logo menu item kinds excluding Audio/MIDI (reconfirmed).
   evidence: Already deferred 2026-10-04; shortcut rejection covers Cmd/Ctrl+Alt+,; menu structure stays smoke/manual.

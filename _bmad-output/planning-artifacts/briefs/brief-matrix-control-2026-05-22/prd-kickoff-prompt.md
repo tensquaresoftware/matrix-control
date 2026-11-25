@@ -42,7 +42,7 @@ Matrix-Control est un plugin JUCE 8 (VST3/AU/Standalone) — éditeur MIDI + ins
 - `.cursorrules`
 
 **Specs legacy (draft — NON autoritaires, à réconcilier explicitement)**
-- `Documentation/Development/Specifications/Functional-Specification.md`
+- `Documentation/Devs/Specifications/Functional-Specification.md`
 
 ## Mode de travail demandé
 

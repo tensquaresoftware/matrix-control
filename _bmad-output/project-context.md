@@ -30,7 +30,7 @@ Authoritative detail: `CONVENTIONS.md` §1. Cursor rule: `.cursor/rules/communic
 | **Chat with Guillaume** (Cursor, BMad workflows, all agents) | **French** | Informal *tu*; plain French; complete sentences; no unnecessary anglicisms. Project identifiers stay in English when citing code. |
 | **BMad artifacts** (`_bmad-output/`, stories, PRD, architecture, sprint status, etc.) | **English** | Unless Guillaume explicitly requests another language for a specific document. |
 | **Source code, comments, commits, GitHub issues** | **English** | No French in `Source/` or public `Documentation/`. |
-| **Development plans** (`Documentation/Development/Plans/…`) | **English** | `YYYY-MM-DD-Title-In-English.md` naming. |
+| **Development plans** (`Documentation/Devs/Plans/…`) | **English** | `YYYY-MM-DD-Title-In-English.md` naming. |
 
 **BMad config (SSOT for workflow variables):**
 
@@ -222,7 +222,7 @@ Do not route editor SysEx through `processBlock()` midiBuffer.
 - **No global `AffineTransform`** on the component tree for user resize — causes blur and clipping.
 - Recalculate layout in `resized()` with a **single rounding policy** (`ScaledLayout::scaledInt`, distribute helpers).
 - Design dimensions must be **divisible by 4** so integer scales land cleanly.
-- Separate **layout geometry** (bounds, margins) from **stroke thickness** (borders, separators) — see `Documentation/Development/GUI/GUI-Scaling-Strategy.md` and `Documentation/Development/Plans/2026/04/2026-04-20-Widget-Drawing-UiScale-DisplayScale-Snapping-Reference.md`.
+- Separate **layout geometry** (bounds, margins) from **stroke thickness** (borders, separators) — see `Documentation/Devs/GUI/GUI-Scaling-Strategy.md` and `Documentation/Devs/Plans/2026/04/2026-04-20-Widget-Drawing-UiScale-DisplayScale-Snapping-Reference.md`.
 
 ### Widget conventions
 
@@ -260,7 +260,7 @@ Historical debt: clean on dedicated chores; new/changed code on the diff must pa
 
 ## Design Principles (Agent Priorities)
 
-> Full reference: `Documentation/Development/software-development-quality-principles.md` — `CONVENTIONS.md` §6.16
+> Full reference: `Documentation/Devs/software-development-quality-principles.md` — `CONVENTIONS.md` §6.16
 
 | Principle | Rule |
 |---|---|
@@ -342,12 +342,12 @@ Legacy panel names (`TopPanel`, `BottomPanel`, `MiddlePanel`) were renamed — u
 
 | Document | Path | Role |
 |---|---|---|
-| Functional spec | `Documentation/Development/Specifications/Functional-Specification.md` | Product requirements input |
-| Technical spec | `Documentation/Development/Specifications/Technical-Specification.md` | Architecture & threading input |
-| Class inventory | `Documentation/Development/Architecture/Classes.md` | Planned Core classes |
-| GUI scaling | `Documentation/Development/GUI/GUI-Scaling-Strategy.md` | Scaling reference |
+| Functional spec | `Documentation/Devs/Specifications/Functional-Specification.md` | Product requirements input |
+| Technical spec | `Documentation/Devs/Specifications/Technical-Specification.md` | Architecture & threading input |
+| Class inventory | `Documentation/Devs/Architecture/Classes.md` | Planned Core classes |
+| GUI scaling | `Documentation/Devs/GUI/GUI-Scaling-Strategy.md` | Scaling reference |
 | Oberheim SysEx | `Documentation/References/MD/Oberheim-Matrix-1000-MIDI-SysEx-Implementation.md` | Protocol reference |
-| Legacy plans | `Documentation/Development/Plans/` | Pre-BMad archive — input for epics, not active sprint docs |
+| Legacy plans | `Documentation/Devs/Plans/` | Pre-BMad archive — input for epics, not active sprint docs |
 
 BMad planning artifacts live in `_bmad-output/planning-artifacts/`. Promote validated decisions back to `Documentation/` when stable.
 
@@ -401,7 +401,7 @@ See `CONTRIBUTING.md` § Continuous Integration and `_bmad-output/planning-artif
 - Introduce GUI dependencies into `Source/Core/`.
 - Use global AffineTransform scaling for the main UI.
 - Create a parallel string/ID system outside `PluginIDs` / `PluginDisplayNames`.
-- Delete `Documentation/Development/Plans/` archive.
+- Delete `Documentation/Devs/Plans/` archive.
 - Reorganize the root folder structure or rename `Source/`.
 - Add French text in source code or public documentation.
 - Use UTF-8 punctuation (em dash, en dash, curly quotes, `…`) in footer/status/dialog/help string literals — ASCII only unless an approved exception in `_bmad/custom/ascii-display-strings.md`.
@@ -424,7 +424,7 @@ See `CONTRIBUTING.md` § Continuous Integration and `_bmad-output/planning-artif
 ## Key Reference Files (Read Before Implementing)
 
 - `CONVENTIONS.md` — full coding standards (authoritative for style disputes); Cursor summary in `.cursor/rules/`
-- `Documentation/Development/software-development-quality-principles.md` — complete design principles reference
+- `Documentation/Devs/software-development-quality-principles.md` — complete design principles reference
 - `Source/Shared/Definitions/PluginDescriptors.h`
 - `Source/GUI/Factories/WidgetFactory.h`
 - `Source/GUI/Layout/ScaledLayout.h`

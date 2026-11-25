@@ -35,4 +35,4 @@ route: 'one-shot'
 **Docs**
 
 - Document logo shortcuts including Option/Alt + click.
-  [`manuel-utilisateur.md:452`](../../Documentation/User/manuel-utilisateur.md#L452)
+  [`manuel-utilisateur.md:452`](../../Documentation/Users/manuel-utilisateur.md#L452)

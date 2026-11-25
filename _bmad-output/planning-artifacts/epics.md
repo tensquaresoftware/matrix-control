@@ -363,7 +363,7 @@ Users undo and redo editorial patch, master, and Matrix Mod changes with standar
 
 Users complete a short multi-step **GETTING STARTED** wizard (Previous/Next) that unlocks edit / play / hear for their format (plugin vs Standalone), with Scale/Skin early, shared Settings bricks (no duplicated MIDI/audio lists), per-step flags, and Settings controls to show again or suppress auto-open. Absorbs the Device Setup one-shot.
 
-**Product SSOT:** `Documentation/Development/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md`
+**Product SSOT:** `Documentation/Devs/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md`
 
 **Does not reopen:** Epic 7 / Epic 8 as incomplete.
 
@@ -1852,7 +1852,7 @@ So that editorial recovery matches platform conventions (CAP-3, CAP-4 reorder).
 **Then** one undo restores pre-reorder bus layout
 **When** user presses Cmd/Ctrl+Z or Shift variant in Standalone or hosted plugin (per `keyboard-shortcuts.md` focus rules)
 **Then** editorial undo/redo runs without stealing shortcuts from text fields or modal dialogs
-**And** `Documentation/User/manuel-utilisateur.md` §7 documents shortcuts and grouping (removes no-undo statement)
+**And** `Documentation/Users/manuel-utilisateur.md` §7 documents shortcuts and grouping (removes no-undo statement)
 
 **Spec:** `stories.yaml` id `12-4` · **Covers:** CAP-2, CAP-3, CAP-4 (reorder)
 
@@ -1929,7 +1929,7 @@ UX-DR1–UX-DR8 covered by stories 10.2, 10.3, 2.7/2.8, 6.8, 7.9, 6.6, 7.8.
 
 ## Epic GS: Getting Started wizard
 
-Post-sprint onboarding. Product SSOT: `Documentation/Development/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md`. Sprint Change Proposal: `sprint-change-proposal-2026-10-08-getting-started.md`.
+Post-sprint onboarding. Product SSOT: `Documentation/Devs/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md`. Sprint Change Proposal: `sprint-change-proposal-2026-10-08-getting-started.md`.
 
 ### Story GS-1: Settings User Interface — Scale, Skin, Getting Started block
 

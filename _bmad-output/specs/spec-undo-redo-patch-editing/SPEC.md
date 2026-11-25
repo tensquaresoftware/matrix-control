@@ -9,7 +9,7 @@ companions:
 sources:
   - ../../implementation-artifacts/5-2-module-copy-paste-enable-and-gray-rules.md
   - ../../implementation-artifacts/5-3-matrix-modulation-section-i-c-p-gui.md
-  - ../../../Documentation/User/manuel-utilisateur.md
+  - ../../../Documentation/Users/manuel-utilisateur.md
 ---
 
 > **Canonical contract.** This SPEC and the files in `companions:` are the complete, preservation-validated contract for what to build, test, and validate. Source documents listed in frontmatter are for traceability — consult them only if you need narrative rationale or prose color this contract intentionally omits.
@@ -60,7 +60,7 @@ Matrix-Control users edit Oberheim Matrix patches in real time with every slider
 - v1 delivers keyboard shortcuts only — no Undo/Redo menu items or toolbar buttons unless explicitly added in a later spec revision.
 - No host DAW automation undo integration in v1; plugin-internal undo only.
 - English-only source; English UI strings; JUCE 9.0.3; builds under `Builds/`; quality gate via `Scripts/quality/lint_touched.py`.
-- Update `Documentation/User/manuel-utilisateur.md` §7: remove the no-undo statement; document shortcuts and grouping behavior.
+- Update `Documentation/Users/manuel-utilisateur.md` §7: remove the no-undo statement; document shortcuts and grouping behavior.
 
 ## Non-goals
 

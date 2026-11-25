@@ -117,7 +117,7 @@ AU / VST3 / Standalone as listed above; multi-platform **CI** (build + unit test
 Still evolving toward a polished `1.0`:
 
 - 🔄 Broader DAW / hardware validation and polish based on alpha feedback
-- 🔄 English user manual (a French guide already lives in `Documentation/User/`)
+- 🔄 English user manual (a French guide already lives in `Documentation/Users/`)
 - 🔜 Additional skins and further UX refinements
 
 Binary builds: [GitHub Releases](https://github.com/tensquaresoftware/matrix-control/releases).

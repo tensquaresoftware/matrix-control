@@ -465,7 +465,7 @@ Matrix-Control/
 │   ├── README.md
 │   └── development/
 │       ├── architecture/          # optional mirror of key public arch notes
-│       └── gui/                   # ex-Documentation/Development/GUI/
+│       └── gui/                   # ex-Documentation/Devs/GUI/
 ├── tests/
 │   ├── CMakeLists.txt
 │   └── core/
