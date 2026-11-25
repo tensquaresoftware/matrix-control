@@ -59,9 +59,13 @@ Vous pouvez l’utiliser :
 
 Pour les crédits et les contacts, ouvrez `ABOUT...` depuis le menu du logo `MATRIX-CONTROL`.
 
+<p align="center">
+
 ![Fenêtre principale du Matrix-Control avec un Matrix-1000 détecté.](Screenshots/01-main-window-matrix-1000.png)
 
-*Légende :* Fenêtre principale du Matrix-Control avec un Matrix-1000 détecté.
+*Fenêtre principale du Matrix-Control avec un Matrix-1000 détecté.*
+
+</p>
 
 ---
 

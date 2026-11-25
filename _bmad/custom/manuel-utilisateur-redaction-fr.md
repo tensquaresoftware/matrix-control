@@ -139,19 +139,25 @@ Nommage des fichiers (ASCII, stable) :
 
 `NN-english-slug.png` — `NN` = section number in the manual; **English** slug (project primary language), e.g. `01-main-window-matrix-1000.png`.
 
+Cible d’affichage principale : **Typora** (édition) et **PDF** exporté depuis Typora (musiciens). Le `.md` source reste lisible tel quel pour qui préfère Markdown.
+
 Format type — **placeholder** (tant que l’image n’est pas prête) :
 
 ```markdown
 > **Capture d’écran — À placer ici**  
-> *Légende :* …
+> *…légende provisoire…*
 ```
 
-Format type — **image placée** :
+Format type — **image placée** (centrage + italique ; pas de préfixe « Légende : ») :
 
 ```markdown
-![Légende courte.](Screenshots/NN-english-slug.png)
+<p align="center">
 
-*Légende :* …
+![Same caption as below, for accessibility.](Screenshots/NN-english-slug.png)
+
+*Caption in French, italic, no “Légende :” prefix.*
+
+</p>
 ```
 
 ---
