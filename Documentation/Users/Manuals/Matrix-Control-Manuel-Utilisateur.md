@@ -21,7 +21,7 @@ References:
 
 1. [Qu’est-ce que le Matrix-Control ?](#1-quest-ce-que-le-matrix-control)
 2. [Équipements nécessaires pour utiliser le Matrix-Control](#2-équipements-nécessaires-pour-utiliser-le-matrix-control)
-3. [Synthétiseurs Oberheim Matrix-1000, Matrix-6 et Matrix-6R](#3-synthétiseurs-oberheim-matrix-1000-matrix-6-et-matrix-6r)
+3. [Oberheim Matrix-1000, Matrix-6 et Matrix-6R](#3-oberheim-matrix-1000-matrix-6-et-matrix-6r)
 4. [Installer et lancer le Matrix-Control](#4-installer-et-lancer-le-matrix-control)
 5. [Utiliser l’assistant de premier lancement (GETTING STARTED)](#5-utiliser-lassistant-de-premier-lancement-getting-started)
 6. [Connecter le synthé et établir la communication MIDI](#6-connecter-le-synthé-et-établir-la-communication-midi)
@@ -68,9 +68,9 @@ Pour les crédits et les contacts, ouvrez `ABOUT...` depuis le menu du logo `MAT
 - Un synthétiseur Oberheim **Matrix-1000**, **Matrix-6** ou **Matrix-6R**
 - Une interface MIDI : boîtier USB-MIDI dédié, ou interface audio équipée de connecteurs MIDI au format DIN 5 broches, selon votre installation
 - **Deux câbles MIDI** pour une communication dans les **deux sens** en même temps (ordinateur ↔ synthé) :
-  - De l’ordinateur **vers** le synthé (pour transmettre les patches et les réglages globaux)
+  - De l’ordinateur **vers** le synthé (pour transmettre les patches et les réglages globaux « Master »)
   - Du synthé **vers** l’ordinateur (pour que le Matrix-Control lise le patch courant et reconnaisse la machine)
-- Un **chemin audio** pour entendre le synthé : sortie audio du synthé vers une entrée d’interface audio, une table de mixage ou des enceintes. Le Matrix-Control pilote uniquement le synthé en MIDI : il ne produit pas le son et ne l’enregistre pas. En plugin, ce retour se route en général sur une **piste audio séparée** du DAW ; en Standalone, l’écoute se règle dans `SETTINGS...` → `AUDIO` (détail en [sections 4](#4-installer-et-lancer-le-matrix-control) et [16](#16-utiliser-lapplication-autonome-et-le-plugin))
+- Un **chemin audio** pour entendre le synthé : sortie audio du synthé vers une entrée d’interface audio, une table de mixage ou des enceintes. Le Matrix-Control pilote uniquement le synthé en MIDI : il ne produit pas le son et ne l’enregistre pas. En plugin, ce retour arrive en général sur une **piste audio séparée** du DAW ; en Standalone, l’écoute se règle dans `SETTINGS...` → `AUDIO` (détail en [sections 4](#4-installer-et-lancer-le-matrix-control) et [16](#16-utiliser-lapplication-autonome-et-le-plugin))
 
 Sans ces deux directions MIDI, l’éditeur ne pourra pas piloter le synthé correctement. Sans chemin audio, vous pourrez éditer à l’écran, mais vous n’entendrez pas le résultat.
 
@@ -94,49 +94,49 @@ Sans ces deux directions MIDI, l’éditeur ne pourra pas piloter le synthé cor
 - Savoir ouvrir un instrument virtuel dans votre DAW **si** vous utilisez le plugin, **ou** lancer une application comme n’importe quel autre programme si vous restez en Standalone
 - L’interface du Matrix-Control est en **anglais** : ce manuel traduit et explique chaque section, module et groupe
 
-## 3. Synthétiseurs Oberheim Matrix-1000, Matrix-6 et Matrix-6R
+## 3. Oberheim Matrix-1000, Matrix-6 et Matrix-6R
 
-Ces machines partagent le même genre de « moteur » sonore (deux oscillateurs, un filtre passe-bas résonant, trois enveloppes, deux LFO, une matrice de modulation, etc.). Ce qui change surtout pour vous dans le Matrix-Control :
+Ces synthètiseurs partagent le même genre de « moteur » sonore (deux oscillateurs, un filtre passe-bas résonant, trois enveloppes, deux LFO, une matrice de modulation, etc.). Ce qui change surtout pour vous dans le Matrix-Control :
 
 | | **Matrix-1000** | **Matrix-6/6R** |
 |---|-----------------|-----------------|
 | Mémoire des patches | **10 banques** (0 à 9), **100 patches** par banque (0 à 99) | **100 patches** seulement (pas de banques) |
 | Module `BANK UTILITY` | Actif (banques, `COPY` / `PASTE` / `IMPORT` / `EXPORT`) | Boutons de banque, `COPY` et `PASTE` grisés ; `IMPORT` / `EXPORT` restent utilisables |
 | Section `MASTER EDIT` | Active (réglages globaux : canal MIDI, vibrato, accordage…) | Grisée (indisponible) |
-| Façade | Non programmable pour les patches (très peu de boutons) : l’éditeur à l’écran est indispensable | Programmables : clavier (Matrix-6) ou rack (Matrix-6R) avec davantage de commandes directes |
+| Façade | Non programmable pour les patches (très peu de boutons) : l’éditeur à l’écran est indispensable | Programmables : version clavier (Matrix-6) ou rack (Matrix-6R) avec davantage de commandes directes |
 
-**Banques en lecture seule du Matrix-1000 : **Sur le Matrix-1000, les banques **2 à 9** sont en lecture seule (mémoire ROM) pour certaines actions : les boutons `INIT`, `PASTE` et `STORE` y sont indisponibles. Les banques **0** et **1** sont celles dans lesquelles vous pouvez enregistrer vos modifications dans la machine (mémoire RAM).
+**Banques en lecture seule du Matrix-1000 : **Sur le Matrix-1000, les banques **2 à 9** sont en lecture seule (mémoire ROM d'usine) pour certaines actions : les boutons `INIT`, `PASTE` et `STORE` y sont indisponibles. Les banques **0** et **1** (mémoire RAM utilisateur) sont celles dans lesquelles vous pouvez enregistrer vos modifications dans la machine.
 
 **Reconnaissance du synthé :** Dès que les ports MIDI sont correctement sélectionnés, le Matrix-Control demande au synthé de s’identifier. En bas à droite de la fenêtre, vous voyez alors le type de machine détecté, ou `NOT CONNECTED` (sous le badge `DEVICE`) s’il n’y a pas encore de dialogue.
 
-> **À noter.** Un Matrix-6R peut pour l’instant apparaître simplement comme Matrix-6. Pour éditer un patch au quotidien, cela ne change presque rien : la sélection de banque et `MASTER EDIT` restent propres au Matrix-1000 (détail de `BANK UTILITY` en [section 11](#11-gérer-les-banques-du-matrix-1000-bank-utility)).
+> **À noter.** Un Matrix-6R peut pour l’instant apparaître simplement comme « Matrix-6 ». Pour éditer un patch au quotidien, cela ne change presque rien : la sélection de banque et `MASTER EDIT` restent propres au Matrix-1000 (détail de `BANK UTILITY` en [section 11](#11-gérer-les-banques-du-matrix-1000-bank-utility)).
 
 ## 4. Installer et lancer le Matrix-Control
 
-Avant le premier lancement, branchez de préférence le MIDI (dans les deux sens) et le chemin audio du synthé — voir [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi). Vous pourrez aussi le faire pendant l’assistant `GETTING STARTED`, mais avoir le câblage prêt évite de chercher les ports et l’écoute « à vide ».
+Avant le premier lancement, branchez de préférence le MIDI dans les deux sens (ordinateur ↔ synthé) et la sortie audio du synthé vers votre écoute — voir [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi). Vous pourrez aussi faire ces réglages pendant l’assistant `GETTING STARTED`, mais câbler avant d’ouvrir le logiciel évite de chercher les ports MIDI ou de régler l’écoute sans rien entendre encore.
 
 ### Télécharger et installer
 
 Le Matrix-Control se télécharge sous la forme de fichiers ZIP comprenant une application autonome et les plugins compatibles avec votre système, accompagnés de la documentation utilisateur :
 
-- **Plugin AU** (macOS) — à placer dans le dossier des composants Audio Units (en général celui proposé par l’installateur ou indiqué dans les instructions du téléchargement)
+- **Plugin AU** (macOS uniquement) — à placer dans le dossier des composants Audio Units (en général celui proposé par l’installateur ou indiqué dans les instructions du téléchargement)
 - **Plugin VST3** (macOS, Windows, Linux) — à placer dans le dossier VST3 habituel de votre système
 - **Application Standalone** — l’application Matrix-Control, à lancer comme n’importe quel autre programme
 
-Si le plugin n’apparaît pas dans le DAW, rescannez la liste des plugins et vérifiez que les fichiers ont bien été installés dans le dossier attendu (voir aussi les instructions fournies avec le téléchargement).
+Si le plugin n’apparaît pas dans votre DAW, rescannez la liste des plugins et vérifiez que les fichiers ont bien été installés dans le dossier attendu (voir aussi les instructions fournies avec le téléchargement).
 
 ### Dans un DAW
 
 1. Créez une piste **MIDI / instrument**
 2. Chargez le **Matrix-Control** comme instrument virtuel
-3. Au premier lancement, l’assistant `GETTING STARTED` peut s’ouvrir automatiquement (voir [section 5](#5-utiliser-lassistant-de-premier-lancement-getting-started))
+3. Au premier lancement, l’assistant `GETTING STARTED` s’ouvre automatiquement pour vous guider (voir [section 5](#5-utiliser-lassistant-de-premier-lancement-getting-started))
 4. Assurez-vous que la piste peut envoyer et recevoir du MIDI vers / depuis votre interface (selon votre DAW)
-5. Le signal audio du synthé doit être branché séparément dans le DAW (connexion à une entrée de votre interface audio, ou retour de table de mixage). Le Matrix-Control ne remplace pas le synthé : il le pilote en MIDI
+5. Pour entendre le synthé dans le DAW, créez aussi une **piste audio** séparée et branchez-y la sortie du synthé — soit une entrée de votre interface audio, soit un retour de table de mixage. Le Matrix-Control ne remplace pas le synthé : il le pilote en MIDI ; le son arrive toujours de la machine
 
 ### En Standalone
 
 1. Lancez l’application **Matrix-Control**
-2. Au premier lancement, l’assistant `GETTING STARTED` peut s’ouvrir automatiquement pour l’apparence, le MIDI vers le synthé, le clavier optionnel, puis l’écoute audio (voir [section 5](#5-utiliser-lassistant-de-premier-lancement-getting-started))
+2. Au premier lancement, l’assistant `GETTING STARTED` s’ouvre automatiquement. Il vous guide pas à pas : choix d’une apparence graphique (`SKIN`), choix d’une taille de fenêtre (`UI SCALE`), sélection des ports MIDI pour la communication dans les deux sens avec le synthé, port MIDI pour un éventuel clavier maître, puis choix d’une interface audio et d’une entrée pour écouter le son produit par le synthé (voir [section 5](#5-utiliser-lassistant-de-premier-lancement-getting-started))
 3. Vous pourrez ensuite peaufiner le MIDI dans `SETTINGS...` → onglet `MIDI & DEVICE` ou depuis les listes du bandeau supérieur, et l’écoute audio (interface, canaux) dans `SETTINGS...` → onglet `AUDIO`
 
 > **Capture d’écran — À placer ici**  
@@ -144,11 +144,11 @@ Si le plugin n’apparaît pas dans le DAW, rescannez la liste des plugins et v�
 
 ## 5. Utiliser l’assistant de premier lancement (GETTING STARTED)
 
-Lorsque des étapes de configuration utiles restent incomplètes, le Matrix-Control peut ouvrir automatiquement l’assistant **`GETTING STARTED`**. C’est le chemin guidé de premier lancement pour débloquer l’édition, le jeu et l’écoute selon le format (plugin ou Standalone).
+Au premier lancement, le Matrix-Control ouvre automatiquement l’assistant **`GETTING STARTED`**. C’est un parcours guidé pour préparer l’apparence, le dialogue MIDI avec le synthé, le clavier éventuel, et — en application autonome — l’écoute audio, afin que vous puissiez éditer, jouer et entendre selon votre usage (plugin dans un DAW, ou Standalone).
 
-L’ouverture automatique dépend du réglage `SETUP WIZARD` dans `SETTINGS...` → onglet `GETTING STARTED` (voir plus bas et [section 15](#15-sélectionner-un-skin-et-ajuster-la-taille-de-la-fenêtre-settings)).
+Plus tard, l’assistant peut aussi se rouvrir tant qu’il reste des étapes utiles non terminées. Vous pouvez couper cette ouverture automatique via le réglage `SETUP WIZARD` dans `SETTINGS...` → onglet `GETTING STARTED` (voir plus bas et [section 15](#15-sélectionner-un-skin-et-ajuster-la-taille-de-la-fenêtre-settings)).
 
-Une fois que vous avez quitté l’introduction avec `CONTINUE`, une réouverture automatique reprend à la **première étape applicable encore incomplète** — pas à l’introduction. L’introduction ne revient que lors d’un vrai premier contact, ou après `RUN SETUP AGAIN`.
+Une fois que vous avez quitté l’introduction avec `CONTINUE`, une réouverture automatique reprend à la **première étape encore à faire pour votre usage** — pas à l’introduction. L’introduction ne revient que lors d’un vrai premier contact, ou après `RUN SETUP AGAIN`.
 
 > **Capture d’écran — À placer ici**  
 > *Légende :* Fenêtre `GETTING STARTED` à l’étape d’introduction.
@@ -157,22 +157,22 @@ Une fois que vous avez quitté l’introduction avec `CONTINUE`, une réouvertur
 
 | Étape | Titre à l’écran | Ce que vous réglez |
 |-------|-----------------|--------------------|
-| 0 | `GETTING STARTED` | Introduction — aucun contrôle, seulement `CONFIGURE LATER` ou `CONTINUE` |
-| 1 | `GETTING STARTED | STEP 1: USER INTERFACE` | `UI SCALE` et `SKIN` (lisibilité sur votre écran) |
-| 2 | `GETTING STARTED | STEP 2: SYNTH COMMUNICATION` | Ports MIDI vers / depuis le synthé (`SYNTH FROM` / `SYNTH TO`, comme Settings → `MIDI & DEVICE`), badge `DEVICE`, type `EPROM TYPE` |
+| 0 | `GETTING STARTED` | Introduction — aucun réglage, seulement `CONFIGURE LATER` ou `CONTINUE` |
+| 1 | `GETTING STARTED | STEP 1: USER INTERFACE` | Choix d’une taille de fenêtre (`UI SCALE`) et d’une apparence graphique (`SKIN`) |
+| 2 | `GETTING STARTED | STEP 2: SYNTH COMMUNICATION` | Ports MIDI pour la communication dans les deux sens avec le synthé (`SYNTH FROM` / `SYNTH TO`, comme dans Settings → `MIDI & DEVICE`), badge `DEVICE`, type `EPROM TYPE` |
 | 3 | `GETTING STARTED | STEP 3: MIDI KEYBOARD` | Clavier — contenu différent en plugin et en Standalone (voir ci-dessous) |
 
-`CONFIGURE LATER` et `CONTINUE` n’apparaissent que sur l’**introduction**. Les étapes suivantes utilisent `PREVIOUS`, `NEXT`, éventuellement `SKIP` (clavier Standalone), et `FINISH` sur la dernière étape applicable.
+`CONFIGURE LATER` et `CONTINUE` n’apparaissent que sur l’**introduction**. Les étapes suivantes utilisent `PREVIOUS`, `NEXT`, éventuellement `SKIP` (clavier en Standalone), et `FINISH` sur la dernière étape de votre parcours.
 
-Pour l’ouverture automatique et les rappels, `NEXT`, `SKIP` et `FINISH` marquent l’étape courante comme **terminée**. Ce marquage ne vérifie pas que les ports sont choisis, ni que le badge `DEVICE` affiche une machine reconnue : vous pouvez avancer même si le dialogue MIDI n’est pas encore établi, puis finir dans Settings.
+Quand vous appuyez sur `NEXT`, `SKIP` ou `FINISH`, l’assistant considère l’étape en cours comme **faite** pour l’ouverture automatique. Il ne vérifie pas que les ports sont déjà choisis, ni que le badge `DEVICE` affiche une machine reconnue : vous pouvez avancer même si le dialogue MIDI n’est pas encore établi, puis terminer dans Settings.
 
 ### Plugin (VST3 / AU)
 
-En plugin, le DAW gère déjà l’audio de la session. L’assistant **ne propose pas** l’étape Audio.
+En plugin, le DAW gère déjà l’audio de la session. L’assistant **ne propose pas** l’étape Audio : le son du synthé arrive via une piste audio séparée dans le DAW (voir [section 4](#4-installer-et-lancer-le-matrix-control)).
 
 - Après le clavier (étape 3), le dernier bouton est `FINISH`
-- À l’étape clavier, il n’y a **pas** de liste `KEYBOARD FROM` ni de `SKIP` : les notes MIDI arrivent depuis l’hôte (le DAW)
-- Le texte à l’écran renvoie à ce manuel pour des exemples de routage du clavier maître — voir [Clavier maître via le DAW](#clavier-maître-via-le-daw-plugin)
+- À l’étape clavier, il n’y a **pas** de liste `KEYBOARD FROM` ni de `SKIP` : les notes MIDI arrivent depuis le DAW
+- Le texte à l’écran renvoie à ce manuel pour des exemples de branchement d’un clavier maître via le DAW — voir [Clavier maître via le DAW](#clavier-maître-via-le-daw-plugin)
 
 ### Standalone
 
@@ -180,38 +180,38 @@ En application autonome, l’assistant ajoute une quatrième étape :
 
 | Étape | Titre à l’écran | Ce que vous réglez |
 |-------|-----------------|--------------------|
-| 4 | `GETTING STARTED | STEP 4: AUDIO` | Interface / entrée audio pour écouter le synthé, et canaux d’écoute `SYNTH FROM` (Settings → `AUDIO` — distincts du port MIDI du même nom) |
+| 4 | `GETTING STARTED | STEP 4: AUDIO` | Choix d’une interface audio et d’une entrée pour écouter le son du synthé, puis canaux d’écoute `SYNTH FROM` (Settings → `AUDIO` — à ne pas confondre avec le port MIDI du même nom) |
 
-- À l’étape clavier : liste `KEYBOARD FROM` ; vous pouvez `SKIP` si vous jouez sur le clavier intégré d’un Matrix-6, ou si vous n’avez pas encore de clavier maître. `SKIP` marque l’étape clavier comme **terminée** pour l’ouverture automatique et les rappels, sans choisir de port
-- La dernière étape est l’Audio : `FINISH` ferme l’assistant et marque cette étape comme terminée pour l’ouverture automatique (même si l’écoute n’est pas encore parfaite)
+- À l’étape clavier : liste `KEYBOARD FROM` pour choisir le port MIDI d’un clavier maître. Vous pouvez `SKIP` si vous jouez sur le clavier intégré d’un Matrix-6, ou si vous n’avez pas encore de clavier maître. `SKIP` compte l’étape clavier comme faite pour l’ouverture automatique, sans choisir de port
+- La dernière étape est l’Audio : `FINISH` ferme l’assistant et compte cette étape comme faite pour l’ouverture automatique (même si l’écoute n’est pas encore parfaite)
 - Les réglages plus fins (fréquence d’échantillonnage, taille de buffer, etc.) restent disponibles ensuite dans `SETTINGS...` → `AUDIO`
 
 ### Configurer plus tard
 
-Sur l’introduction, `CONFIGURE LATER` ferme l’assistant sans marquer comme terminées les étapes non visitées. Vous pouvez finir dans `SETTINGS...` (ports MIDI, audio Standalone, apparence).
+Sur l’introduction, `CONFIGURE LATER` ferme l’assistant sans compter comme faites les étapes que vous n’avez pas encore parcourues. Vous pouvez tout finir plus tard dans `SETTINGS...` (ports MIDI, audio Standalone, apparence).
 
-Comportement de rappel et de silence :
+Ce qui se passe ensuite :
 
-- Le premier `CONFIGURE LATER` **arme un seul rappel** au prochain lancement, pour le **même format** (plugin ou Standalone), s’il reste une étape applicable incomplète. Pendant que ce rappel est armé, l’**autre** format ne s’ouvre pas automatiquement
-- Le silence s’installe ensuite dans l’un de ces cas : ce rappel s’est déjà ouvert automatiquement, **ou** vous avez choisi `CONFIGURE LATER` une seconde fois. Plus d’ouverture auto jusqu’à `RUN SETUP AGAIN`, ou jusqu’à ce que vous remettiez la combo sur `SHOW WHEN INCOMPLETE`
+- Au prochain lancement **dans le même usage** (plugin ou Standalone), l’assistant se rouvre **une seule fois** en rappel, s’il reste quelque chose d’utile à faire. Pendant ce rappel, l’autre usage (plugin ↔ Standalone) ne s’ouvre pas automatiquement
+- Après ce rappel, ou si vous choisissez `CONFIGURE LATER` une seconde fois, l’assistant ne s’ouvre plus tout seul — jusqu’à `RUN SETUP AGAIN`, ou jusqu’à ce que vous remettiez le menu sur `SHOW WHEN INCOMPLETE`
 - Fermer avec **Échap** ou un clic à l’extérieur **ne compte pas** comme `CONFIGURE LATER` : l’assistant peut encore se rouvrir au prochain lancement selon les règles normales
-- **Exception :** une étape qui devient applicable pour la première fois (par exemple le premier passage en Standalone alors que seul l’Audio manque) peut réarmer une ouverture ciblée — **sauf** si la combo est sur `NEVER SHOW AT LAUNCH`, qui bloque toute ouverture automatique
+- **Exception :** si une nouvelle étape devient utile pour la première fois (par exemple votre premier passage en Standalone alors que seule l’écoute audio manque), l’assistant peut se rouvrir une fois pour cette étape — **sauf** si le menu est sur `NEVER SHOW AT LAUNCH`, qui bloque toute ouverture automatique
 
-### Relancer ou couper l’ouverture auto (Settings)
+### Relancer ou couper l’ouverture automatique (Settings)
 
 Dans `SETTINGS...` → onglet `GETTING STARTED`, la ligne `SETUP WIZARD` propose :
 
 | Contrôle | Rôle |
 |----------|------|
-| Combo `SHOW WHEN INCOMPLETE` (défaut) | Ouvre l’assistant au lancement s’il reste une étape applicable non faite |
-| Combo `NEVER SHOW AT LAUNCH` | Jamais d’ouverture automatique ; uniquement Settings ou `RUN SETUP AGAIN` |
-| Bouton `RUN SETUP AGAIN` | Remet à non fait les étapes applicables au format courant et rouvre l’assistant à l’introduction |
+| Menu `SHOW WHEN INCOMPLETE` (défaut) | Ouvre l’assistant au lancement s’il reste une étape utile non faite |
+| Menu `NEVER SHOW AT LAUNCH` | Jamais d’ouverture automatique ; uniquement Settings ou `RUN SETUP AGAIN` |
+| Bouton `RUN SETUP AGAIN` | Remet à « non fait » les étapes de votre usage courant (plugin ou Standalone) et rouvre l’assistant à l’introduction |
 
-`UI SCALE` et `SKIN` se règlent dans l’onglet `USER INTERFACE` ; les raccourcis du menu logo `MATRIX-CONTROL` restent disponibles.
+`UI SCALE` (taille de la fenêtre) et `SKIN` (apparence graphique) se règlent aussi dans l’onglet `USER INTERFACE` ; les raccourcis du menu logo `MATRIX-CONTROL` restent disponibles.
 
 ## 6. Connecter le synthé et établir la communication MIDI
 
-C’est l’étape la plus importante côté matériel. Idéalement, faites ce câblage **avant** (ou pendant) le premier lancement et l’assistant `GETTING STARTED` : tant que le synthé n’est pas reconnu, une grande partie de l’éditeur demeure verrouillée — et sans chemin audio, vous n’entendrez pas vos changements.
+C’est l’étape la plus importante côté matériel. Idéalement, faites ce câblage **avant** (ou pendant) le premier lancement et l’assistant `GETTING STARTED` : tant que le synthé n’est pas reconnu, une grande partie de l’éditeur reste indisponible — et sans sortie audio branchée, vous n’entendrez pas vos changements.
 
 ### Câblage type
 
@@ -261,7 +261,7 @@ Les sections d’édition restent alors verrouillées jusqu’à détection. Ce 
 
 ### Clavier maître via le DAW (plugin)
 
-Lorsque le Matrix-Control tourne **en plugin**, les notes MIDI ne se choisissent pas dans la fenêtre de l’éditeur : elles viennent de l’hôte. Routez votre clavier maître (ou l’entrée MIDI du DAW) vers la piste qui charge le Matrix-Control. L’audio du synthé, lui, revient toujours par votre interface audio / une piste audio du DAW — c’est un chemin séparé du MIDI d’édition.
+Lorsque le Matrix-Control tourne **en plugin**, les notes MIDI ne se choisissent pas dans la fenêtre de l’éditeur : elles viennent du DAW. Dirigez votre clavier maître (ou l’entrée MIDI du DAW) vers la piste qui charge le Matrix-Control. Le son du synthé, lui, arrive toujours par votre interface audio et une piste audio du DAW — c’est un chemin séparé du MIDI d’édition.
 
 Voici des exemples concrets pour trois hôtes courants. L’idée est la même dans Cubase, Reaper, GarageBand, etc. : piste instrument → Matrix-Control → entrée MIDI / clavier armé vers cette piste.
 
@@ -806,7 +806,7 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 | **`DCO 2 \| DCO 1 MIX`** | Curseur du module `VCF/VCA` qui dose le mélange entre les deux oscillateurs (libellé à l’écran). |
 | **ENV** | Envelope — enveloppe (attaque, decay, sustain, release…) qui façonne l’évolution du patch dans le temps. |
 | **FM** | Modulation de fréquence du filtre par l’oscillateur, pour des timbres plus riches ou métalliques. |
-| **GETTING STARTED** | Assistant de premier lancement (apparence, MIDI synthé, clavier, audio Standalone). Se relance depuis Settings → `GETTING STARTED` → `SETUP WIZARD`. |
+| **GETTING STARTED** | Assistant de premier lancement : Skin et taille de fenêtre, ports MIDI vers / depuis le synthé, clavier maître éventuel, et écoute audio en Standalone. S’ouvre au premier lancement ; se relance depuis Settings → `GETTING STARTED` → `SETUP WIZARD`. |
 | **Groupe** | Sous-partie d’un module (`BROWSER`, `MEMORY`, `STORAGE`, etc.). |
 | **JACK** | Sous Linux, serveur / pilote audio souvent utilisé en MAO. Peut apparaître dans Settings → `AUDIO` → `DRIVER TYPE` en Standalone, selon votre installation. |
 | **LFO** | Oscillateur lent : fait vibrer, trembler ou balayer un paramètre. |
