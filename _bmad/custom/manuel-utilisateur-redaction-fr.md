@@ -77,7 +77,8 @@ Référence de style pour l’intro d’installation (à conserver / imiter) :
 | **interface audio** | carte son |
 | **commutateur** (Mutator modules) | « case » |
 | **bus de modulation** | « ligne » de modulation |
-| Titre section besoins : **Ce dont vous aurez besoin** | « Ce qu’il vous faut » |
+| Titres de section : **verbe d’action** quand c’est naturel, sinon formulation claire (ex. *Qu’est-ce que…*, *Équipements nécessaires…*, *Guide de dépannage*) ; libellé GUI en **MAJUSCULES** entre parenthèses quand utile (ex. *Créer des variations de patch (PATCH MUTATOR)*) | Titres nominaux vagues (*Le Patch Mutator*) ; casse GUI incorrecte |
+| Matrix-1000 : **non programmable en façade** (intérêt historique du Matrix-Control) ; Matrix-6/6R : programmables en façade | « Au lieu de tout manipuler depuis la façade » comme si cela valait pour tous les modèles |
 
 Conserver **Matrix-Control**, les noms de modèles, et les **citations exactes** des messages UI anglais (ex. *power-cycle the Matrix*).
 
@@ -106,24 +107,24 @@ Contrôles GUI mentionnés dans le texte : toujours en **`backticks`** (`STORE`,
 
 Aligné sur la table des matières du manuel FR (ne pas renuméroter « pour le plaisir ») :
 
-1. À quoi sert le Matrix-Control  
-2. Ce dont vous aurez besoin  
-3. Matrix-1000 vs Matrix-6/6R  
-4. Installer et ouvrir  
-5. Premier lancement : `GETTING STARTED`  
-6. Brancher MIDI / détection  
-7. Tour de l’écran  
+1. Qu’est-ce que le Matrix-Control ?  
+2. Équipements nécessaires pour utiliser le Matrix-Control  
+3. Synthétiseurs Oberheim Matrix-1000, Matrix-6 et Matrix-6R  
+4. Installer et lancer le Matrix-Control  
+5. Utiliser l’assistant de premier lancement (`GETTING STARTED`)  
+6. Connecter le synthé et établir la communication MIDI  
+7. Découvrir l’écran principal  
 8. Éditer un patch (`PATCH EDIT`)  
-9. Matrice de modulation  
-10. Patches internes  
-11. Banques (M-1000)  
-12. Sauvegarde synthé / ordinateur  
-13. Patch Mutator  
-14. Master Edit  
-15. Apparence / Settings  
-16. Standalone vs plugin  
-17. Dépannage  
-18. Lexique 
+9. Éditer la matrice de modulation (`MATRIX MODULATION`)  
+10. Charger un patch depuis la mémoire du synthé (`INTERNAL PATCHES`)  
+11. Gérer les banques du Matrix-1000 (`BANK UTILITY`)  
+12. Sauvegarder un patch dans la mémoire du synthé et dans l’ordinateur (`STORE` / `COMPUTER PATCHES`)  
+13. Créer des variations de patch (`PATCH MUTATOR`)  
+14. Gérer les paramètres globaux du synthé (`MASTER EDIT`)  
+15. Sélectionner un Skin et ajuster la taille de la fenêtre (`SETTINGS`)  
+16. Utiliser l’application autonome et le plugin  
+17. Guide de dépannage  
+18. Lexique
 
 ### Ce qu’il ne faut plus faire
 

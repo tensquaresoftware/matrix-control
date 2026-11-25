@@ -21,32 +21,36 @@ References:
 
 ## Table des matières
 
-1. [À quoi sert le Matrix-Control ?](#1-à-quoi-sert-le-matrix-control)
-2. [Ce dont vous aurez besoin](#2-ce-dont-vous-aurez-besoin)
-3. [Le Matrix-1000 et le Matrix-6/6R en deux minutes](#3-le-matrix-1000-et-le-matrix-66r-en-deux-minutes)
-4. [Installer et ouvrir le logiciel](#4-installer-et-ouvrir-le-logiciel)
-5. [Premier lancement : GETTING STARTED](#5-premier-lancement--getting-started)
-6. [Brancher le synthé et établir le dialogue MIDI](#6-brancher-le-synthé-et-établir-le-dialogue-midi)
-7. [Premier contact : l’écran principal](#7-premier-contact-lécran-principal)
+1. [Qu’est-ce que le Matrix-Control ?](#1-quest-ce-que-le-matrix-control)
+2. [Équipements nécessaires pour utiliser le Matrix-Control](#2-équipements-nécessaires-pour-utiliser-le-matrix-control)
+3. [Synthétiseurs Oberheim Matrix-1000, Matrix-6 et Matrix-6R](#3-synthétiseurs-oberheim-matrix-1000-matrix-6-et-matrix-6r)
+4. [Installer et lancer le Matrix-Control](#4-installer-et-lancer-le-matrix-control)
+5. [Utiliser l’assistant de premier lancement (GETTING STARTED)](#5-utiliser-lassistant-de-premier-lancement-getting-started)
+6. [Connecter le synthé et établir la communication MIDI](#6-connecter-le-synthé-et-établir-la-communication-midi)
+7. [Découvrir l’écran principal](#7-découvrir-lécran-principal)
 8. [Éditer un patch (PATCH EDIT)](#8-éditer-un-patch-patch-edit)
-9. [La matrice de modulation](#9-la-matrice-de-modulation)
-10. [Choisir un patch dans le synthé (INTERNAL PATCHES)](#10-choisir-un-patch-dans-le-synthé-internal-patches)
-11. [Banques du Matrix-1000 (BANK UTILITY)](#11-banques-du-matrix-1000-bank-utility)
-12. [Sauvegarder sur le synthé et sur l’ordinateur](#12-sauvegarder-sur-le-synthé-et-sur-lordinateur)
-13. [Le Patch Mutator](#13-le-patch-mutator)
-14. [Réglages globaux du synthé (MASTER EDIT)](#14-réglages-globaux-du-synthé-master-edit)
-15. [Apparence, échelle et Settings](#15-apparence-échelle-et-settings)
-16. [Mode autonome (Standalone) et mode plugin](#16-mode-autonome-standalone-et-mode-plugin)
-17. [Dépannage rapide](#17-dépannage-rapide)
+9. [Éditer la matrice de modulation (MATRIX MODULATION)](#9-éditer-la-matrice-de-modulation-matrix-modulation)
+10. [Charger un patch depuis la mémoire du synthé (INTERNAL PATCHES)](#10-charger-un-patch-depuis-la-mémoire-du-synthé-internal-patches)
+11. [Gérer les banques du Matrix-1000 (BANK UTILITY)](#11-gérer-les-banques-du-matrix-1000-bank-utility)
+12. [Sauvegarder un patch dans la mémoire du synthé et dans l’ordinateur (STORE / COMPUTER PATCHES)](#12-sauvegarder-un-patch-dans-la-mémoire-du-synthé-et-dans-lordinateur-store--computer-patches)
+13. [Créer des variations de patch (PATCH MUTATOR)](#13-créer-des-variations-de-patch-patch-mutator)
+14. [Gérer les paramètres globaux du synthé (MASTER EDIT)](#14-gérer-les-paramètres-globaux-du-synthé-master-edit)
+15. [Sélectionner un Skin et ajuster la taille de la fenêtre (SETTINGS)](#15-sélectionner-un-skin-et-ajuster-la-taille-de-la-fenêtre-settings)
+16. [Utiliser l’application autonome et le plugin](#16-utiliser-lapplication-autonome-et-le-plugin)
+17. [Guide de dépannage](#17-guide-de-dépannage)
 18. [Lexique](#lexique)
 
 ---
 
-## 1. À quoi sert le Matrix-Control ?
+## 1. Qu’est-ce que le Matrix-Control ?
 
-Le Matrix-Control est un **éditeur MIDI** moderne et très complet pour les synthétiseurs Oberheim **Matrix-1000**, **Matrix-6** et **Matrix-6R**.
+Le Matrix-Control est un **éditeur MIDI** moderne et très complet, conçu avant tout pour le synthétiseur Oberheim **Matrix-1000**. Il offre aussi une bonne compatibilité avec les **Matrix-6** et **Matrix-6R**, principalement pour l’édition des patches.
 
-Il ne produit pas le son lui-même : celui-ci est toujours généré par votre synthétiseur. Le Matrix-Control agit plutôt comme une télécommande sophistiquée : il envoie et reçoit des messages MIDI afin que vous puissiez **visualiser et modifier** les réglages du synthé à l’écran — à l’aide de boutons, de curseurs, de menus déroulants et d’afficheurs graphiques — au lieu de tout manipuler depuis la façade de la machine. Pour **entendre** le synthé, branchez sa sortie audio vers une entrée de votre interface audio, une table de mixage ou vos enceintes — le Matrix-Control ne remplace pas ce chemin audio et n’enregistre pas le son.
+Cet éditeur ne produit pas le son lui-même : celui-ci est toujours généré par votre synthétiseur. Le Matrix-Control agit plutôt comme une télécommande sophistiquée : il envoie et reçoit des messages MIDI afin que vous puissiez **visualiser et modifier** les réglages du synthé à l’écran — à l’aide de boutons, curseurs, menus déroulants et afficheurs graphiques.
+
+Sur un **Matrix-6** ou un **Matrix-6R**, c’est une alternative confortable à la programmation depuis la façade, ces modèles étant programmables. Sur un **Matrix-1000**, la façade ne permet pas de programmer les patches : l’éditeur à l’écran devient alors indispensable — et c’est d’ailleurs pour ce synthé très puissant, mais non programmable en façade, que le Matrix-Control a d’abord été conçu.
+
+Pour **entendre** le son produit par le synthé, branchez sa sortie audio vers une entrée de votre interface audio, une table de mixage ou vos enceintes — le Matrix-Control ne remplace pas ce chemin audio et n’enregistre pas le son.
 
 Vous pouvez l’utiliser :
 
@@ -60,7 +64,7 @@ Pour les crédits et les contacts, ouvrez `ABOUT...` depuis le menu du logo `MAT
 
 ---
 
-## 2. Ce dont vous aurez besoin
+## 2. Équipements nécessaires pour utiliser le Matrix-Control
 
 ### Matériel
 
@@ -69,7 +73,7 @@ Pour les crédits et les contacts, ouvrez `ABOUT...` depuis le menu du logo `MAT
 - **Deux câbles MIDI** pour une communication dans les **deux sens** en même temps (ordinateur ↔ synthé) :
   - De l’ordinateur **vers** le synthé (pour transmettre les patches et les réglages globaux)
   - Du synthé **vers** l’ordinateur (pour que le Matrix-Control lise le patch courant et reconnaisse la machine)
-- Un **chemin audio** pour entendre le synthé : sortie audio du synthé vers une entrée d’interface audio, une table de mixage ou des enceintes. Le Matrix-Control pilote uniquement le synthé en MIDI : il ne produit pas le son et ne l’enregistre pas. En plugin, ce retour se route en général sur une **piste audio séparée** du DAW ; en Standalone, l’écoute se règle dans `SETTINGS...` → `AUDIO` (détail en [sections 4](#4-installer-et-ouvrir-le-logiciel) et [16](#16-mode-autonome-standalone-et-mode-plugin))
+- Un **chemin audio** pour entendre le synthé : sortie audio du synthé vers une entrée d’interface audio, une table de mixage ou des enceintes. Le Matrix-Control pilote uniquement le synthé en MIDI : il ne produit pas le son et ne l’enregistre pas. En plugin, ce retour se route en général sur une **piste audio séparée** du DAW ; en Standalone, l’écoute se règle dans `SETTINGS...` → `AUDIO` (détail en [sections 4](#4-installer-et-lancer-le-matrix-control) et [16](#16-utiliser-lapplication-autonome-et-le-plugin))
 
 Sans ces deux directions MIDI, l’éditeur ne pourra pas piloter le synthé correctement. Sans chemin audio, vous pourrez éditer à l’écran, mais vous n’entendrez pas le résultat.
 
@@ -95,7 +99,7 @@ Sans ces deux directions MIDI, l’éditeur ne pourra pas piloter le synthé cor
 
 ---
 
-## 3. Le Matrix-1000 et le Matrix-6/6R en deux minutes
+## 3. Synthétiseurs Oberheim Matrix-1000, Matrix-6 et Matrix-6R
 
 Ces machines partagent le même genre de « moteur » sonore (deux oscillateurs, un filtre passe-bas résonant, trois enveloppes, deux LFO, une matrice de modulation, etc.). Ce qui change surtout pour vous dans le Matrix-Control :
 
@@ -104,19 +108,19 @@ Ces machines partagent le même genre de « moteur » sonore (deux oscillateurs,
 | Mémoire des patches | **10 banques** (0 à 9), **100 patches** par banque (0 à 99) | **100 patches** seulement (pas de banques) |
 | Module `BANK UTILITY` | Actif (banques, `COPY` / `PASTE` / `IMPORT` / `EXPORT`) | Boutons de banque, `COPY` et `PASTE` grisés ; `IMPORT` / `EXPORT` restent utilisables |
 | Section `MASTER EDIT` | Active (réglages globaux : canal MIDI, vibrato, accordage…) | Grisée (indisponible) |
-| Façade | Très peu de boutons : l’éditeur MIDI à l’écran s’avère particulièrement utile | Clavier (Matrix-6) ou rack (Matrix-6R) avec davantage de commandes directes |
+| Façade | Non programmable pour les patches (très peu de boutons) : l’éditeur à l’écran est indispensable | Programmables : clavier (Matrix-6) ou rack (Matrix-6R) avec davantage de commandes directes |
 
 **Banques en lecture seule du Matrix-1000 : **Sur le Matrix-1000, les banques **2 à 9** sont en lecture seule (mémoire ROM) pour certaines actions : les boutons `INIT`, `PASTE` et `STORE` y sont indisponibles. Les banques **0** et **1** sont celles dans lesquelles vous pouvez enregistrer vos modifications dans la machine (mémoire RAM).
 
 **Reconnaissance du synthé :** Dès que les ports MIDI sont correctement sélectionnés, le Matrix-Control demande au synthé de s’identifier. En bas à droite de la fenêtre, vous voyez alors le type de machine détecté, ou `NOT CONNECTED` (sous le badge `DEVICE`) s’il n’y a pas encore de dialogue.
 
-> **À noter.** Un Matrix-6R peut pour l’instant apparaître simplement comme Matrix-6. Pour éditer un patch au quotidien, cela ne change presque rien : la sélection de banque et `MASTER EDIT` restent propres au Matrix-1000 (détail de `BANK UTILITY` en [section 11](#11-banques-du-matrix-1000-bank-utility)).
+> **À noter.** Un Matrix-6R peut pour l’instant apparaître simplement comme Matrix-6. Pour éditer un patch au quotidien, cela ne change presque rien : la sélection de banque et `MASTER EDIT` restent propres au Matrix-1000 (détail de `BANK UTILITY` en [section 11](#11-gérer-les-banques-du-matrix-1000-bank-utility)).
 
 ---
 
-## 4. Installer et ouvrir le logiciel
+## 4. Installer et lancer le Matrix-Control
 
-Avant le premier lancement, branchez de préférence le MIDI (dans les deux sens) et le chemin audio du synthé — voir [section 6](#6-brancher-le-synthé-et-établir-le-dialogue-midi). Vous pourrez aussi le faire pendant l’assistant `GETTING STARTED`, mais avoir le câblage prêt évite de chercher les ports et l’écoute « à vide ».
+Avant le premier lancement, branchez de préférence le MIDI (dans les deux sens) et le chemin audio du synthé — voir [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi). Vous pourrez aussi le faire pendant l’assistant `GETTING STARTED`, mais avoir le câblage prêt évite de chercher les ports et l’écoute « à vide ».
 
 ### Télécharger et installer
 
@@ -132,14 +136,14 @@ Si le plugin n’apparaît pas dans le DAW, rescannez la liste des plugins et v�
 
 1. Créez une piste **MIDI / instrument**
 2. Chargez le **Matrix-Control** comme instrument virtuel
-3. Au premier lancement, l’assistant `GETTING STARTED` peut s’ouvrir automatiquement (voir [section 5](#5-premier-lancement--getting-started))
+3. Au premier lancement, l’assistant `GETTING STARTED` peut s’ouvrir automatiquement (voir [section 5](#5-utiliser-lassistant-de-premier-lancement-getting-started))
 4. Assurez-vous que la piste peut envoyer et recevoir du MIDI vers / depuis votre interface (selon votre DAW)
 5. Le signal audio du synthé doit être branché séparément dans le DAW (connexion à une entrée de votre interface audio, ou retour de table de mixage). Le Matrix-Control ne remplace pas le synthé : il le pilote en MIDI
 
 ### En Standalone
 
 1. Lancez l’application **Matrix-Control**
-2. Au premier lancement, l’assistant `GETTING STARTED` peut s’ouvrir automatiquement pour l’apparence, le MIDI vers le synthé, le clavier optionnel, puis l’écoute audio (voir [section 5](#5-premier-lancement--getting-started))
+2. Au premier lancement, l’assistant `GETTING STARTED` peut s’ouvrir automatiquement pour l’apparence, le MIDI vers le synthé, le clavier optionnel, puis l’écoute audio (voir [section 5](#5-utiliser-lassistant-de-premier-lancement-getting-started))
 3. Vous pourrez ensuite peaufiner le MIDI dans `SETTINGS...` → onglet `MIDI & DEVICE` ou depuis les listes du bandeau supérieur, et l’écoute audio (interface, canaux) dans `SETTINGS...` → onglet `AUDIO`
 
 > **Capture d’écran — À placer ici**  
@@ -147,11 +151,11 @@ Si le plugin n’apparaît pas dans le DAW, rescannez la liste des plugins et v�
 
 ---
 
-## 5. Premier lancement : GETTING STARTED
+## 5. Utiliser l’assistant de premier lancement (GETTING STARTED)
 
 Lorsque des étapes de configuration utiles restent incomplètes, le Matrix-Control peut ouvrir automatiquement l’assistant **`GETTING STARTED`**. C’est le chemin guidé de premier lancement pour débloquer l’édition, le jeu et l’écoute selon le format (plugin ou Standalone).
 
-L’ouverture automatique dépend du réglage `SETUP WIZARD` dans `SETTINGS...` → onglet `GETTING STARTED` (voir plus bas et [section 15](#15-apparence-échelle-et-settings)).
+L’ouverture automatique dépend du réglage `SETUP WIZARD` dans `SETTINGS...` → onglet `GETTING STARTED` (voir plus bas et [section 15](#15-sélectionner-un-skin-et-ajuster-la-taille-de-la-fenêtre-settings)).
 
 Une fois que vous avez quitté l’introduction avec `CONTINUE`, une réouverture automatique reprend à la **première étape applicable encore incomplète** — pas à l’introduction. L’introduction ne revient que lors d’un vrai premier contact, ou après `RUN SETUP AGAIN`.
 
@@ -216,7 +220,7 @@ Dans `SETTINGS...` → onglet `GETTING STARTED`, la ligne `SETUP WIZARD` propose
 
 ---
 
-## 6. Brancher le synthé et établir le dialogue MIDI
+## 6. Connecter le synthé et établir la communication MIDI
 
 C’est l’étape la plus importante côté matériel. Idéalement, faites ce câblage **avant** (ou pendant) le premier lancement et l’assistant `GETTING STARTED` : tant que le synthé n’est pas reconnu, une grande partie de l’éditeur demeure verrouillée — et sans chemin audio, vous n’entendrez pas vos changements.
 
@@ -281,7 +285,7 @@ Voici des exemples concrets pour trois hôtes courants. L’idée est la même d
 5. Jouez : les notes doivent atteindre le Matrix-Control (`KEYBOARD FROM` reste sur `HOST`)
 6. Pour **entendre** le synthé, créez une piste audio (ou utilisez une entrée déjà routée) branchée sur la sortie du Matrix via votre interface audio — ce n’est pas le Matrix-Control qui génère le son
 
-**Windows et image floue (VST3).** Sous Windows, Ableton Live propose une option **Auto-Scale Plugin Window**. Quand elle est activée, l’interface du Matrix-Control en **VST3** peut apparaître floue, **quel que soit** le réglage `UI SCALE` dans le Matrix-Control. Ce n’est pas un défaut de l’échelle interne du plugin : Live redimensionne l’image à sa façon. L’application **Standalone** reste en général nette sur la même machine. Sous macOS, cette option n’existe pas dans Live. (Rappel aussi dans [Settings / `UI SCALE`](#fenêtre-settings) et [Dépannage](#17-dépannage-rapide).)
+**Windows et image floue (VST3).** Sous Windows, Ableton Live propose une option **Auto-Scale Plugin Window**. Quand elle est activée, l’interface du Matrix-Control en **VST3** peut apparaître floue, **quel que soit** le réglage `UI SCALE` dans le Matrix-Control. Ce n’est pas un défaut de l’échelle interne du plugin : Live redimensionne l’image à sa façon. L’application **Standalone** reste en général nette sur la même machine. Sous macOS, cette option n’existe pas dans Live. (Rappel aussi dans [Settings / `UI SCALE`](#fenêtre-settings) et [Dépannage](#17-guide-de-dépannage).)
 
 Pour les plugins VST3 librement redimensionnables (dont le Matrix-Control), le conseil Ableton est de **désactiver** Auto-Scale Plugin Window, puis de **recharger** le device. En pratique : chargez d’abord le Matrix-Control sur une piste, faites un clic droit sur la barre de titre du device **en bas, dans la vue Device** (pas seulement sur la fenêtre flottante du plugin) pour décocher l’option, rechargez le device, et vérifiez que l’interface est nette.
 
@@ -315,9 +319,9 @@ Sous Windows, un port MIDI est souvent réservé à une seule application à la 
 
 ---
 
-## 7. Premier contact : l’écran principal
+## 7. Découvrir l’écran principal
 
-Une fois le logiciel ouvert, l’interface s’organise à peu près ainsi :
+Une fois le logiciel ouvert, l’interface graphique du Matrix-Control s’organise à peu près ainsi :
 
 ```
 +--------------------------------------------------------------------+
@@ -372,7 +376,7 @@ Dans ce manuel, nous désignons les grands blocs de l’interface comme suit :
 
 ## 8. Éditer un patch (PATCH EDIT)
 
-Une fois le synthé détecté et un patch chargé (voir [section 10](#10-choisir-un-patch-dans-le-synthé-internal-patches)), vous travaillez dans la section `PATCH EDIT`.
+Une fois le synthé détecté et un patch chargé (voir [section 10](#10-charger-un-patch-depuis-la-mémoire-du-synthé-internal-patches)), vous travaillez dans la section `PATCH EDIT`.
 
 ### Principe
 
@@ -441,7 +445,7 @@ Le double-clic met à jour le nom **dans l’éditeur** (et peut l’envoyer au 
 
 Après un `INIT` dans `INTERNAL PATCHES`, l’afficheur montre `* INIT *`. Ce marqueur n’est pas un nom Matrix valide : vous devez le remplacer **avant** un `STORE` dans le synthé, et **avant** un `SAVE` / `SAVE AS` sur l’ordinateur. Un `STORE` dans cet état ouvre directement la saisie du nom ; un `SAVE` / `SAVE AS` refuse l’enregistrement tant que le marqueur reste affiché.
 
-Pour un fichier `.m1kp`, le nom affiché vient **toujours** du nom de fichier (voir [Computer Patches](#module-computer-patches)). Les préférences `DISPLAY…` se règlent dans [section 15](#15-apparence-échelle-et-settings).
+Pour un fichier `.m1kp`, le nom affiché vient **toujours** du nom de fichier (voir [Computer Patches](#module-computer-patches)). Les préférences `DISPLAY…` se règlent dans [section 15](#15-sélectionner-un-skin-et-ajuster-la-taille-de-la-fenêtre-settings).
 
 ### Modules de synthèse
 
@@ -459,7 +463,7 @@ La section `PATCH EDIT` regroupe les briques classiques de la synthèse soustrac
 
 ---
 
-## 9. La matrice de modulation
+## 9. Éditer la matrice de modulation (MATRIX MODULATION)
 
 La section `MATRIX MODULATION` constitue un peu le **centre nerveux** du synthé. C’est ici que l’on donne vie aux patches, en reliant des sources de modulation à des paramètres de destination — d’où le nom des machines Matrix-1000 et Matrix-6/6R.
 
@@ -482,7 +486,7 @@ Vous pouvez également :
 
 ---
 
-## 10. Choisir un patch dans le synthé (INTERNAL PATCHES)
+## 10. Charger un patch depuis la mémoire du synthé (INTERNAL PATCHES)
 
 Dans `PATCH MANAGER` → module `INTERNAL PATCHES` :
 
@@ -512,26 +516,26 @@ Après `INIT`, le nom devient `* INIT *` : renommez le patch avant `STORE`, et a
 
 Sur les banques en lecture seule **2–9** du Matrix-1000, `INIT`, `PASTE` et `STORE` sont indisponibles (contrôles grisés).
 
-**Si `STORE` semble ne rien enregistrer.** Sur un Matrix-1000, vérifiez `MEMORY PROTECT` et `BANK LOCK` dans `MASTER EDIT` → `MISC` (détail en [section 14](#14-réglages-globaux-du-synthé-master-edit)). Sur un Matrix-6/6R, `MASTER EDIT` est grisé : regardez surtout l’interrupteur **Memory Protect** à l’arrière de la machine (à mettre sur Off pour pouvoir enregistrer), et éventuellement la protection par patch sur la façade.
+**Si `STORE` semble ne rien enregistrer.** Sur un Matrix-1000, vérifiez `MEMORY PROTECT` et `BANK LOCK` dans `MASTER EDIT` → `MISC` (détail en [section 14](#14-gérer-les-paramètres-globaux-du-synthé-master-edit)). Sur un Matrix-6/6R, `MASTER EDIT` est grisé : regardez surtout l’interrupteur **Memory Protect** à l’arrière de la machine (à mettre sur Off pour pouvoir enregistrer), et éventuellement la protection par patch sur la façade.
 
 > **Capture d’écran — À placer ici**  
 > *Légende :* Module `INTERNAL PATCHES` avec les groupes `BROWSER` et `MEMORY`.
 
 ---
 
-## 11. Banques du Matrix-1000 (BANK UTILITY)
+## 11. Gérer les banques du Matrix-1000 (BANK UTILITY)
 
 Le module `BANK UTILITY`, dans la section `PATCH MANAGER`, sert à **changer de banque** sur un Matrix-1000 et à **transférer une banque entière** : copie interne, collage vers une autre banque réinscriptible, import depuis un dossier de fichiers, ou export vers le disque.
 
 Sur un **Matrix-6/6R**, ces modèles n’ont pas de banques : les boutons `0`–`9`, `COPY` et `PASTE` sont grisés. Les boutons `IMPORT` et `EXPORT` restent toutefois utilisables pour échanger les 100 patches de la machine avec un dossier sur l’ordinateur (sous-dossier `PATCHES`).
 
-**Avant d’écrire une banque** (`PASTE`, `IMPORT`), sauvegardez d’abord sur l’ordinateur les patches que vous voulez conserver — par exemple via `COMPUTER PATCHES` → `SAVE AS`, ou un `EXPORT` de banque (voir [section 12](#12-sauvegarder-sur-le-synthé-et-sur-lordinateur)). Ces opérations peuvent écraser la mémoire de la machine.
+**Avant d’écrire une banque** (`PASTE`, `IMPORT`), sauvegardez d’abord sur l’ordinateur les patches que vous voulez conserver — par exemple via `COMPUTER PATCHES` → `SAVE AS`, ou un `EXPORT` de banque (voir [section 12](#12-sauvegarder-un-patch-dans-la-mémoire-du-synthé-et-dans-lordinateur-store--computer-patches)). Ces opérations peuvent écraser la mémoire de la machine.
 
 Pendant une session avec le Matrix-Control, pilotez le synthé **via le plugin** plutôt que depuis la façade : un changement de banque ou de `BANK LOCK` sur la machine peut désynchroniser l’écran du Matrix-Control. Le réglage `BANK LOCK` lui-même se trouve dans `MASTER EDIT` → `MISC`, pas dans `BANK UTILITY`.
 
 ### Boutons de banque (`0`–`9`)
 
-Sur le Matrix-1000, les boutons `0` à `9` sélectionnent la banque active. Le Matrix-Control demande ensuite au synthé de basculer, puis **relit** le patch courant (avec la même logique de confirmation `Unsaved patch` qu’un changement de patch — voir [section 10](#10-choisir-un-patch-dans-le-synthé-internal-patches)).
+Sur le Matrix-1000, les boutons `0` à `9` sélectionnent la banque active. Le Matrix-Control demande ensuite au synthé de basculer, puis **relit** le patch courant (avec la même logique de confirmation `Unsaved patch` qu’un changement de patch — voir [section 10](#10-charger-un-patch-depuis-la-mémoire-du-synthé-internal-patches)).
 
 Les banques **0** et **1** sont en mémoire RAM (écriture possible). Les banques **2** à **9** sont en lecture seule (ROM) pour le collage et l’import de banque, ainsi que pour `INIT` / `PASTE` / `STORE` dans `INTERNAL PATCHES`. Vous pouvez toujours **sélectionner**, **copier** ou **exporter** une banque ROM.
 
@@ -568,7 +572,7 @@ Une fenêtre de progression accompagne l’export ; en cas de succès, un messag
 
 ---
 
-## 12. Sauvegarder sur le synthé et sur l’ordinateur
+## 12. Sauvegarder un patch dans la mémoire du synthé et dans l’ordinateur (STORE / COMPUTER PATCHES)
 
 Deux emplacements distincts :
 
@@ -594,7 +598,7 @@ Deux emplacements distincts :
 | `SAVE AS` | Enregistrer le patch courant sous un nouveau nom `.syx` |
 | `SAVE` | Enregistrer le patch courant en `.syx` (fichier déjà associé, ou même nom de base après un chargement `.m1kp`) |
 
-`OPEN` liste les fichiers `.syx` **et** `.m1kp` du dossier. Vous pouvez aussi **glisser-déposer** un `.syx` ou un `.m1kp` sur la fenêtre pour le charger. `SAVE` et `SAVE AS` écrivent **toujours** un `.syx` au format Edit Buffer (voir ci-dessous) — jamais une réécriture du fichier `.m1kp` d’origine. Ce module ouvre et enregistre **un patch à la fois** : il n’y a pas de tags ni de favoris. Pour importer ou exporter **une banque entière**, utilisez `BANK UTILITY` (voir [section 11](#11-banques-du-matrix-1000-bank-utility)) — ce n’est pas le rôle de `OPEN` / `SAVE`.
+`OPEN` liste les fichiers `.syx` **et** `.m1kp` du dossier. Vous pouvez aussi **glisser-déposer** un `.syx` ou un `.m1kp` sur la fenêtre pour le charger. `SAVE` et `SAVE AS` écrivent **toujours** un `.syx` au format Edit Buffer (voir ci-dessous) — jamais une réécriture du fichier `.m1kp` d’origine. Ce module ouvre et enregistre **un patch à la fois** : il n’y a pas de tags ni de favoris. Pour importer ou exporter **une banque entière**, utilisez `BANK UTILITY` (voir [section 11](#11-gérer-les-banques-du-matrix-1000-bank-utility)) — ce n’est pas le rôle de `OPEN` / `SAVE`.
 
 Après le chargement d’un `.m1kp`, `SAVE` crée ou met à jour un `.syx` du **même nom de base** dans le dossier. S’il existe déjà, le Matrix-Control demande confirmation (`Overwrite existing .syx?`) : `CONTINUE` remplace ce `.syx` ; `CANCEL` annule la sauvegarde. Le fichier `.m1kp` d’origine n’est pas modifié.
 
@@ -618,18 +622,18 @@ Pour un chargement **`.syx`**, la boîte de dialogue `Patch name mismatch` peut 
 - `Filename` — utiliser le nom du fichier 
 - `Cancel` — annuler le chargement
 
-Ce dialogue ne s’applique **pas** au chargement d’un `.m1kp` (le nom vient toujours du fichier). Le comportement par défaut pour les `.syx` se règle dans `SETTINGS` (voir [section 15](#15-apparence-échelle-et-settings)).
+Ce dialogue ne s’applique **pas** au chargement d’un `.m1kp` (le nom vient toujours du fichier). Le comportement par défaut pour les `.syx` se règle dans `SETTINGS` (voir [section 15](#15-sélectionner-un-skin-et-ajuster-la-taille-de-la-fenêtre-settings)).
 
 > **Capture d’écran — À placer ici**  
 > *Légende :* Module `COMPUTER PATCHES` avec `OPEN` / `SAVE AS` / `SAVE` et une liste de fichiers `.syx` / `.m1kp`.
 
 ---
 
-## 13. Le Patch Mutator
+## 13. Créer des variations de patch (PATCH MUTATOR)
 
 Le module `PATCH MUTATOR` génère des variations aléatoires contrôlées du patch courant — un outil précieux pour explorer des timbres sans tout régler à la main.
 
-`MUTATE` envoie la variation au synthé (dans le buffer d’édition). Si le patch de départ est précieux, sauvegardez-le d’abord sur l’ordinateur ou avec `STORE` dans un emplacement que vous acceptez d’écraser — voir [section 12](#12-sauvegarder-sur-le-synthé-et-sur-lordinateur).
+`MUTATE` envoie la variation au synthé (dans le buffer d’édition). Si le patch de départ est précieux, sauvegardez-le d’abord sur l’ordinateur ou avec `STORE` dans un emplacement que vous acceptez d’écraser — voir [section 12](#12-sauvegarder-un-patch-dans-la-mémoire-du-synthé-et-dans-lordinateur-store--computer-patches).
 
 ### Réglages
 
@@ -666,7 +670,7 @@ L’historique ne survit pas à la fermeture du projet ou de l’application.
 
 ---
 
-## 14. Réglages globaux du synthé (MASTER EDIT)
+## 14. Gérer les paramètres globaux du synthé (MASTER EDIT)
 
 La section `MASTER EDIT` regroupe les **paramètres globaux** du Matrix-1000 : des réglages qui concernent la machine entière et s’appliquent donc **à tous les patches**, et non à un seul son.
 
@@ -694,7 +698,7 @@ Travaillez de préférence sur une banque réinscriptible (`0` ou `1`) lorsque v
 
 ---
 
-## 15. Apparence, échelle et Settings
+## 15. Sélectionner un Skin et ajuster la taille de la fenêtre (SETTINGS)
 
 ### Menu du logo `MATRIX-CONTROL`
 
@@ -740,7 +744,7 @@ La touche **Échap** ferme en général les fenêtres `SETTINGS` et `ABOUT`, ain
 
 ### Fenêtre `SETTINGS`
 
-Les préférences sont regroupées par onglets. L’onglet **`GETTING STARTED`** (premier onglet) contient la ligne `SETUP WIZARD` : combo `SHOW WHEN INCOMPLETE` (défaut) ou `NEVER SHOW AT LAUNCH`, puis bouton `RUN SETUP AGAIN` — voir [section 5](#5-premier-lancement--getting-started).
+Les préférences sont regroupées par onglets. L’onglet **`GETTING STARTED`** (premier onglet) contient la ligne `SETUP WIZARD` : combo `SHOW WHEN INCOMPLETE` (défaut) ou `NEVER SHOW AT LAUNCH`, puis bouton `RUN SETUP AGAIN` — voir [section 5](#5-utiliser-lassistant-de-premier-lancement-getting-started).
 
 L’onglet **`USER INTERFACE`** contient, dans cet ordre :
 
@@ -776,7 +780,7 @@ Après un `INIT` Internal Patches, l’afficheur `PATCH NAME` montre `* INIT *` 
 
 ---
 
-## 16. Mode autonome (Standalone) et mode plugin
+## 16. Utiliser l’application autonome et le plugin
 
 | Fonction | Plugin dans le DAW | Standalone |
 |----------|--------------------|------------|
@@ -797,7 +801,7 @@ En général **non** conservé tel quel : le contenu du patch en cours d’édit
 
 ---
 
-## 17. Dépannage rapide
+## 17. Guide de dépannage
 
 | Symptôme | Que faire |
 |----------|-----------|
@@ -813,7 +817,7 @@ En général **non** conservé tel quel : le contenu du patch en cours d’édit
 | Assistant `GETTING STARTED` ne s’ouvre plus | Dans Settings → `GETTING STARTED` → `SETUP WIZARD`, choisir `SHOW WHEN INCOMPLETE` ou cliquer `RUN SETUP AGAIN` |
 | Pas de son en Standalone | Vérifier Settings → `AUDIO` (`DRIVER TYPE` / interface, entrée, canaux d’écoute `SYNTH FROM` — pas le port MIDI) et le câblage vers l’interface audio |
 | Interface VST3 floue dans Ableton Live (Windows) | Désactiver **Auto-Scale Plugin Window** pour le Matrix-Control, recharger le device ; comparer avec le Standalone (voir [Ableton Live](#ableton-live)) |
-| Deux instances se marchent sur les pieds (détection / édition bizarre) | Ne pas partager les mêmes ports : une paire `SYNTH FROM` / `SYNTH TO` distincte par instance (et par machine si vous en avez plusieurs) — voir [section 6](#6-brancher-le-synthé-et-établir-le-dialogue-midi) |
+| Deux instances se marchent sur les pieds (détection / édition bizarre) | Ne pas partager les mêmes ports : une paire `SYNTH FROM` / `SYNTH TO` distincte par instance (et par machine si vous en avez plusieurs) — voir [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi) |
 | Audio en retard dans le DAW | Ajuster `HARDWARE LATENCY` dans Settings → `MIDI & DEVICE` (plugin) ; et la taille de buffer du DAW / de l’interface audio |
 
 ---
