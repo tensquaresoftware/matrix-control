@@ -17,8 +17,6 @@ References:
 
 > **Lexique.** Les termes techniques et acronymes utilisés dans ce manuel sont expliqués en fin de document, dans le [lexique](#lexique). Vous pouvez y revenir à tout moment.
 
----
-
 ## Table des matières
 
 1. [Qu’est-ce que le Matrix-Control ?](#1-quest-ce-que-le-matrix-control)
@@ -39,8 +37,6 @@ References:
 16. [Utiliser l’application autonome et le plugin](#16-utiliser-lapplication-autonome-et-le-plugin)
 17. [Guide de dépannage](#17-guide-de-dépannage)
 18. [Lexique](#lexique)
-
----
 
 ## 1. Qu’est-ce que le Matrix-Control ?
 
@@ -64,9 +60,6 @@ Pour les crédits et les contacts, ouvrez `ABOUT...` depuis le menu du logo `MAT
 <br />
 <em>Fenêtre principale du Matrix-Control avec un synthé Oberheim Matrix-1000 détecté.</em>
 </div>
-
-
----
 
 ## 2. Équipements nécessaires pour utiliser le Matrix-Control
 
@@ -101,8 +94,6 @@ Sans ces deux directions MIDI, l’éditeur ne pourra pas piloter le synthé cor
 - Savoir ouvrir un instrument virtuel dans votre DAW **si** vous utilisez le plugin, **ou** lancer une application comme n’importe quel autre programme si vous restez en Standalone
 - L’interface du Matrix-Control est en **anglais** : ce manuel traduit et explique chaque section, module et groupe
 
----
-
 ## 3. Synthétiseurs Oberheim Matrix-1000, Matrix-6 et Matrix-6R
 
 Ces machines partagent le même genre de « moteur » sonore (deux oscillateurs, un filtre passe-bas résonant, trois enveloppes, deux LFO, une matrice de modulation, etc.). Ce qui change surtout pour vous dans le Matrix-Control :
@@ -119,8 +110,6 @@ Ces machines partagent le même genre de « moteur » sonore (deux oscillateurs,
 **Reconnaissance du synthé :** Dès que les ports MIDI sont correctement sélectionnés, le Matrix-Control demande au synthé de s’identifier. En bas à droite de la fenêtre, vous voyez alors le type de machine détecté, ou `NOT CONNECTED` (sous le badge `DEVICE`) s’il n’y a pas encore de dialogue.
 
 > **À noter.** Un Matrix-6R peut pour l’instant apparaître simplement comme Matrix-6. Pour éditer un patch au quotidien, cela ne change presque rien : la sélection de banque et `MASTER EDIT` restent propres au Matrix-1000 (détail de `BANK UTILITY` en [section 11](#11-gérer-les-banques-du-matrix-1000-bank-utility)).
-
----
 
 ## 4. Installer et lancer le Matrix-Control
 
@@ -152,8 +141,6 @@ Si le plugin n’apparaît pas dans le DAW, rescannez la liste des plugins et v�
 
 > **Capture d’écran — À placer ici**  
 > *Légende :* Le Matrix-Control chargé comme instrument dans un DAW.
-
----
 
 ## 5. Utiliser l’assistant de premier lancement (GETTING STARTED)
 
@@ -221,8 +208,6 @@ Dans `SETTINGS...` → onglet `GETTING STARTED`, la ligne `SETUP WIZARD` propose
 | Bouton `RUN SETUP AGAIN` | Remet à non fait les étapes applicables au format courant et rouvre l’assistant à l’introduction |
 
 `UI SCALE` et `SKIN` se règlent dans l’onglet `USER INTERFACE` ; les raccourcis du menu logo `MATRIX-CONTROL` restent disponibles.
-
----
 
 ## 6. Connecter le synthé et établir la communication MIDI
 
@@ -321,8 +306,6 @@ Sous Windows, un port MIDI est souvent réservé à une seule application à la 
 > **Capture d’écran — À placer ici**  
 > *Légende :* Ports MIDI correctement choisis, voyants actifs, et type de synthé visible en bas à droite.
 
----
-
 ## 7. Découvrir l’écran principal
 
 Une fois le logiciel ouvert, l’interface graphique du Matrix-Control s’organise à peu près ainsi :
@@ -375,8 +358,6 @@ Dans ce manuel, nous désignons les grands blocs de l’interface comme suit :
 
 > **Capture d’écran — À placer ici**  
 > *Légende :* Vue d’ensemble des trois colonnes et du bandeau du bas.
-
----
 
 ## 8. Éditer un patch (PATCH EDIT)
 
@@ -465,8 +446,6 @@ La section `PATCH EDIT` regroupe les briques classiques de la synthèse soustrac
 > **Capture d’écran — À placer ici**  
 > *Légende :* Section `PATCH EDIT` avec les modules DCO, `VCF/VCA` (curseur `DCO 2 | DCO 1 MIX`), et un afficheur d’enveloppe éditable.
 
----
-
 ## 9. Éditer la matrice de modulation (MATRIX MODULATION)
 
 La section `MATRIX MODULATION` constitue un peu le **centre nerveux** du synthé. C’est ici que l’on donne vie aux patches, en reliant des sources de modulation à des paramètres de destination — d’où le nom des machines Matrix-1000 et Matrix-6/6R.
@@ -487,8 +466,6 @@ Vous pouvez également :
 
 > **Capture d’écran — À placer ici**  
 > *Légende :* Section `MATRIX MODULATION` avec les dix bus SOURCE / AMOUNT / DESTINATION.
-
----
 
 ## 10. Charger un patch depuis la mémoire du synthé (INTERNAL PATCHES)
 
@@ -524,8 +501,6 @@ Sur les banques en lecture seule **2–9** du Matrix-1000, `INIT`, `PASTE` et `S
 
 > **Capture d’écran — À placer ici**  
 > *Légende :* Module `INTERNAL PATCHES` avec les groupes `BROWSER` et `MEMORY`.
-
----
 
 ## 11. Gérer les banques du Matrix-1000 (BANK UTILITY)
 
@@ -573,8 +548,6 @@ Une fenêtre de progression accompagne l’export ; en cas de succès, un messag
 
 > **Capture d’écran — À placer ici**  
 > *Légende :* Module `BANK UTILITY` avec les boutons `0`–`9`, `COPY`, `PASTE`, `IMPORT` et `EXPORT`.
-
----
 
 ## 12. Sauvegarder un patch dans la mémoire du synthé et dans l’ordinateur (STORE / COMPUTER PATCHES)
 
@@ -631,8 +604,6 @@ Ce dialogue ne s’applique **pas** au chargement d’un `.m1kp` (le nom vient t
 > **Capture d’écran — À placer ici**  
 > *Légende :* Module `COMPUTER PATCHES` avec `OPEN` / `SAVE AS` / `SAVE` et une liste de fichiers `.syx` / `.m1kp`.
 
----
-
 ## 13. Créer des variations de patch (PATCH MUTATOR)
 
 Le module `PATCH MUTATOR` génère des variations aléatoires contrôlées du patch courant — un outil précieux pour explorer des timbres sans tout régler à la main.
@@ -672,8 +643,6 @@ L’historique ne survit pas à la fermeture du projet ou de l’application.
 > **Capture d’écran — À placer ici**  
 > *Légende :* Module `PATCH MUTATOR` avec `AMOUNT`, `RANDOM`, commutateurs de modules et boutons `MUTATE` / `RETRY` / `HISTORY`.
 
----
-
 ## 14. Gérer les paramètres globaux du synthé (MASTER EDIT)
 
 La section `MASTER EDIT` regroupe les **paramètres globaux** du Matrix-1000 : des réglages qui concernent la machine entière et s’appliquent donc **à tous les patches**, et non à un seul son.
@@ -699,8 +668,6 @@ Travaillez de préférence sur une banque réinscriptible (`0` ou `1`) lorsque v
 
 > **Capture d’écran — À placer ici**  
 > *Légende :* Section `MASTER EDIT` (modules `MIDI`, `VIBRATO`, `MISC`) sur Matrix-1000.
-
----
 
 ## 15. Sélectionner un Skin et ajuster la taille de la fenêtre (SETTINGS)
 
@@ -782,8 +749,6 @@ Après un `INIT` Internal Patches, l’afficheur `PATCH NAME` montre `* INIT *` 
 > **Capture d’écran — À placer ici**  
 > *Légende :* Onglets Settings (`GETTING STARTED`, `USER INTERFACE`, `MIDI & DEVICE`…) et menu du logo (`UI SCALE`, `SKIN`, six variantes de base + `TONES`).
 
----
-
 ## 16. Utiliser l’application autonome et le plugin
 
 | Fonction | Plugin dans le DAW | Standalone |
@@ -803,8 +768,6 @@ En général **conservé** : ports MIDI, apparence, taille d’interface, progre
 
 En général **non** conservé tel quel : le contenu du patch en cours d’édition (le logiciel privilégie une resynchronisation avec le synthé lorsque les ports sont reconnectés), l’historique du Mutator, l’état Compare.
 
----
-
 ## 17. Guide de dépannage
 
 | Symptôme | Que faire |
@@ -823,8 +786,6 @@ En général **non** conservé tel quel : le contenu du patch en cours d’édit
 | Interface VST3 floue dans Ableton Live (Windows) | Désactiver **Auto-Scale Plugin Window** pour le Matrix-Control, recharger le device ; comparer avec le Standalone (voir [Ableton Live](#ableton-live)) |
 | Deux instances se marchent sur les pieds (détection / édition bizarre) | Ne pas partager les mêmes ports : une paire `SYNTH FROM` / `SYNTH TO` distincte par instance (et par machine si vous en avez plusieurs) — voir [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi) |
 | Audio en retard dans le DAW | Ajuster `HARDWARE LATENCY` dans Settings → `MIDI & DEVICE` (plugin) ; et la taille de buffer du DAW / de l’interface audio |
-
----
 
 ## Lexique
 
@@ -876,7 +837,5 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 | **VCA** | Étage de volume du patch. |
 | **VCF** | Filtre qui sculpte le timbre dans le domaine fréquentiel (grave / aigu, résonance). |
 | **VST3** | Format de plugin très répandu (Windows, macOS, Linux…). |
-
----
 
 *Si quelque chose à l’écran ne correspond pas à ce manuel, notez-le : ce sera le signal pour corriger le document et/ou le logiciel.*

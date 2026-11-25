@@ -141,6 +141,8 @@ Nommage des fichiers (ASCII, stable) :
 
 Cible d’affichage principale : **Typora** (édition) et **PDF** exporté depuis Typora (musiciens). Le `.md` source reste lisible tel quel pour qui préfère Markdown.
 
+**Séparateurs :** ne **pas** mettre de lignes horizontales Markdown (`---`) entre les sections `##` — GitHub (et souvent Typora) souligne déjà les H2 ; doubler avec un `---` alourdit le rendu. Réserver `---` au **frontmatter YAML** uniquement.
+
 Format type — **placeholder** (tant que l’image n’est pas prête) :
 
 ```markdown
@@ -256,6 +258,7 @@ Les phrases hors liste gardent une ponctuation normale.
 - [ ] Listes : majuscule en tête de chaque item, sans ponctuation finale
 - [ ] Lexique en fin de document, annoncé en intro
 - [ ] Placeholders de captures présents là où une image aidera
+- [ ] Pas de `---` thématiques entre sections `##` (YAML frontmatter excepté)
 - [ ] Aligné sur le code actuel
 
 ---
