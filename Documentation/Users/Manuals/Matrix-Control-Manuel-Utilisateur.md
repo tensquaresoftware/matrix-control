@@ -155,12 +155,6 @@ Si la version plugin n’apparaît pas dans votre DAW, rescannez la liste des pl
 4. Assurez-vous que la piste peut envoyer et recevoir du MIDI vers / depuis votre interface (selon votre DAW)
 5. Pour l’écoute du synthé : créez une **piste audio** séparée — détail et exemples par DAW à la [section 6](#jouer-et-éditer-dans-un-daw)
 
-<div align="center">
-<img src="Screenshots/04-matrix-control-in-daw.png" alt="Le Matrix-Control chargé comme instrument dans un DAW." />
-<br />
-<em>Le Matrix-Control chargé comme instrument virtuel dans un DAW (ici, Ableton Live).</em>
-</div>
-
 ## 5. Assistant de premier lancement (GETTING STARTED)
 
 Au premier lancement, le Matrix-Control ouvre automatiquement l’assistant **`GETTING STARTED`**. Il est organisé en plusieurs étapes et vous aide à poser l’essentiel avant d’éditer : taille de la fenêtre (`UI SCALE`), apparence graphique (`SKIN`), ports MIDI vers / depuis le synthé, clavier maître éventuel, et — en application autonome — chemin d'écoute audio. Rien n’est définitif : vous pourrez tout revoir ensuite dans `SETTINGS…`.
@@ -268,12 +262,15 @@ Deux flux MIDI coexistent :
 4. Créez une piste **audio** branchée sur la sortie du synthé via votre interface, et réglez **Monitor : In**
 5. Jouez quand la piste Matrix-Control est armée ; éditez à tout moment grâce à `SYNTH FROM` / `SYNTH TO`
 
+<div align="center">
+<img src="Screenshots/04-matrix-control-in-daw.png" alt="Ableton Live : piste MIDI Matrix-Control armée et piste audio du synthé avec Monitor In." />
+<br />
+<em>Ableton Live : piste MIDI <code>Matrix-Control</code> armée, et piste audio du synthé avec <strong>Monitor : In</strong>.</em>
+</div>
+
 #### Autres DAW
 
-Dans **Logic Pro**, **Reason**, Bitwig, Cubase, Reaper, etc., le principe est le même : piste MIDI / instrument pour le Matrix-Control (armée pour jouer), piste audio séparée pour le retour du synthé, et édition toujours active via `SYNTH FROM` / `SYNTH TO`. Cherchez surtout l’équivalent de **Monitor : In** — l’écoute permanente de l’entrée (souvent appelée input monitoring). Si aucune option de ce type n’existe — ce qui serait étonnant —, maintenez la piste audio armée.
-
-> **Capture d’écran — À placer ici**  
-> *Légende :* Piste Matrix-Control + piste audio du synthé ; notes selon l’armement, édition MIDI toujours active.
+Dans Logic Pro, Reason Studios, Bitwig Studio, Cubase, Reaper, etc., le principe est le même : piste MIDI / instrument pour le Matrix-Control (armée pour jouer), piste audio séparée pour le retour du synthé, et édition toujours active via `SYNTH FROM` / `SYNTH TO`. Cherchez surtout l’équivalent de **Monitor : In** — l’écoute permanente de l’entrée (souvent appelée « input monitoring »). Si aucune option de ce type n’existe (ce qui serait étonnant), maintenez la piste audio armée.
 
 ### Windows : port déjà utilisé
 
