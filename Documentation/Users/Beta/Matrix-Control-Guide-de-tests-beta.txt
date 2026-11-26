@@ -1683,7 +1683,7 @@ ne peut pas tirer parti de votre session.
    L'email avec le .txt joint reste la voie la plus simple.
 
 Pour un bug ou une question hors campagne de tests bêta, utilisez plutôt
-le document Matrix-Control-Comment-signaler-un-bug-FR.txt (fourni dans
+le document Matrix-Control-Comment-signaler-un-bug.txt (fourni dans
 Documentation/ du ZIP de la bêta).
 
 Inutile d'envoyer mots de passe, licences, ou une copie entière du disque.

@@ -1649,7 +1649,7 @@ cannot make use of your session.
    Email with the .txt attached remains the simplest path.
 
 For a bug or question outside a beta test campaign, prefer the document
-Matrix-Control-How-to-report-a-bug-EN.txt (included in the beta ZIP
+Matrix-Control-How-to-report-a-bug.txt (included in the beta ZIP
 Documentation/ folder).
 
 Do not send passwords, licences, or a full disk copy.
