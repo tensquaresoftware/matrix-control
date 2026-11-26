@@ -38,6 +38,7 @@ Ce document capture les exigences de Guillaume pour un manuel **utilisable**, **
 - **Ne pas infantiliser** le lecteur : vocabulaire accessible ≠ vocabulaire basique
 - Éviter le style télégraphique ou « checklist développeur »
 - Partir d’**objets et gestes concrets** (ex. « fichiers ZIP », « brancher MIDI OUT → MIDI IN ») plutôt que de processus de fabrication
+- **Décrire ce qui existe** : rôle des commandes et de l’écran. **Éviter** les phrases « ce n’est pas… / plus de… / pas dans… » issues de corrections internes agent↔Guillaume — le lecteur n’a pas vécu cet échange
 - **Modèle de fluidité :** la section `GETTING STARTED` du manuel FR — intention d’abord, parcours court, détail d’état / cas limites allégés ou renvoyés plus loin. Éviter l’effet « usine à gaz » (mécaniques internes, exceptions empilées) surtout avant le cœur de l’édition
 
 ### Phrase-test utile
@@ -94,7 +95,7 @@ Utiliser de façon cohérente :
 | Terme | Désigne |
 |-------|---------|
 | **Panneau** | Grandes régions de la fenêtre principale : `HEADER`, `BODY`, `FOOTER` (schéma ASCII §7 du manuel). **Disposition chrome** (`HEADER` / `FOOTER` / Settings / assistant) : vérifier le panneau dans `Source/` (ex. `HeaderPanel`) et les libellés dans `PluginDisplayNames.h`. Le guide de tests bêta **n’est pas** la référence de layout — il peut être en retard. |
-| **`HEADER` (état actuel)** | Logo + Undo/Redo + **LEDs** d’activité MIDI (`FROM SYNTH` / `TO SYNTH` / `FROM KEYBOARD`) +, en application autonome, `INPUT GAIN` / monitoring. **Plus de listes / combos de ports dans le bandeau** — le choix des ports MIDI est uniquement dans `SETTINGS…` → `MIDI & DEVICE` (et l’assistant `GETTING STARTED`). Ne jamais écrire « régler le MIDI depuis le bandeau ». |
+| **`HEADER` (état actuel)** | Logo + Undo/Redo + **LEDs** d’activité MIDI (`FROM SYNTH` / `TO SYNTH` / `FROM KEYBOARD`) +, en application autonome, `INPUT GAIN` / monitoring. Ports MIDI : `SETTINGS…` → `MIDI & DEVICE` et assistant `GETTING STARTED`. Dans le **manuel**, formuler positivement (voyants d’activité ; ports dans Settings) — pas de négations du type « ce ne sont pas des listes ». |
 | **`FOOTER` (état actuel)** | Messages / aide à gauche ; badge `DEVICE` à droite. Pas de sélecteurs MIDI. |
 | **Section** | Grands blocs dans le `BODY` : `PATCH EDIT`, `MATRIX MODULATION`, `PATCH MANAGER`, `MASTER EDIT` |
 | **Module** | Blocs fonctionnels : `DCO 1`, `BANK UTILITY`, `PATCH MUTATOR`, etc. |
@@ -142,7 +143,7 @@ Dossier : `Documentation/Users/Manuals/Screenshots/`.
 
 Nommage des fichiers (ASCII, stable) :
 
-`NN-english-slug.png` — `NN` = section number in the manual; **English** slug (project primary language), e.g. `02-main-window-matrix-1000.png`, `04-matrix-control-in-daw.png`, `05-getting-started-intro.png`.
+`NN-english-slug.png` — `NN` = section number in the manual; **English** slug (project primary language), e.g. `02-main-window-matrix-1000.png`, `04-matrix-control-in-daw.png`, `05-getting-started-intro.png`, `06-midi-audio-cabling.png`.
 
 Cible d’affichage principale : **Typora** (édition) et **PDF** exporté depuis Typora (musiciens). Le `.md` source reste lisible tel quel pour qui préfère Markdown.
 
@@ -258,6 +259,7 @@ Les phrases hors liste gardent une ponctuation normale.
 - [ ] Section / Module / Bus / Groupe / Afficheur utilisés correctement
 - [ ] `HEADER` = LEDs MIDI (pas de listes de ports) ; ports = `SETTINGS…` → `MIDI & DEVICE` / assistant seulement
 - [ ] Chrome vérifié dans `Source/` (pas recopié depuis le guide bêta)
+- [ ] Pas de phrases « ce n’est pas… / pas dans… » de correction interne : décrire le rôle réel des commandes
 - [ ] « patch » plutôt que « son » (contexte Oberheim)
 - [ ] « un DAW » ; « interface audio » ; « application autonome » après une seule intro Standalone
 - [ ] Modules de synthèse et MASTER EDIT sans inventaires de paramètres
