@@ -239,11 +239,9 @@ L’assistant `GETTING STARTED` propose déjà ces choix. Ensuite, vous les retr
 | `SYNTH TO` | Port MIDI **vers** le synthé (branché sur son MIDI IN). Si rien n’est choisi : `NO OUTPUT` |
 | `KEYBOARD FROM` | En **application autonome** : port du clavier maître. En **plugin** : fixé à `HOST` (notes via le DAW) |
 
-Dans le bandeau du haut (`HEADER`), le bloc `MIDI` comporte des **LEDs** `FROM SYNTH`, `TO SYNTH` et `FROM KEYBOARD` qui clignotent lorsque des messages MIDI circulent. Les mêmes voyants se retrouvent dans `SETTINGS…` → `MIDI & DEVICE` : ils aident à sélectionner les bons ports. Quand le Matrix-Control interroge le synthé à intervalle régulier et que celui-ci répond, ou lorsque vous jouez sur le clavier MIDI, le clignotement confirme que les ports choisis correspondent au matériel branché.
+Dans le bandeau du haut (`HEADER`), le groupe `MIDI` comporte des **LEDs** `FROM SYNTH`, `TO SYNTH` et `FROM KEYBOARD` qui clignotent lorsque des messages MIDI circulent. Les mêmes voyants se retrouvent dans `SETTINGS…` → `MIDI & DEVICE` : ils aident à sélectionner les bons ports. Quand le Matrix-Control interroge le synthé à intervalle régulier et que celui-ci répond, ou lorsque vous jouez sur le clavier MIDI, le clignotement confirme que les ports choisis correspondent au matériel branché.
 
 Le Matrix-Control mémorise les ports choisis et tente de les rouvrir au prochain lancement. Dès qu’ils sont ouverts, il demande au synthé de s’identifier. La liste `EPROM TYPE` suit en général le type reconnu ; un ` *` dans la liste ouverte marque la suggestion automatique.
-
-**Astuce.** Dans Settings → `AUDIO` (application autonome), le libellé `SYNTH FROM` désigne les **canaux d’écoute** du retour audio.
 
 **Plusieurs instances.** Si vous ouvrez plusieurs Matrix-Control en même temps, **ne partagez pas les mêmes ports MIDI** entre deux fenêtres : chaque instance doit avoir sa propre paire `SYNTH FROM` / `SYNTH TO` vers **un** synthé. Deux machines = deux jeux de ports.
 
@@ -563,7 +561,7 @@ Trois modules — `MIDI`, `VIBRATO`, `MISC` — avec chacun un `I` pour réiniti
 | Réglage | Effet |
 |---------|--------|
 | `MEMORY PROTECT` | Empêche d’écrire des patches. Si `STORE` ne produit aucun enregistrement apparent, vérifiez ici d’abord |
-| `BANK LOCK` | Verrouille le changement de banque (ce n’est **pas** un bouton de `BANK UTILITY`) |
+| `BANK LOCK` | Verrouille le changement de banque côté Matrix-1000 (`MASTER EDIT` → `MISC`) |
 
 Pour enregistrer, travaillez de préférence sur une banque `0` ou `1`.
 
@@ -605,7 +603,7 @@ Les préférences sont regroupées par onglets.
 - **`GETTING STARTED`** — ligne `SETUP WIZARD` : `SHOW WHEN INCOMPLETE` (défaut), `NEVER SHOW AT LAUNCH`, ou `RUN SETUP AGAIN` ([section 5](#5-assistant-de-premier-lancement-getting-started))
 - **`USER INTERFACE`** — `UI SCALE`, `SKIN`, `INFO MESSAGE`, `CONTEXTUAL HELP`. Si l’interface VST3 paraît floue dans Ableton Live sous Windows, voyez plutôt Auto-Scale Plugin Window de Live ([Ableton Live](#ableton-live))
 - **`MIDI & DEVICE`** — ports `SYNTH FROM` / `SYNTH TO` (`KEYBOARD FROM` en application autonome), badge `DEVICE`, `EPROM TYPE` ; `HARDWARE LATENCY` en plugin seulement
-- **`AUDIO`** — **application autonome seulement** : interface / `DRIVER TYPE`, entrées / sorties, canaux d’écoute `SYNTH FROM` (audio, pas le port MIDI), fréquence d’échantillonnage, buffer… (ASIO sous Windows ou JACK sous Linux peuvent apparaître selon votre machine)
+- **`AUDIO`** — **application autonome seulement** : interface / `DRIVER TYPE`, entrées / sorties, canaux d’écoute du retour audio (libellés `SYNTH FROM`), fréquence d’échantillonnage, buffer… (ASIO sous Windows ou JACK sous Linux peuvent apparaître selon votre machine)
 
 Autres réglages utiles : affichage des noms (`MATRIX-1000 PATCHES`, `COMPUTER PATCHES`), avertissement de patch non sauvé (`UNSAVED STATE`), modèles `INIT` patch / Master (`SAVE AS INIT` / `DELETE`), et utilitaires Master (`LOAD` / `SAVE AS` / `INIT`). Préférez ces boutons Settings plutôt que d’éditer à la main les fichiers modèles dans le Finder.
 
@@ -645,7 +643,7 @@ En général **non** conservé tel quel : le patch en cours d’édition (le log
 | Plugin invisible dans le DAW | Rescanner les plugins ; vérifier le format (AU/VST3) et le dossier indiqué avec le téléchargement |
 | Pas de notes en plugin | Router le clavier maître vers la piste Matrix-Control dans le DAW ([exemples](#clavier-maître-via-le-daw-plugin)) ; `KEYBOARD FROM` reste sur `HOST` |
 | Assistant `GETTING STARTED` ne s’ouvre plus | Dans Settings → `GETTING STARTED` → `SETUP WIZARD`, choisir `SHOW WHEN INCOMPLETE` ou cliquer `RUN SETUP AGAIN` |
-| Pas de son en application autonome | Vérifier Settings → `AUDIO` (`DRIVER TYPE` / interface, entrée, canaux d’écoute `SYNTH FROM` — pas le port MIDI) et le câblage vers l’interface audio |
+| Pas de son en application autonome | Vérifier Settings → `AUDIO` (`DRIVER TYPE` / interface, entrée, canaux d’écoute `SYNTH FROM`) et le câblage vers l’interface audio |
 | Interface VST3 floue dans Ableton Live (Windows) | Désactiver **Auto-Scale Plugin Window** pour le Matrix-Control, recharger le device ; comparer avec l’application autonome (voir [Ableton Live](#ableton-live)) |
 | Deux instances entrent en conflit (détection / édition instable ou incohérente) | Ne pas partager les mêmes ports : une paire `SYNTH FROM` / `SYNTH TO` distincte par instance (et par machine si vous en avez plusieurs) — voir [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi) |
 | Audio en retard dans le DAW | Ajuster `HARDWARE LATENCY` dans Settings → `MIDI & DEVICE` (plugin) ; et la taille de buffer du DAW / de l’interface audio |
