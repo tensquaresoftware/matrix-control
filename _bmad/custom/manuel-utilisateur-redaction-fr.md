@@ -93,7 +93,9 @@ Utiliser de façon cohérente :
 
 | Terme | Désigne |
 |-------|---------|
-| **Panneau** | Grandes régions de la fenêtre principale : `HEADER`, `BODY`, `FOOTER` (schéma ASCII §7 aligné sur le guide de tests bêta) |
+| **Panneau** | Grandes régions de la fenêtre principale : `HEADER`, `BODY`, `FOOTER` (schéma ASCII §7 du manuel). **Disposition chrome** (`HEADER` / `FOOTER` / Settings / assistant) : vérifier le panneau dans `Source/` (ex. `HeaderPanel`) et les libellés dans `PluginDisplayNames.h`. Le guide de tests bêta **n’est pas** la référence de layout — il peut être en retard. |
+| **`HEADER` (état actuel)** | Logo + Undo/Redo + **LEDs** d’activité MIDI (`FROM SYNTH` / `TO SYNTH` / `FROM KEYBOARD`) +, en application autonome, `INPUT GAIN` / monitoring. **Plus de listes / combos de ports dans le bandeau** — le choix des ports MIDI est uniquement dans `SETTINGS…` → `MIDI & DEVICE` (et l’assistant `GETTING STARTED`). Ne jamais écrire « régler le MIDI depuis le bandeau ». |
+| **`FOOTER` (état actuel)** | Messages / aide à gauche ; badge `DEVICE` à droite. Pas de sélecteurs MIDI. |
 | **Section** | Grands blocs dans le `BODY` : `PATCH EDIT`, `MATRIX MODULATION`, `PATCH MANAGER`, `MASTER EDIT` |
 | **Module** | Blocs fonctionnels : `DCO 1`, `BANK UTILITY`, `PATCH MUTATOR`, etc. |
 | **Bus de modulation** | Une des dix voies de `MATRIX MODULATION` |
@@ -140,7 +142,7 @@ Dossier : `Documentation/Users/Manuals/Screenshots/`.
 
 Nommage des fichiers (ASCII, stable) :
 
-`NN-english-slug.png` — `NN` = section number in the manual; **English** slug (project primary language), e.g. `01-main-window-matrix-1000.png`.
+`NN-english-slug.png` — `NN` = section number in the manual; **English** slug (project primary language), e.g. `02-main-window-matrix-1000.png`, `04-matrix-control-in-daw.png`, `05-getting-started-intro.png`.
 
 Cible d’affichage principale : **Typora** (édition) et **PDF** exporté depuis Typora (musiciens). Le `.md` source reste lisible tel quel pour qui préfère Markdown.
 
@@ -240,9 +242,10 @@ Les phrases hors liste gardent une ponctuation normale.
 ## 9. Exactitude et évolutions
 
 1. Avant d’écrire ou de mettre à jour un passage : **vérifier le comportement réel** dans `Source/` (et les libellés dans `PluginDisplayNames.h` / l’UI).
-2. Si le code change (nouveau module, dialogue, libellé) : **mettre à jour le manuel dans le même mouvement** que la livraison fonctionnelle, ou immédiatement après.
-3. En cas de doute entre PRD et code : **le code gagne** ; le manuel décrit l’existant.
-4. Les messages UI cités doivent rester fidèles à l’anglais affiché.
+2. Pour tout ce qui touche au **chrome** (`HEADER`, `FOOTER`, Settings, `GETTING STARTED`) : **ne pas** s’appuyer sur le guide bêta ni sur une formulation déjà présente dans le manuel sans relecture code — c’est la cause typique des descriptions périmées (ex. anciennes listes MIDI dans le bandeau).
+3. Si le code change (nouveau module, dialogue, libellé) : **mettre à jour le manuel dans le même mouvement** que la livraison fonctionnelle, ou immédiatement après. Si le guide bêta décrit encore l’ancienne UI, le corriger aussi — ou au minimum ne pas le traiter comme SSOT de layout.
+4. En cas de doute entre PRD / docs Users et code : **le code gagne** ; le manuel décrit l’existant.
+5. Les messages UI cités doivent rester fidèles à l’anglais affiché.
 
 ---
 
@@ -253,8 +256,10 @@ Les phrases hors liste gardent une ponctuation normale.
 - [ ] `synthé` à la place de « Matrix » seul ; `Matrix-6/6R` orthographié correctement
 - [ ] Logo `MATRIX-CONTROL` ; contrôles en backticks
 - [ ] Section / Module / Bus / Groupe / Afficheur utilisés correctement
+- [ ] `HEADER` = LEDs MIDI (pas de listes de ports) ; ports = `SETTINGS…` → `MIDI & DEVICE` / assistant seulement
+- [ ] Chrome vérifié dans `Source/` (pas recopié depuis le guide bêta)
 - [ ] « patch » plutôt que « son » (contexte Oberheim)
-- [ ] « un DAW » ; « interface audio »
+- [ ] « un DAW » ; « interface audio » ; « application autonome » après une seule intro Standalone
 - [ ] Modules de synthèse et MASTER EDIT sans inventaires de paramètres
 - [ ] Matrice = centre nerveux + bus + prose développée + drag gris/rouge
 - [ ] Dialogues dans le scénario concerné
