@@ -5,12 +5,7 @@ Projet: Matrix-Control
 Titre: Matrix-Control — Manuel utilisateur
 Version: 1.0
 Version-Produit: 1.0.0-alpha.8
-Created: 2026-07-20
-Updated: 2026-11-26
-References:
-  - Documentation/Users/Manuals/ (EN user manual à venir)
-  - CONTRIBUTING.md
-  - README.md
+Révision: 26/11/2026
 ---
 
 # Matrix-Control — Manuel utilisateur
@@ -57,9 +52,7 @@ Sur le Matrix-1000, les banques **0** et **1** sont réinscriptibles (mémoire u
 
 Le **Matrix-Control** est un **éditeur MIDI** moderne conçu pour cette famille de synthétiseurs. Il s’agit d’une refonte complète du module Max for Live *Matrix-1000 Editor* proposé en décembre 2020. Le Matrix-Control a été pensé d’abord pour le **Matrix-1000**, car non programmable en façade. L’éditeur est également très utile aux possesseurs de **Matrix-6** et **Matrix-6R**, qui partagent pour l’essentiel la même architecture.
 
-Le Matrix-Control ne produit pas le son : celui-ci est toujours généré par votre synthé. L’éditeur agit comme une télécommande à l’écran — boutons, curseurs, menus et afficheurs — en échangeant des messages MIDI « System Exclusive » (SysEx) avec la machine.
-
-Pour **entendre** le résultat, branchez la sortie audio du synthé vers une entrée de votre interface audio, une table de mixage ou vos enceintes. Le Matrix-Control ne remplace pas ce chemin audio et n’enregistre pas le son.
+Le Matrix-Control ne produit pas le son : celui-ci est toujours généré par votre synthé. L’éditeur agit comme une télécommande à l’écran — boutons, curseurs, menus et afficheurs — en échangeant des messages MIDI « System Exclusive » (SysEx) avec la machine. Le chemin audio (sortie du synthé vers votre écoute) se règle côté matériel ; le détail figure à la [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi).
 
 Vous pouvez l’utiliser :
 
@@ -111,9 +104,7 @@ En haut, le `HEADER` ; au centre, le panneau principal `BODY` (structuré en tro
 - **Deux câbles MIDI** pour une communication **bidirectionnelle** (ordinateur ↔ synthé) :
   - De l’ordinateur **vers** le synthé (pour transmettre les patches et les réglages globaux « Master »)
   - Du synthé **vers** l’ordinateur (afin que le Matrix-Control puisse reconnaître la machine, lire le patch courant, etc.)
-- Un **chemin audio** pour entendre le synthé : sortie audio du synthé vers une entrée d’interface audio, une table de mixage ou des enceintes. En application autonome, l’écoute se règle dans `SETTINGS…` → `AUDIO` ; dans la version plugin, le retour audio arrive en général sur une **piste audio séparée** du DAW (détail en [sections 4](#4-installer-et-lancer-le-matrix-control) et [16](#16-utiliser-lapplication-autonome-et-la-version-plugin))
-
-Sans connexion MIDI dans les deux sens, l’éditeur ne peut pas piloter correctement le synthé. Sans chemin audio, vous pourrez éditer à l’écran, mais vous n’entendrez pas le résultat.
+- Un **chemin audio** : sortie du synthé vers une entrée d’interface audio, une table de mixage ou des enceintes (schéma et réglages à la [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi))
 
 ### Ordinateur
 
@@ -131,13 +122,12 @@ Sans connexion MIDI dans les deux sens, l’éditeur ne peut pas piloter correct
 
 ### Pour démarrer sereinement
 
-- Savoir brancher les ports MIDI IN / MIDI OUT (ou USB-MIDI), et la sortie audio du synthé vers votre écoute
 - Savoir lancer une application, **ou** ouvrir un instrument virtuel dans votre DAW si vous utilisez la version plugin
 - L’interface du Matrix-Control est en **anglais** : ce manuel traduit et explique chaque section au fil de la lecture
 
 ## 4. Installer et lancer le Matrix-Control
 
-Avant le premier lancement, branchez de préférence le MIDI dans les deux sens (ordinateur ↔ synthé) et la sortie audio du synthé vers votre écoute — voir [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi). Vous pourrez aussi le faire pendant l’assistant `GETTING STARTED`, mais brancher le MIDI et l’audio avant d’ouvrir le logiciel évite de chercher les ports ou de régler l’écoute sans signal.
+Idéalement, réalisez le câblage MIDI et audio **avant** le premier lancement — voir [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi). Vous pourrez aussi le finaliser pendant l’assistant `GETTING STARTED`.
 
 ### Télécharger et installer le logiciel
 
@@ -161,7 +151,7 @@ Si la version plugin n’apparaît pas dans votre DAW, rescannez la liste des pl
 2. Chargez le **Matrix-Control** comme instrument virtuel
 3. Au premier lancement, l’assistant `GETTING STARTED` s’ouvre automatiquement pour vous guider (voir [section 5](#5-assistant-de-premier-lancement-getting-started))
 4. Assurez-vous que la piste peut envoyer et recevoir du MIDI vers / depuis votre interface (selon votre DAW)
-5. Pour entendre le synthé dans le DAW, créez également une **piste audio** distincte et branchez-y la sortie du synthé — soit une entrée de votre interface audio, soit un retour de table de mixage. Le Matrix-Control ne remplace pas le synthé : il le pilote en MIDI ; le son arrive toujours de la machine
+5. Pour l’écoute du synthé : une **piste audio** séparée — détail et exemples par DAW à la [section 6](#jouer-et-éditer-dans-un-daw)
 
 <div align="center">
 <img src="Screenshots/04-matrix-control-in-daw.png" alt="Le Matrix-Control chargé comme instrument dans un DAW." />
@@ -190,7 +180,7 @@ L’écran d’accueil de l'assistant propose un bouton `CONTINUE` pour démarre
 | 3 | `MIDI KEYBOARD` | Sélectionner un clavier maître MIDI (facultatif, détail ci-dessous) |
 | 4 | `AUDIO` | **Application autonome seulement** — choisir une interface audio et une entrée pour entendre le synthé |
 
-Dans la version plugin, l’assistant s’arrête après l’étape clavier : le DAW gère déjà l’audio de la session, et le son du synthé arrive en général sur une piste audio séparée (voir [section 4](#4-installer-et-lancer-le-matrix-control)).
+Dans la version plugin, l’assistant s’arrête après l’étape clavier : le DAW gère déjà l’audio de la session (écoute du synthé : [section 6](#jouer-et-éditer-dans-un-daw)).
 
 Après l’introduction, naviguez avec `PREVIOUS` et `NEXT`, puis `FINISH` à la dernière étape. Vous pouvez avancer même si le synthé n’est pas encore reconnu : le câblage et les ports se finalisent à la [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi) et dans Settings.
 
@@ -627,6 +617,8 @@ Autres réglages utiles : affichage des noms (`MATRIX-1000 PATCHES`, `COMPUTER P
 
 ## 16. Utiliser l’application autonome et la version plugin
 
+Tableau récapitulatif — le détail du câblage et du jeu en DAW est à la [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi).
+
 | Fonction | Application autonome | Version plugin dans le DAW |
 |----------|----------------------|--------------------|
 | Assistant `GETTING STARTED` | Inclut l’étape Audio | Pas d’étape Audio ; notes via le DAW |
@@ -636,8 +628,6 @@ Autres réglages utiles : affichage des noms (`MATRIX-1000 PATCHES`, `COMPUTER P
 | Écoute du synthé | Settings → `AUDIO` + monitoring dans l’app | Piste audio séparée (ex. Monitor : In sous Live) |
 | `INPUT GAIN` / monitoring bandeau | Visibles | Masqués |
 | `HARDWARE LATENCY` | Masqué | Visible (Settings → `MIDI & DEVICE`) |
-
-Dans les deux cas, le **son** reste celui du synthé : le Matrix-Control pilote les réglages. En version plugin, voir aussi [Jouer et éditer dans un DAW](#jouer-et-éditer-dans-un-daw).
 
 ### Ce qui est mémorisé d’une session à l’autre
 
