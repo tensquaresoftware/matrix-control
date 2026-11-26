@@ -17,7 +17,7 @@ Révision: 26/11/2026
 1. [Oberheim Matrix-1000, Matrix-6 et Matrix-6R](#1-oberheim-matrix-1000-matrix-6-et-matrix-6r)
 2. [Qu’est-ce que le Matrix-Control ?](#2-quest-ce-que-le-matrix-control)
 3. [Se repérer dans la fenêtre principale](#3-se-repérer-dans-la-fenêtre-principale)
-4. [Équipements nécessaires pour utiliser le Matrix-Control](#4-équipements-nécessaires-pour-utiliser-le-matrix-control)
+4. [Équipements nécessaires](#4-équipements-nécessaires)
 5. [Installer et lancer le Matrix-Control](#5-installer-et-lancer-le-matrix-control)
 6. [Connecter le synthé et établir la communication MIDI](#6-connecter-le-synthé-et-établir-la-communication-midi)
 7. [Assistant de premier lancement (GETTING STARTED)](#7-assistant-de-premier-lancement-getting-started)
@@ -37,13 +37,19 @@ Révision: 26/11/2026
 
 Les synthétiseurs Oberheim **Matrix-1000**, **Matrix-6** et **Matrix-6R** forment une même famille. Ils partagent en grande partie la même architecture sonore : deux oscillateurs (DCO), un filtre passe-bas résonant (VCF), deux amplificateurs (VCA), trois enveloppes, deux LFO, une matrice de modulation — le « cœur Matrix » qui a donné son nom à ces machines.
 
+<div align="center">
+<img src="Screenshots/01-oberheim-matrix-1000.jpg" alt="Synthétiseur Oberheim Matrix-1000." />
+<br />
+<em>Synthétiseur Oberheim Matrix-1000.</em>
+</div>
+
 Ce qui change surtout à l’usage :
 
 | | **Matrix-1000** | **Matrix-6/6R** |
 |---|-----------------|----------------|
 | **Façade** | Non programmable en façade (très peu de boutons) : un éditeur externe devient indispensable | Programmables en façade — version clavier (Matrix-6) ou rack (Matrix-6R) |
 | **Mémoire** | **10 banques** (0–9), **100 patches** par banque | **100 patches** seulement (pas de banques) |
-| **Réglages globaux (Master)** | Master avec notamment les **Groupes** propres au Matrix-1000 | Master différent sur quelques points ; **pas de Groupes** |
+| **Réglages globaux (Master)** | Master avec notamment les **Groupes** propres au Matrix-1000 (pas encore éditables dans le Matrix-Control — voir [section 14](#groupes-matrix-1000)) | Master différent sur quelques points ; **pas de Groupes** |
 | **Autres écarts** | Pas de mode Split ; sortie audio mono | Mode Split ; sortie audio stéréo ; davantage de commandes directes en façade |
 
 Sur le Matrix-1000, les banques **0** et **1** sont réinscriptibles (mémoire utilisateur). Les banques **2 à 9** sont en lecture seule (mémoire d’usine) : on y consulte les sons d’origine, on ne les écrase pas.
@@ -118,7 +124,7 @@ Dans ce manuel, **section** désigne un grand bloc (`PATCH EDIT`, `MATRIX MODULA
 - **À gauche :** messages et, le cas échéant, l’aide contextuelle
 - **À droite :** badge `DEVICE` — machine détectée (par ex. Matrix-1000) ou `NOT CONNECTED`
 
-## 4. Équipements nécessaires pour utiliser le Matrix-Control
+## 4. Équipements nécessaires
 
 ### Matériel
 
@@ -154,7 +160,7 @@ Idéalement, effectuez le câblage MIDI et audio **avant** le premier lancement 
 
 ### Télécharger et installer le logiciel
 
-Le Matrix-Control se télécharge sous la forme d'un fichier ZIP comprenant une application autonome et les plugins compatibles avec votre système d'exploitation, accompagnés de la documentation utilisateur :
+Le Matrix-Control se télécharge sous la forme d'un fichier ZIP comprenant une application autonome et les plugins compatibles avec votre système d'exploitation, accompagnés de la documentation utilisateur (dont ce manuel et, pour le Matrix-1000, la liste [Oberheim Matrix-1000 – Factory Patch Names](Oberheim-Matrix-1000-Factory-Patch-Names.pdf)) :
 
 - **Application autonome** — l’application Matrix-Control, à lancer comme n’importe quel autre logiciel
 - **Plugin VST3** (macOS, Windows, Linux) — à placer dans le dossier VST3 habituel de votre système
@@ -201,6 +207,8 @@ Dans l’ordre, côté matériel :
 3. **Sortie audio** du synthé → entrée de votre interface audio, table de mixage ou enceintes
 4. Allumez le synthé et votre interface audio/MIDI
 5. Vérifiez que le canal MIDI du synthé soit cohérent avec celui que vous utiliserez (sur Matrix-1000, vous pourrez aussi le régler dans `MASTER EDIT` → `MIDI` → `CHANNEL`)
+
+Dans la mesure du possible, réservez une **paire de ports MIDI dédiée** au Matrix (entrée + sortie). Cela évite que d’autres appareils du home studio reçoivent les messages SysEx du synthé, et que le Matrix soit perturbé par le trafic MIDI d’une autre machine.
 
 ### Sélection des ports MIDI
 
@@ -338,6 +346,8 @@ Entre deux modules du même type (`LFO` ↔ `LFO`, `DCO` ↔ `DCO`), le collage 
 ### PATCH NAME
 
 L’afficheur montre le nom courant (8 caractères). Un **double-clic** permet de le renommer quand le contexte l’autorise — par exemple un fichier Computer Patches, ou un patch en mémoire réinscriptible. Sous Compare, sur une banque ROM 2–9, ou quand les noms matériels Matrix-1000 sont affichés, le double-clic laisse le nom en lecture seule.
+
+Sur Matrix-1000, les banques **2 à 9** (usine) affichent en général les noms Oberheim d’origine. La liste complète figure dans le document [Oberheim Matrix-1000 – Factory Patch Names](Oberheim-Matrix-1000-Factory-Patch-Names.pdf), fourni avec ce manuel. Les banques **0** et **1** (utilisateur) n’ont pas de noms mémorisés dans la machine : l’éditeur peut afficher un libellé générique du type `BNK0:77` selon le réglage d’affichage des noms.
 
 Le nom modifié vit d’abord dans l’éditeur. Pour le **garder** : `STORE` (mémoire du synthé) ou `SAVE` / `SAVE AS` (fichier). Ce nom de 8 caractères n’est pas le même objet que le nom de fichier `.syx` sur l’ordinateur.
 
@@ -532,6 +542,21 @@ Pour enregistrer, travaillez de préférence sur une banque `0` ou `1`.
 
 **Sur Matrix-6/6R**, mettez l’interrupteur **Memory Protect** à l’arrière de la machine sur Off pour pouvoir `STORE`.
 
+### Groupes (Matrix-1000)
+
+Les **Groupes** sont une fonction propre au Matrix-1000 (plusieurs machines / unités liées). Le Matrix-Control **n’édite pas encore** ces matrices à l’écran : vous continuez de les gérer sur la machine, ou via un fichier Master `.m1km` qui les contient déjà.
+
+Lorsque vous chargez un `.m1km` depuis Settings (utilitaires Master → `LOAD`), une boîte peut proposer :
+- **`MASTER SETTINGS ONLY`** — recharge les réglages Master affichés ici, et **réinitialise** Groupes / cascade côté fichier appliqué
+- **`FULL MASTER`** — conserve aussi les données Groupes / cascade présentes dans le fichier
+- **`CANCEL`** — laisse le Master courant inchangé
+
+### Si le synthé ne répond plus
+
+Après certaines manipulations Master (Groupes ou autres), le Matrix-1000 peut sembler « figé » face à l’éditeur. Dans la majorité des cas :
+1. Sauvegardez d’abord le Master si besoin (`SAVE AS` dans Settings), puis utilisez `INIT` Master (Settings, ou `I` sur les modules concernés — vous perdrez les réglages Master non sauvés)
+2. Si le contrôle ne revient pas : éteignez le synthé, maintenez **ENTER** enfoncé à la mise sous tension (procédure Oberheim ; quelques secondes), puis rouvrez les ports MIDI
+
 > **Capture d’écran — À placer ici**  
 > *Légende :* Section `MASTER EDIT` (modules `MIDI`, `VIBRATO`, `MISC`) sur Matrix-1000.
 
@@ -572,6 +597,8 @@ Les préférences sont regroupées par onglets.
 
 Dans `MIDI & DEVICE`, la liste **`EPROM TYPE`** indique quelle mémoire / firmware équipe votre Matrix — d’usine (`FACTORY`) ou alternative (`GLIGLI`, `TAUNTEK`, `UNTERGEEK`…). Quand le synthé est reconnu, le Matrix-Control propose en général la valeur adaptée. Si vous ouvrez la liste, une étoile ` *` marque cette suggestion : vous pouvez la confirmer ou en choisir une autre.
 
+L’édition SysEx est en général **plus fluide** avec une EPROM alternative (par ex. TaunTek) qu’avec une EPROM d’usine : moins de ralentissements ou de blocages lors des échanges. Le Matrix-Control fonctionne aussi en `FACTORY` ; choisissez surtout la valeur qui correspond vraiment à votre machine. Le remplacement d’EPROM est une opération technique (risque électrique) — consultez la documentation du fabricant de l’EPROM si vous envisagez une mise à jour matérielle.
+
 Autres réglages utiles : affichage des noms (`MATRIX-1000 PATCHES`, `COMPUTER PATCHES`), avertissement de patch non sauvé (`UNSAVED STATE`), modèles `INIT` patch / Master (`SAVE AS INIT` / `DELETE`), et utilitaires Master (`LOAD` / `SAVE AS` / `INIT`). Préférez ces boutons Settings plutôt que d’éditer à la main les fichiers modèles dans le Finder.
 
 > **Capture d’écran — À placer ici**  
@@ -602,6 +629,7 @@ En général **non** conservé tel quel : le patch en cours d’édition (le log
 | Symptôme | Que faire |
 |----------|-----------|
 | `NOT CONNECTED` / éditeur verrouillé | Vérifier le sens des câbles ; les ports `SYNTH FROM` / `SYNTH TO` (Settings → `MIDI & DEVICE`) ; que le synthé est allumé ; éventuellement l’éteindre puis le rallumer ; sous Windows, s’assurer qu’aucune autre application n’occupe le port |
+| Le synthé ne répond plus aux commandes (après Master / Groupes…) | Sauvegarder le Master si besoin, puis `INIT` Master (Settings) ; si besoin, réinitialisation façade Oberheim : **ENTER** maintenu à la mise sous tension — voir [MASTER EDIT](#si-le-synthé-ne-répond-plus) |
 | Les contrôles bougent mais le patch ne change pas | Vérifier `SYNTH TO` ; le canal MIDI (`MASTER EDIT` sur Matrix-1000) ; `MEMORY PROTECT` / `BANK LOCK` |
 | Changement de patch : l’écran ne se met pas à jour | Vérifier le port MIDI `SYNTH FROM` (Settings → `MIDI & DEVICE` ; le synthé doit pouvoir répondre) |
 | `STORE` ou `PASTE` grisés | Banque 2–9 sur Matrix-1000 — passer en banque 0 ou 1 |
@@ -638,7 +666,8 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 | **ENV** | Envelope — enveloppe (attaque, decay, sustain, release…) qui façonne l’évolution du patch dans le temps. |
 | **FM** | Modulation de fréquence du filtre par l’oscillateur, pour des timbres plus riches ou métalliques. |
 | **GETTING STARTED** | Assistant de premier lancement : Skin et taille de fenêtre, ports MIDI vers / depuis le synthé, clavier maître éventuel, et écoute audio en application autonome. S’ouvre au premier lancement ; se relance depuis Settings → `GETTING STARTED` → `SETUP WIZARD`. |
-| **Groupe** | Sous-partie d’un module (`BROWSER`, `MEMORY`, `STORAGE`, etc.). |
+| **Groupe** (UI) | Sous-partie d’un module de l’interface (`BROWSER`, `MEMORY`, `STORAGE`, etc.). |
+| **Groupes** (Master) | Fonction Matrix-1000 reliant plusieurs unités / patches. Pas encore éditables dans le Matrix-Control ; pris en charge à l’import d’un `.m1km` (`MASTER SETTINGS ONLY` / `FULL MASTER`) — voir [section 14](#groupes-matrix-1000). |
 | **JACK** | Sous Linux, serveur / pilote audio souvent utilisé en MAO. Peut apparaître dans Settings → `AUDIO` → `DRIVER TYPE` en application autonome, selon votre installation. |
 | **LFO** | Oscillateur lent : fait vibrer, trembler ou balayer un paramètre. |
 | **MASTER** | Réglages globaux de la machine (canal MIDI, vibrato, accordage…), distincts d’un patch. |
@@ -662,6 +691,7 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 | **SYNTH FROM / SYNTH TO** | Ports MIDI vers / depuis le synthé, dans Settings → `MIDI & DEVICE`. Dans le `HEADER`, `FROM SYNTH` / `TO SYNTH` désignent les **voyants** d’activité MIDI. Dans Settings → `AUDIO` (application autonome), `SYNTH FROM` désigne aussi les canaux d’écoute du retour audio. |
 | **SysEx** | Messages MIDI détaillés propres à une marque / un modèle, utilisés pour éditer le synthé en profondeur. |
 | **`.m1kp`** | Fichier de patch Matrix-Control (chargement via Computer Patches / glisser-déposer). La sauvegarde native reste un `.syx` ; le `.m1kp` d’origine n’est pas réécrit. |
+| **`.m1km`** | Fichier Master (réglages globaux) ; peut inclure des données Groupes / cascade. Chargement via Settings → utilitaires Master → `LOAD`. |
 | **`.syx`** | Fichier qui contient un patch au format SysEx. |
 | **Track Generator** | Courbe qui transforme la position sur le clavier en valeur de modulation (afficheur interactif). |
 | **VCA** | Étage de volume du patch. |
