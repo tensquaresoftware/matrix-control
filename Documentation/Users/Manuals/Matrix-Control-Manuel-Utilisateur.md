@@ -315,18 +315,18 @@ Pour le relancer, ou pour empêcher qu’il s’ouvre automatiquement : `SETTING
 
 `PATCH EDIT` est le cœur de la programmation sonore : oscillateurs, filtre, enveloppes, LFO… Chaque mouvement de bouton, de curseur ou de menu est transmis au synthé. Vous entendez le résultat tout de suite sur la machine (et via l’écoute audio en application autonome).
 
-Dès que le synthé est détecté, le patch courant de la machine apparaît ici. Pour en charger un autre depuis la mémoire du synthé ou depuis un fichier, utilisez [`INTERNAL PATCHES`](#10-gérer-les-patches-dans-le-synthé-internal-patches) et [`COMPUTER PATCHES`](#12-gérer-les-patches-dans-lordinateur-computer-patches) plus loin dans ce manuel.
+Dès que le synthé est détecté, le patch courant de la machine apparaît ici. Pour en charger un autre depuis la mémoire du synthé ou depuis un fichier, utilisez `INTERNAL PATCHES` et `COMPUTER PATCHES` — voir [section 10](#10-gérer-les-patches-dans-le-synthé-internal-patches) et [section 12](#12-gérer-les-patches-dans-lordinateur-computer-patches).
 
 ### UNDO / REDO
 
-| Action | macOS | Windows / Linux |
+| Action | Raccourci clavier macOS | Raccourci clavier Windows / Linux |
 |--------|-------|-----------------|
-| Annuler | ⌘Z | Ctrl+Z |
-| Rétablir | ⌘⇧Z | Ctrl+Shift+Z |
+| Annuler la dernière opération | ⌘Z | Ctrl+Z |
+| Rétablir l'opération annulée | ⌘⇧Z | Ctrl+Shift+Z |
 
-Ces raccourcis concernent les **réglages** du patch (et du Master / de la matrice). Ils ne remplacent ni l’historique du Patch Mutator, ni le bouton `C` (Compare).
+Ces raccourcis concernent les **réglages** du Patch, du Master et de la matrice de modulation. Ils ne remplacent ni l’historique du Patch Mutator, ni le bouton `C` (Compare).
 
-En pratique : un glisser de curseur, un geste sur une enveloppe ou le Track Generator, un `I` / `P` de module, ou un réordonnancement de bus Matrix Mod comptent chacun comme une étape. Charger un autre patch, importer une banque, coller un patch complet, ou lancer `MUTATE` / `RETRY` repart d’une nouvelle base : on ne peut plus annuler « avant » ce point.
+En pratique : un réglage de curseur, d'enveloppe ou du Track Generator, un clic sur le bouton `I` / `P` d'un module, ou un réordonnancement de bus de Matrix Modulation comptent chacun comme une étape. Charger un autre patch, importer une banque, coller un patch complet, ou lancer `MUTATE` / `RETRY` repart d’une nouvelle base : on ne peut plus annuler « avant » ce point.
 
 `STORE`, `SAVE` / `SAVE AS`, l’import / export de banque et la simple navigation entre patches ne s’annulent pas avec ⌘Z / Ctrl+Z. Pour garder un travail important, utilisez plutôt `STORE`, `SAVE` / `SAVE AS`, ou Compare dans le Mutator.
 
@@ -336,13 +336,13 @@ Sur plusieurs modules, l’en-tête propose :
 
 | Bouton | Action |
 |--------|--------|
-| `I` | Réinitialise le module |
-| `C` | Copie ses réglages |
-| `P` | Colle les réglages précédemment copiés |
+| `I` | Réinitialise le module à ses valeurs par défaut |
+| `C` | Copie les réglages du module vers le presse-papiers |
+| `P` | Colle les réglages présents dans le presse-papiers vers le module |
 
 `P` n’est actif que si le presse-papiers convient au module cible. Sinon il est grisé ; un clic affiche alors un message en bas de fenêtre.
 
-Entre deux modules du même type (`LFO` ↔ `LFO`, `DCO` ↔ `DCO`), le collage reprend en général les réglages communs. Les contrôles propres à un seul côté (par ex. `SYNC` sur `DCO 1`, `DETUNE` / `NOISE` sur `DCO 2`, ou certaines modulations locales des LFO) restent tels quels sur la cible — sans message particulier. Un collage **dans le même module** reprend tous ses paramètres.
+Entre deux modules du même type ( `DCO 1` ↔ `DCO 2`, `ENV 1` ↔ `ENV 2` ↔ `ENV 3`, `LFO 1` ↔ `LFO 2`), le collage reprend en général les réglages communs. Les contrôles propres à un seul côté (par ex. `SYNC` sur `DCO 1`, `DETUNE` / `NOISE` sur `DCO 2`, ou certaines modulations locales des LFO) restent tels quels sur la cible — sans message particulier. Un collage **dans le même module** reprend tous ses paramètres.
 
 ### PATCH NAME
 
