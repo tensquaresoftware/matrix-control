@@ -264,15 +264,17 @@ Deux flux MIDI coexistent :
 4. Créez une piste **audio** branchée sur la sortie du synthé via votre interface, et réglez **Monitor : In**
 5. Jouez quand la piste Matrix-Control est armée ; éditez à tout moment grâce à `SYNTH FROM` / `SYNTH TO`
 
+Par prudence — surtout en jeu live devant une audience — baissez le fader de la piste Matrix-Control à **-inf**. Le plugin est conçu pour être totalement silencieux en sortie. Cependant, fermer le fader offre une double sécurité et évite ainsi tout risque de bruit ou de routage malencontreux sur un gros système. Le son reste sur la piste audio dédiée au monitoring du synthé.
+
 <div align="center">
-<img src="Screenshots/04-matrix-control-in-daw.png" alt="Ableton Live : piste MIDI Matrix-Control armée et piste audio du synthé avec Monitor In." />
+<img src="Screenshots/04-matrix-control-in-daw.png" alt="Ableton Live : piste MIDI Matrix-Control à -inf, piste audio du synthé avec Monitor In et signal au Main." />
 <br />
-<em>Ableton Live : piste MIDI <code>Matrix-Control</code> armée, et piste audio du synthé avec <strong>Monitor : In</strong>.</em>
+<em>Exemple dans Ableton Live : piste MIDI <code>Matrix-Control</code> (fader à <strong>-inf</strong>), piste audio du synthé avec <strong>Monitor : In</strong>, signal visible sur cette piste et sur le Main.</em>
 </div>
 
 #### Autres DAW
 
-Dans Logic Pro, Reason Studios, Bitwig Studio, Cubase, Reaper, etc., le principe est le même : piste MIDI / instrument pour le Matrix-Control (armée pour jouer), piste audio séparée pour le retour du synthé, et édition toujours active via `SYNTH FROM` / `SYNTH TO`. Cherchez surtout l’équivalent de **Monitor : In** — l’écoute permanente de l’entrée (souvent appelée « input monitoring »). Si aucune option de ce type n’existe (ce qui serait étonnant), maintenez la piste audio armée.
+Dans Logic Pro, Reason Studios, Bitwig Studio, Cubase, Reaper, etc., le principe est le même : piste MIDI / instrument pour le Matrix-Control (armée pour jouer), piste audio séparée pour le retour du synthé, et édition toujours active via `SYNTH FROM` / `SYNTH TO`. Cherchez surtout l’équivalent de **Monitor : In** — l’écoute permanente de l’entrée (souvent appelée « input monitoring »). Si aucune option de ce type n’existe (ce qui serait étonnant), maintenez la piste audio armée. La même prudence de fader à **-inf** sur la piste Matrix-Control reste recommandée, surtout en live.
 
 ### Windows : port déjà utilisé
 
