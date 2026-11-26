@@ -149,11 +149,13 @@ Si la version plugin n’apparaît pas dans votre DAW, rescannez la liste des pl
 
 ### Plugin dans un DAW
 
+Voici le minimum pour ouvrir le Matrix-Control dans votre DAW. Le détail — jouer, éditer, écouter le synthé (piste audio, monitoring) — est à la [section 6](#jouer-et-éditer-dans-un-daw).
+
 1. Créez une piste **MIDI / instrument**
 2. Chargez le **Matrix-Control** comme instrument virtuel
 3. Au premier lancement, l’assistant `GETTING STARTED` s’ouvre automatiquement pour vous guider (voir [section 5](#5-assistant-de-premier-lancement-getting-started))
 4. Assurez-vous que la piste peut envoyer et recevoir du MIDI vers / depuis votre interface (selon votre DAW)
-5. Pour l’écoute du synthé : créez une **piste audio** séparée — détail et exemples par DAW à la [section 6](#jouer-et-éditer-dans-un-daw)
+5. Pour l’écoute : prévoyez aussi une **piste audio** séparée pour le retour du synthé
 
 ## 5. Assistant de premier lancement (GETTING STARTED)
 
