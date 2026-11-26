@@ -38,6 +38,7 @@ Ce document capture les exigences de Guillaume pour un manuel **utilisable**, **
 - **Ne pas infantiliser** le lecteur : vocabulaire accessible ≠ vocabulaire basique
 - Éviter le style télégraphique ou « checklist développeur »
 - Partir d’**objets et gestes concrets** (ex. « fichiers ZIP », « brancher MIDI OUT → MIDI IN ») plutôt que de processus de fabrication
+- **Modèle de fluidité :** la section `GETTING STARTED` du manuel FR — intention d’abord, parcours court, détail d’état / cas limites allégés ou renvoyés plus loin. Éviter l’effet « usine à gaz » (mécaniques internes, exceptions empilées) surtout avant le cœur de l’édition
 
 ### Phrase-test utile
 
@@ -52,11 +53,11 @@ Si non → réécrire.
 Ne **pas** parler au lecteur de :
 
 - compilation, build local, presets CMake, chemins de dépôt
-- « release GitHub » comme jargon d’installateur interne (parler plutôt de **téléchargement** de ZIP / paquets prêts à l’emploi)
+- « release GitHub » comme jargon d’installeur interne (parler plutôt de **téléchargement** de ZIP / paquets prêts à l’emploi)
 - chemins vers `Documentation/Devs/…`
 - détails d’implémentation (octets, Device Inquiry brut, NumberBox, inquiry auto, APVTS, etc.) dans le parcours
 
-**Installation :** l’utilisateur télécharge des **exécutables** (Standalone + plugins) et la doc — il ne compile rien. Décrire le geste d’install, pas la chaîne de build.
+**Installation :** l’utilisateur télécharge des **exécutables** (application autonome + plugins) et la doc — il ne compile rien. Décrire le geste d’install, pas la chaîne de build.
 
 Référence de style pour l’intro d’installation (à conserver / imiter) :
 
@@ -75,6 +76,8 @@ Référence de style pour l’intro d’installation (à conserver / imiter) :
 | **patch** (vocabulaire Oberheim) | « son » quand on parle d’un programme mémorisé |
 | **un / le DAW** | une / la DAW |
 | **interface audio** | carte son |
+| **application autonome** — introduire une seule fois **application autonome (Standalone)** en début de manuel, puis uniquement **application autonome** | répéter `Standalone` dans le corps du manuel |
+| Couple des deux formats : toujours **application autonome** puis **plugin** | « plugin et Standalone », « plugin ou application autonome » en tête |
 | **commutateur** (Mutator modules) | « case » |
 | **bus de modulation** | « ligne » de modulation |
 | Titres de section : **verbe d’action** quand c’est naturel, sinon formulation claire (ex. *Qu’est-ce que…*, *Équipements nécessaires…*, *Guide de dépannage*) ; libellé GUI en **MAJUSCULES** entre parenthèses quand utile (ex. *Créer des variations de patch (PATCH MUTATOR)*) | Titres nominaux vagues (*Le Patch Mutator*) ; casse GUI incorrecte |
@@ -107,18 +110,18 @@ Contrôles GUI mentionnés dans le texte : toujours en **`backticks`** (`STORE`,
 
 Aligné sur la table des matières du manuel FR (ne pas renuméroter « pour le plaisir ») :
 
-1. Qu’est-ce que le Matrix-Control ?  
-2. Équipements nécessaires pour utiliser le Matrix-Control  
-3. Synthétiseurs Oberheim Matrix-1000, Matrix-6 et Matrix-6R  
+1. Oberheim Matrix-1000, Matrix-6 et Matrix-6R (famille d’abord : points communs, écarts utiles)  
+2. Qu’est-ce que le Matrix-Control ? (transition : refonte du Matrix-1000 Editor → Matrix-1000 non programmable en façade, utile aussi Matrix-6/6R)  
+3. Équipements nécessaires pour utiliser le Matrix-Control  
 4. Installer et lancer le Matrix-Control  
-5. Utiliser l’assistant de premier lancement (`GETTING STARTED`)  
+5. Assistant de premier lancement (`GETTING STARTED`)  
 6. Connecter le synthé et établir la communication MIDI  
-7. Découvrir l’écran principal  
+7. Se repérer dans l’écran principal  
 8. Éditer un patch (`PATCH EDIT`)  
 9. Éditer la matrice de modulation (`MATRIX MODULATION`)  
-10. Charger un patch depuis la mémoire du synthé (`INTERNAL PATCHES`)  
+10. Gérer les patches dans la mémoire du synthé (`INTERNAL PATCHES`) — inclure le focus de navigation Internal ↔ Computer  
 11. Gérer les banques du Matrix-1000 (`BANK UTILITY`)  
-12. Sauvegarder un patch dans la mémoire du synthé et dans l’ordinateur (`STORE` / `COMPUTER PATCHES`)  
+12. Gérer les patches sur l’ordinateur (`COMPUTER PATCHES`) — pas de doublon `STORE` (déjà en §10)  
 13. Créer des variations de patch (`PATCH MUTATOR`)  
 14. Gérer les paramètres globaux du synthé (`MASTER EDIT`)  
 15. Sélectionner un Skin et ajuster la taille de la fenêtre (`SETTINGS`)  
@@ -203,14 +206,14 @@ Format type — **image placée** (centrage + italique ; pas de préfixe « Lég
 ### Prérequis (§2) et câblage (§6)
 
 - Inclure un **chemin audio** (sortie synthé → interface / table / enceintes) dès les prérequis — pas seulement le MIDI
-- Préciser **deux câbles MIDI** (deux sens) ; DAW **optionnel** si Standalone seul
+- Préciser **deux câbles MIDI** (deux sens) ; DAW **optionnel** si application autonome seule
 - Câblage type : MIDI **et** audio ; idéalement avant / pendant le premier lancement
 
 ### Plateformes
 
-- macOS (Apple Silicon ou Intel) : AU, VST3, Standalone  
-- Windows 10 / 11 : VST3, Standalone  
-- Linux (Ubuntu 24.x / 26.x ou proche) : VST3, Standalone  
+- macOS (Apple Silicon ou Intel) : application autonome, AU, VST3
+- Windows 10 / 11 : application autonome, VST3
+- Linux (Ubuntu 24.x / 26.x ou proche) : application autonome, VST3
 - (Ne plus marquer Linux comme indisponible)
 
 ---
