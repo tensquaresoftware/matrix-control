@@ -365,7 +365,7 @@ Selon votre système, vous devriez trouver au moins :
 [ ] Le plugin VST3
 [ ] Sur macOS seulement : le plugin AU
 [ ] Un dossier Documentation/ (ce guide de tests ; Matrix-Control-Comment-
-    signaler-un-bug-FR.txt pour les bugs hors campagne ; éventuellement un
+    signaler-un-bug.txt pour les bugs hors campagne ; éventuellement un
     manuel)
 [ ] Un dossier Test-Data/ avec des fichiers de test prêts à l'emploi :
       Test-Data/Patches/syx/     — patches .syx (+ invalid-*.syx)
