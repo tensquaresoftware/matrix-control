@@ -197,7 +197,7 @@ Après l’introduction, naviguez avec `PREVIOUS` et `NEXT`, puis `FINISH` à la
 ### Clavier maître
 
 - **Application autonome :** la liste `KEYBOARD FROM` sert à choisir le port MIDI d’un clavier maître. Si vous jouez sur le clavier d’un Matrix-6, ou si vous ne souhaitez pas utiliser de clavier maître, utilisez `SKIP`
-- **Version plugin :** les notes MIDI proviennent du DAW (`KEYBOARD FROM` est fixé à `HOST`). Des exemples de branchement figurent plus loin — voir [DAW et clavier maître](#daw-et-clavier-maître)
+- **Version plugin :** les notes MIDI proviennent du DAW (`KEYBOARD FROM` est fixé à `HOST`). Des exemples de branchement figurent plus loin — voir [Jouer et éditer dans un DAW](#jouer-et-éditer-dans-un-daw)
 
 ### Plus tard, ou à nouveau
 
@@ -259,19 +259,24 @@ Si aucun appareil n’est reconnu, le bas de fenêtre affiche un message du type
 
 Les sections d’édition restent alors verrouillées. C’est voulu : le Matrix-Control n’envoie pas de modifications tant que le synthé n’est pas détecté.
 
-### DAW et clavier maître
+### Jouer et éditer dans un DAW
 
-Dans la version plugin du Matrix-Control, les notes proviennent du DAW : dirigez votre clavier maître vers la piste qui charge le Matrix-Control. Le son du synthé arrive toujours par une piste audio séparée.
+Dans la version plugin, le Matrix-Control se comporte un peu comme un **instrument virtuel** : vous le chargez sur une piste MIDI / instrument, vous jouez depuis le clavier maître quand cette piste est **armée**, et `KEYBOARD FROM` reste sur `HOST`. Particularité importante : le plugin **ne sort pas le son** du synthé — celui-ci arrive sur une **piste audio séparée**, branchée sur la sortie de la machine via votre interface.
 
-L’idée est la même dans la plupart des DAW : piste instrument → Matrix-Control → entrée MIDI / clavier armé vers cette piste. Exemples :
+Deux flux MIDI coexistent :
+
+- **Jouer** — les notes (et autres messages de jeu tels que les contrôleurs continus ou « CC ») suivent l’armement de la piste Matrix-Control, comme pour un instrument virtuel classique
+- **Éditer** — la liaison `SYNTH FROM` / `SYNTH TO` avec le synthé reste **active en permanence**, que la piste soit armée ou non. Vous pouvez donc éditer à l’écran sans vous soucier de l’armement — très pratique au quotidien
+
+Pour l’écoute, réglez la piste audio pour entendre l’entrée en continu. Sous **Ableton Live**, choisissez **Monitor : In**. Dans les autres DAW, cherchez l’équivalent (écoute permanente de l’entrée / input monitoring). Si aucune option de ce type n’existe — ce qui serait étonnant —, maintenez la piste audio armée.
 
 #### Ableton Live
 
 1. Créez une piste **MIDI** (ou Instrument) et chargez le **Matrix-Control**
-2. Armez la piste (ou activez le monitoring MIDI)
-3. Choisissez votre clavier maître comme entrée MIDI, ou laissez « All Ins » si c'est votre unique clavier
-4. Jouez : `KEYBOARD FROM` reste sur `HOST`
-5. Pour entendre le synthé, créez une piste audio branchée sur sa sortie via votre interface
+2. Armez la piste pour jouer (ou activez le monitoring MIDI)
+3. Choisissez votre clavier maître comme entrée MIDI, ou laissez « All Ins » si c’est votre unique clavier
+4. Créez une piste **audio** branchée sur la sortie du synthé via votre interface, et réglez **Monitor : In**
+5. Jouez quand la piste Matrix-Control est armée ; éditez à tout moment grâce à `SYNTH FROM` / `SYNTH TO`
 
 **Image floue sous Windows (VST3).** Si l’interface paraît floue dans Live, désactivez **Auto-Scale Plugin Window** (clic droit sur la barre du device **en bas**, dans la vue Device), puis rechargez le device. Le réglage `UI SCALE` du Matrix-Control est indépendant. L’application autonome reste en général nette sur la même machine. (Rappel aussi en [SETTINGS](#settings) et [Dépannage](#17-guide-de-dépannage).)
 
@@ -279,18 +284,18 @@ L’idée est la même dans la plupart des DAW : piste instrument → Matrix-Con
 
 1. Créez un device **Instrument** et chargez le **Matrix-Control** en VST3
 2. Armez-le pour le jeu en temps réel et choisissez votre clavier comme source MIDI
-3. Jouez : `KEYBOARD FROM` reste sur `HOST`
-4. Pour entendre le synthé, créez une piste / un device audio branché sur sa sortie via votre interface
+3. Créez une piste / un device audio branché sur la sortie du synthé, avec une écoute d’entrée permanente si le logiciel le propose
+4. Jouez quand le device est armé ; l’édition via `SYNTH FROM` / `SYNTH TO` reste disponible en permanence
 
 #### Logic Pro
 
 1. Créez une piste **Instrument logiciel** et chargez le **Matrix-Control** (AU ou VST3)
-2. Choisissez votre clavier comme entrée et activez l’enregistrement / le monitoring de la piste
-3. Jouez : `KEYBOARD FROM` reste sur `HOST`
-4. Créez une piste audio pour le retour sonore du synthé
+2. Choisissez votre clavier comme entrée et activez l’enregistrement / le monitoring de la piste pour jouer
+3. Créez une piste audio pour le retour du synthé, avec une écoute d’entrée permanente si le logiciel le propose
+4. Jouez quand la piste instrument est armée ; l’édition via `SYNTH FROM` / `SYNTH TO` reste disponible en permanence
 
 > **Capture d’écran — À placer ici**  
-> *Légende :* Dans un DAW, clavier maître routé vers la piste qui charge le Matrix-Control (notes vers le plugin ; audio du synthé sur une piste séparée).
+> *Légende :* Piste Matrix-Control + piste audio du synthé ; notes selon l’armement, édition MIDI toujours active.
 
 ### Windows : port déjà utilisé
 
@@ -625,13 +630,14 @@ Autres réglages utiles : affichage des noms (`MATRIX-1000 PATCHES`, `COMPUTER P
 | Fonction | Application autonome | Version plugin dans le DAW |
 |----------|----------------------|--------------------|
 | Assistant `GETTING STARTED` | Inclut l’étape Audio | Pas d’étape Audio ; notes via le DAW |
-| `KEYBOARD FROM` | Choix d’un port MIDI (ou `SKIP`) | Fixé à `HOST` ([exemples](#daw-et-clavier-maître)) |
-| Écoute du synthé | Settings → `AUDIO` + monitoring dans l’app | Piste audio du DAW / interface |
+| `KEYBOARD FROM` | Choix d’un port MIDI (ou `SKIP`) | Fixé à `HOST` ([exemples](#jouer-et-éditer-dans-un-daw)) |
+| Notes jouées | Port `KEYBOARD FROM` | DAW / clavier vers la piste armée |
+| Édition MIDI ↔ synthé | Toujours via `SYNTH FROM` / `SYNTH TO` | Idem — indépendante de l’armement de la piste |
+| Écoute du synthé | Settings → `AUDIO` + monitoring dans l’app | Piste audio séparée (ex. Monitor : In sous Live) |
 | `INPUT GAIN` / monitoring bandeau | Visibles | Masqués |
 | `HARDWARE LATENCY` | Masqué | Visible (Settings → `MIDI & DEVICE`) |
-| Notes jouées | Port `KEYBOARD FROM` | DAW / clavier routé vers la piste |
 
-Dans les deux cas, le **son** reste celui du synthé : le Matrix-Control pilote les réglages.
+Dans les deux cas, le **son** reste celui du synthé : le Matrix-Control pilote les réglages. En version plugin, voir aussi [Jouer et éditer dans un DAW](#jouer-et-éditer-dans-un-daw).
 
 ### Ce qui est mémorisé d’une session à l’autre
 
@@ -651,7 +657,7 @@ En général **non** conservé tel quel : le patch en cours d’édition (le log
 | Tout `BANK UTILITY` inutilisable, y compris `IMPORT` / `EXPORT` | Aucun appareil n’est détecté, ou un transfert de banque est déjà en cours |
 | Compare empêche toute édition | Cliquer à nouveau sur `C` dans le Mutator |
 | Plugin invisible dans le DAW | Rescanner les plugins ; vérifier le format (AU/VST3) et le dossier indiqué avec le téléchargement |
-| Pas de notes dans la version plugin | Router le clavier maître vers la piste Matrix-Control dans le DAW ([exemples](#daw-et-clavier-maître)) ; `KEYBOARD FROM` reste sur `HOST` |
+| Pas de notes dans la version plugin | Armer la piste Matrix-Control et router le clavier maître vers elle ([exemples](#jouer-et-éditer-dans-un-daw)) ; `KEYBOARD FROM` reste sur `HOST` |
 | Assistant `GETTING STARTED` ne s’ouvre plus | Dans Settings → `GETTING STARTED` → `SETUP WIZARD`, choisir `SHOW WHEN INCOMPLETE` ou cliquer `RUN SETUP AGAIN` |
 | Pas de son en application autonome | Vérifier Settings → `AUDIO` (`DRIVER TYPE` / interface, entrée, canaux d’écoute `SYNTH FROM`) et le câblage vers l’interface audio |
 | Interface VST3 floue dans Ableton Live (Windows) | Désactiver **Auto-Scale Plugin Window** pour le Matrix-Control, recharger le device ; comparer avec l’application autonome (voir [Ableton Live](#ableton-live)) |
