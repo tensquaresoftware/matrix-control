@@ -34,7 +34,7 @@ References:
 13. [Créer des variations de patch (PATCH MUTATOR)](#13-créer-des-variations-de-patch-patch-mutator)
 14. [Gérer les paramètres globaux du synthé (MASTER EDIT)](#14-gérer-les-paramètres-globaux-du-synthé-master-edit)
 15. [Sélectionner un Skin et ajuster la taille de la fenêtre (SETTINGS)](#15-sélectionner-un-skin-et-ajuster-la-taille-de-la-fenêtre-settings)
-16. [Utiliser l’application autonome et le plugin](#16-utiliser-lapplication-autonome-et-le-plugin)
+16. [Utiliser l’application autonome et la version plugin](#16-utiliser-lapplication-autonome-et-la-version-plugin)
 17. [Guide de dépannage](#17-guide-de-dépannage)
 18. [Lexique](#lexique)
 
@@ -72,9 +72,9 @@ Dès que les connexions MIDI sont opérationnelles, le Matrix-Control demande au
 
 Pour les crédits et les contacts : cliquez sur le logo `MATRIX-CONTROL` puis le menu `ABOUT…`.
 
-### Les grandes zones de l’écran
+### Présentation de la fenêtre principale
 
-Dès l’ouverture, la fenêtre se découpe en trois panneaux — voici un plan simple pour nommer ce que vous voyez avant d’entrer dans le détail :
+Dès l’ouverture, la fenêtre se découpe en trois panneaux — voici un plan simple pour nommer ce que vous voyez à l'écran, avant d’entrer dans le détail :
 
 ```
 +--------------------------------------------------------------------+
@@ -111,7 +111,7 @@ En haut, le `HEADER` ; au centre, le panneau principal `BODY` (structuré en tro
 - **Deux câbles MIDI** pour une communication **bidirectionnelle** (ordinateur ↔ synthé) :
   - De l’ordinateur **vers** le synthé (pour transmettre les patches et les réglages globaux « Master »)
   - Du synthé **vers** l’ordinateur (afin que le Matrix-Control puisse reconnaître la machine, lire le patch courant, etc.)
-- Un **chemin audio** pour entendre le synthé : sortie audio du synthé vers une entrée d’interface audio, une table de mixage ou des enceintes. En application autonome, l’écoute se règle dans `SETTINGS…` → `AUDIO` ; dans le plugin, le retour audio arrive en général sur une **piste audio séparée** du DAW (détail en [sections 4](#4-installer-et-lancer-le-matrix-control) et [16](#16-utiliser-lapplication-autonome-et-le-plugin))
+- Un **chemin audio** pour entendre le synthé : sortie audio du synthé vers une entrée d’interface audio, une table de mixage ou des enceintes. En application autonome, l’écoute se règle dans `SETTINGS…` → `AUDIO` ; dans la version plugin, le retour audio arrive en général sur une **piste audio séparée** du DAW (détail en [sections 4](#4-installer-et-lancer-le-matrix-control) et [16](#16-utiliser-lapplication-autonome-et-la-version-plugin))
 
 Sans connexion MIDI dans les deux sens, l’éditeur ne peut pas piloter correctement le synthé. Sans chemin audio, vous pourrez éditer à l’écran, mais vous n’entendrez pas le résultat.
 
@@ -132,7 +132,7 @@ Sans connexion MIDI dans les deux sens, l’éditeur ne peut pas piloter correct
 ### Pour démarrer sereinement
 
 - Savoir brancher les ports MIDI IN / MIDI OUT (ou USB-MIDI), et la sortie audio du synthé vers votre écoute
-- Savoir lancer une application, **ou** ouvrir un instrument virtuel dans votre DAW si vous utilisez le plugin
+- Savoir lancer une application, **ou** ouvrir un instrument virtuel dans votre DAW si vous utilisez la version plugin
 - L’interface du Matrix-Control est en **anglais** : ce manuel traduit et explique chaque section au fil de la lecture
 
 ## 4. Installer et lancer le Matrix-Control
@@ -147,7 +147,7 @@ Le Matrix-Control se télécharge sous la forme d'un fichier ZIP comprenant une 
 - **Plugin VST3** (macOS, Windows, Linux) — à placer dans le dossier VST3 habituel de votre système
 - **Plugin AU** (macOS uniquement) — à placer dans le dossier des composants Audio Units (en général celui proposé par l’installeur ou indiqué dans les instructions du téléchargement)
 
-Si le plugin n’apparaît pas dans votre DAW, rescannez la liste des plugins et vérifiez que les fichiers ont bien été installés dans le dossier attendu (voir aussi les instructions fournies avec le téléchargement).
+Si la version plugin n’apparaît pas dans votre DAW, rescannez la liste des plugins et vérifiez que les fichiers ont bien été installés dans le dossier attendu (voir aussi les instructions fournies avec le téléchargement).
 
 ### En application autonome
 
@@ -179,9 +179,9 @@ Au premier lancement, le Matrix-Control ouvre automatiquement l’assistant **`G
 <em>Fenêtre <code>GETTING STARTED</code> à l’étape d’introduction.</em>
 </div>
 
-### Les étapes
+### Étapes de configuration
 
-L’écran d’accueil propose `CONTINUE` pour démarrer les réglages (recommandé), ou `CONFIGURE LATER` si vous préférez configurer plus tard. Puis l’assistant enchaîne :
+L’écran d’accueil de l'assistant propose un bouton `CONTINUE` pour démarrer les réglages (recommandé), et un bouton `CONFIGURE LATER` si vous préférez configurer plus tard. Puis l’assistant enchaîne :
 
 | Étape | À l’écran | Ce que vous faites |
 |-------|-----------|--------------------|
@@ -190,14 +190,14 @@ L’écran d’accueil propose `CONTINUE` pour démarrer les réglages (recomman
 | 3 | `MIDI KEYBOARD` | Sélectionner un clavier maître MIDI (facultatif, détail ci-dessous) |
 | 4 | `AUDIO` | **Application autonome seulement** — choisir une interface audio et une entrée pour entendre le synthé |
 
-En plugin, l’assistant s’arrête après l’étape clavier : le DAW gère déjà l’audio de la session, et le son du synthé arrive en général sur une piste audio séparée (voir [section 4](#4-installer-et-lancer-le-matrix-control)).
+Dans la version plugin, l’assistant s’arrête après l’étape clavier : le DAW gère déjà l’audio de la session, et le son du synthé arrive en général sur une piste audio séparée (voir [section 4](#4-installer-et-lancer-le-matrix-control)).
 
 Après l’introduction, naviguez avec `PREVIOUS` et `NEXT`, puis `FINISH` à la dernière étape. Vous pouvez avancer même si le synthé n’est pas encore reconnu : le câblage et les ports se finalisent à la [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi) et dans Settings.
 
 ### Clavier maître
 
 - **Application autonome :** la liste `KEYBOARD FROM` sert à choisir le port MIDI d’un clavier maître. Si vous jouez sur le clavier d’un Matrix-6, ou si vous ne souhaitez pas utiliser de clavier maître, utilisez `SKIP`
-- **Plugin :** les notes MIDI proviennent du DAW (`KEYBOARD FROM` est fixé à `HOST`). Des exemples de branchement figurent plus loin — voir [Clavier maître via le DAW](#clavier-maître-via-le-daw-plugin)
+- **Version plugin :** les notes MIDI proviennent du DAW (`KEYBOARD FROM` est fixé à `HOST`). Des exemples de branchement figurent plus loin — voir [DAW et clavier maître](#daw-et-clavier-maître)
 
 ### Plus tard, ou à nouveau
 
@@ -229,7 +229,7 @@ Dans l’ordre, côté matériel :
 4. Allumez le synthé (et votre interface MIDI / audio si besoin)
 5. Vérifiez que le canal MIDI du synthé est cohérent avec celui que vous utiliserez (sur Matrix-1000, vous pourrez aussi le régler dans `MASTER EDIT` → `MIDI` → `CHANNEL`)
 
-### Sélectionner les ports MIDI
+### Sélection des ports MIDI
 
 L’assistant `GETTING STARTED` propose déjà ces choix. Ensuite, vous les retrouvez dans `SETTINGS…` → `MIDI & DEVICE`.
 
@@ -237,15 +237,21 @@ L’assistant `GETTING STARTED` propose déjà ces choix. Ensuite, vous les retr
 |---------|------|
 | `SYNTH FROM` | Port MIDI **depuis** le synthé (branché sur son MIDI OUT). Si rien n’est choisi : `NO INPUT` |
 | `SYNTH TO` | Port MIDI **vers** le synthé (branché sur son MIDI IN). Si rien n’est choisi : `NO OUTPUT` |
-| `KEYBOARD FROM` | En **application autonome** : port du clavier maître. En **plugin** : fixé à `HOST` (notes via le DAW) |
+| `KEYBOARD FROM` | En **application autonome** : port du clavier maître. Dans la **version plugin** : fixé à `HOST` (notes via le DAW) |
+
+### Témoins d'activité MIDI
 
 Dans le bandeau du haut (`HEADER`), le groupe `MIDI` comporte des **LEDs** `FROM SYNTH`, `TO SYNTH` et `FROM KEYBOARD` qui clignotent lorsque des messages MIDI circulent. Les mêmes voyants se retrouvent dans `SETTINGS…` → `MIDI & DEVICE` : ils aident à sélectionner les bons ports. Quand le Matrix-Control interroge le synthé à intervalle régulier et que celui-ci répond, ou lorsque vous jouez sur le clavier MIDI, le clignotement confirme que les ports choisis correspondent au matériel branché.
 
+### Persistance des ports MIDI
+
 Le Matrix-Control mémorise les ports choisis et tente de les rouvrir au prochain lancement. Dès qu’ils sont ouverts, il demande au synthé de s’identifier. La liste `EPROM TYPE` suit en général le type reconnu ; un ` *` dans la liste ouverte marque la suggestion automatique.
 
-**Plusieurs instances.** Si vous ouvrez plusieurs Matrix-Control en même temps, **ne partagez pas les mêmes ports MIDI** entre deux fenêtres : chaque instance doit avoir sa propre paire `SYNTH FROM` / `SYNTH TO` vers **un** synthé. Deux machines = deux jeux de ports.
+### Plusieurs instances
 
-### Tant que le synthé n’est pas détecté
+Si vous possédez plusieurs machines — par exemple un **Matrix-1000** et un **Matrix-6R**, ou deux **Matrix-1000** — vous pouvez ouvrir **une instance du Matrix-Control par synthé**. Chaque instance doit alors gérer sa propre paire de ports `SYNTH FROM` / `SYNTH TO`, branchée sur **sa** machine. Deux synthés = deux jeux de ports distincts.
+
+### Synthé non détecté
 
 Si aucun appareil n’est reconnu, le bas de fenêtre affiche un message du type :
 
@@ -253,9 +259,9 @@ Si aucun appareil n’est reconnu, le bas de fenêtre affiche un message du type
 
 Les sections d’édition restent alors verrouillées. C’est voulu : le Matrix-Control n’envoie pas de modifications tant que le synthé n’est pas détecté.
 
-### Clavier maître via le DAW (plugin)
+### DAW et clavier maître
 
-En plugin, les notes viennent du DAW : dirigez votre clavier maître vers la piste qui charge le Matrix-Control. Le son du synthé arrive toujours par une piste audio séparée.
+Dans la version plugin du Matrix-Control, les notes proviennent du DAW : dirigez votre clavier maître vers la piste qui charge le Matrix-Control. Le son du synthé arrive toujours par une piste audio séparée.
 
 L’idée est la même dans la plupart des DAW : piste instrument → Matrix-Control → entrée MIDI / clavier armé vers cette piste. Exemples :
 
@@ -263,11 +269,11 @@ L’idée est la même dans la plupart des DAW : piste instrument → Matrix-Con
 
 1. Créez une piste **MIDI** (ou Instrument) et chargez le **Matrix-Control**
 2. Armez la piste (ou activez le monitoring MIDI)
-3. Choisissez votre clavier comme entrée MIDI, ou laissez « All Ins » s’il n’y en a qu’un
+3. Choisissez votre clavier maître comme entrée MIDI, ou laissez « All Ins » si c'est votre unique clavier
 4. Jouez : `KEYBOARD FROM` reste sur `HOST`
 5. Pour entendre le synthé, créez une piste audio branchée sur sa sortie via votre interface
 
-**Image floue sous Windows (VST3).** Si l’interface paraît floue dans Live, désactivez **Auto-Scale Plugin Window** (clic droit sur la barre du device **en bas**, dans la vue Device), puis rechargez le device. Le réglage `UI SCALE` du Matrix-Control est indépendant. L’application autonome reste en général nette sur la même machine. (Rappel aussi en [Settings](#fenêtre-settings) et [Dépannage](#17-guide-de-dépannage).)
+**Image floue sous Windows (VST3).** Si l’interface paraît floue dans Live, désactivez **Auto-Scale Plugin Window** (clic droit sur la barre du device **en bas**, dans la vue Device), puis rechargez le device. Le réglage `UI SCALE` du Matrix-Control est indépendant. L’application autonome reste en général nette sur la même machine. (Rappel aussi en [SETTINGS](#settings) et [Dépannage](#17-guide-de-dépannage).)
 
 #### Reason
 
@@ -315,13 +321,15 @@ Une fois le logiciel ouvert, la fenêtre s’organise ainsi :
 +--------------------------------------------------------------------+
 ```
 
-### En haut (`HEADER`)
+### HEADER
 
 - Logo `MATRIX-CONTROL` (clic → menu : `UI SCALE`, `SKIN`, `SETTINGS…`, `ABOUT…`)
 - Undo / Redo, et les voyants MIDI `FROM SYNTH` / `TO SYNTH` / `FROM KEYBOARD`
 - En application autonome seulement : `INPUT GAIN` et le monitoring du bandeau (l’interface d’écoute se règle dans `SETTINGS…` → `AUDIO`)
 
-### Au centre (`BODY`) — trois colonnes
+### BODY
+
+Trois colonnes d’édition :
 
 | Colonne | Contenu |
 |---------|---------|
@@ -331,7 +339,7 @@ Une fois le logiciel ouvert, la fenêtre s’organise ainsi :
 
 Dans ce manuel, **section** désigne un grand bloc (`PATCH EDIT`, `MATRIX MODULATION`…), **module** un bloc fonctionnel (`DCO 1`, `BANK UTILITY`…), et **afficheur** une zone graphique (enveloppes, Track Generator, `PATCH NAME`). Le reste du vocabulaire est dans le [lexique](#lexique).
 
-### En bas (`FOOTER`)
+### FOOTER
 
 - **À gauche :** messages et, le cas échéant, l’aide contextuelle
 - **À droite :** badge `DEVICE` — machine détectée (par ex. Matrix-1000) ou `NOT CONNECTED`
@@ -345,7 +353,7 @@ Une fois le synthé détecté et un patch chargé (voir [section 10](#10-gérer-
 
 Chaque mouvement de bouton, de curseur ou de menu est transmis au synthé. Vous entendez le résultat tout de suite sur la machine (et via l’écoute audio en application autonome).
 
-### Annuler / rétablir (`UNDO` / `REDO`)
+### UNDO / REDO
 
 | Action | macOS | Windows / Linux |
 |--------|-------|-----------------|
@@ -372,7 +380,7 @@ Sur plusieurs modules, l’en-tête propose :
 
 Entre deux modules du même type (`LFO` ↔ `LFO`, `DCO` ↔ `DCO`), le collage reprend en général les réglages communs. Les contrôles propres à un seul côté (par ex. `SYNC` sur `DCO 1`, `DETUNE` / `NOISE` sur `DCO 2`, ou certaines modulations locales des LFO) restent tels quels sur la cible — sans message particulier. Un collage **dans le même module** reprend tous ses paramètres.
 
-### Nom du patch (`PATCH NAME`)
+### PATCH NAME
 
 L’afficheur montre le nom courant (8 caractères). Un **double-clic** permet de le renommer quand le contexte l’autorise — par exemple un fichier Computer Patches, ou un patch en mémoire réinscriptible. Sous Compare, sur une banque ROM 2–9, ou quand les noms matériels Matrix-1000 sont affichés, le double-clic laisse le nom en lecture seule.
 
@@ -418,7 +426,7 @@ Dans `PATCH MANAGER`, deux modules gèrent des **sources de patches** différent
 
 **Focus de navigation.** Un seul module à la fois contrôle les boutons `<` / `>` et la navigation. Cliquez le **titre** du module voulu : il passe en **rouge**, et les flèches parcourent alors cette source. Au survol, le titre change aussi de couleur pour indiquer qu’il est cliquable. Cliquez l’autre titre pour basculer.
 
-### Parcourir (`BROWSER`)
+### BROWSER
 
 Avec le focus sur `INTERNAL PATCHES` :
 
@@ -428,7 +436,7 @@ Avec le focus sur `INTERNAL PATCHES` :
 
 Quand vous changez de patch (ou de banque), le Matrix-Control peut d’abord demander quoi faire des modifications non sauvées (`Unsaved patch` : `Cancel`, `Discard`, ou `Store` / `Save` / `Save As` selon le contexte — réglage `UNSAVED STATE` dans Settings). Puis il bascule sur l’emplacement, **lit** le patch depuis le synthé et l’affiche. Il ne le réécrit pas automatiquement juste après cette lecture.
 
-### Mémoire (`MEMORY`)
+### MEMORY
 
 | Bouton | Rôle |
 |--------|------|
@@ -437,7 +445,7 @@ Quand vous changez de patch (ou de banque), le Matrix-Control peut d’abord dem
 | `PASTE` | Colle un patch précédemment copié |
 | `STORE` | Enregistre dans l’emplacement courant **du synthé** |
 
-Après `INIT`, le nom devient `* INIT *` : renommez avant `STORE` ou `SAVE` / `SAVE AS` (voir [Nom du patch](#nom-du-patch-patch-name)). Sur les banques **2–9** du Matrix-1000, `INIT`, `PASTE` et `STORE` sont grisés.
+Après `INIT`, le nom devient `* INIT *` : renommez avant `STORE` ou `SAVE` / `SAVE AS` (voir [PATCH NAME](#patch-name)). Sur les banques **2–9** du Matrix-1000, `INIT`, `PASTE` et `STORE` sont grisés.
 
 **Si `STORE` ne produit aucun enregistrement apparent.** Sur Matrix-1000, vérifiez `MEMORY PROTECT` et `BANK LOCK` dans `MASTER EDIT` → `MISC` ([section 14](#14-gérer-les-paramètres-globaux-du-synthé-master-edit)). Sur Matrix-6/6R, mettez surtout l’interrupteur **Memory Protect** à l’arrière de la machine sur Off.
 
@@ -454,20 +462,20 @@ Sur **Matrix-6/6R**, il n’y a pas de banques : `0`–`9`, `COPY` et `PASTE` so
 
 Pendant une session, pilotez le synthé **depuis le Matrix-Control** plutôt que depuis la façade : un changement de banque ou de `BANK LOCK` sur la machine peut désynchroniser l’écran. `BANK LOCK` se trouve dans `MASTER EDIT` → `MISC`, pas ici.
 
-### Boutons de banque (`0`–`9`)
+### Boutons de banque
 
-Sur Matrix-1000, ces boutons sélectionnent la banque active ; le Matrix-Control bascule puis **relit** le patch courant (même confirmation `Unsaved patch` qu’en [section 10](#10-gérer-les-patches-dans-la-mémoire-du-synthé-internal-patches)).
+Sur Matrix-1000, les boutons `0`–`9` sélectionnent la banque active ; le Matrix-Control bascule puis **relit** le patch courant (même confirmation `Unsaved patch` qu’en [section 10](#10-gérer-les-patches-dans-la-mémoire-du-synthé-internal-patches)).
 
 Banques **0** et **1** : écriture possible. Banques **2**–**9** : lecture seule pour collage / import (et pour `INIT` / `PASTE` / `STORE` dans Internal Patches). Vous pouvez toujours les sélectionner, les copier ou les exporter.
 
-### Copier et coller (`COPY` / `PASTE`)
+### COPY / PASTE
 
 - `COPY` lit la banque sélectionnée depuis le synthé
 - `PASTE` l’écrit dans une autre banque **réinscriptible** (`0` ou `1`)
 
 `PASTE` reste grisé s’il n’y a rien de copié, sur une banque ROM, ou si la destination est la même que la source. Une confirmation `Paste bank?` précède l’écriture ; une progression accompagne le transfert.
 
-### Importer (`IMPORT`)
+### IMPORT
 
 Sur Matrix-1000, `IMPORT` remplit la banque RAM sélectionnée (`0` ou `1`). Sur Matrix-6/6R, il écrit les **100 emplacements** de la machine. Choisissez le dossier **qui contient** les fichiers patch (par ex. `BANK 3` ou `PATCHES`), pas le dossier parent au-dessus.
 
@@ -475,7 +483,7 @@ Jusqu’à **100** fichiers valides, dans l’ordre alphabétique : moins de 100
 
 Confirmation `Import bank?`, puis barre de progression. Sur les banques ROM 2–9, `IMPORT` est grisé.
 
-### Exporter (`EXPORT`)
+### EXPORT
 
 `EXPORT` enregistre les 100 patches (banque Matrix-1000, ou machine Matrix-6/6R) sur le disque :
 
@@ -556,12 +564,14 @@ L’historique ne survit pas à la fermeture de l’application. Des boîtes peu
 
 Trois modules — `MIDI`, `VIBRATO`, `MISC` — avec chacun un `I` pour réinitialiser (confirmation `RESET MASTER MODULE?`). Vous y trouvez notamment le canal MIDI, le vibrato, l’accordage, la transposition, et les protections mémoire.
 
-### Protections mémoire (`MISC`)
+### Protections mémoire
+
+Dans le module `MISC` :
 
 | Réglage | Effet |
 |---------|--------|
 | `MEMORY PROTECT` | Empêche d’écrire des patches. Si `STORE` ne produit aucun enregistrement apparent, vérifiez ici d’abord |
-| `BANK LOCK` | Verrouille le changement de banque côté Matrix-1000 (`MASTER EDIT` → `MISC`) |
+| `BANK LOCK` | Verrouille le changement de banque côté Matrix-1000 |
 
 Pour enregistrer, travaillez de préférence sur une banque `0` ou `1`.
 
@@ -572,9 +582,9 @@ Pour enregistrer, travaillez de préférence sur une banque `0` ou `1`.
 
 ## 15. Sélectionner un Skin et ajuster la taille de la fenêtre (SETTINGS)
 
-### Menu du logo `MATRIX-CONTROL`
+### Menu du logo MATRIX-CONTROL
 
-Un clic sur le logo (en haut à gauche) ouvre :
+Un clic sur le logo `MATRIX-CONTROL` (en haut à gauche) ouvre :
 
 | Entrée | Contenu |
 |--------|---------|
@@ -596,13 +606,13 @@ Raccourcis clavier (éditeur au focus, hors saisie de texte) :
 
 Les raccourcis 1–6 suivent l’ordre de la liste `SKIN` dans Settings. La famille `TONES` (quinze variantes) se choisit dans le sous-menu, ou via les cycles de flèches. Le détail est aussi rappelé dans le menu du logo.
 
-### Fenêtre `SETTINGS`
+### SETTINGS
 
 Les préférences sont regroupées par onglets.
 
 - **`GETTING STARTED`** — ligne `SETUP WIZARD` : `SHOW WHEN INCOMPLETE` (défaut), `NEVER SHOW AT LAUNCH`, ou `RUN SETUP AGAIN` ([section 5](#5-assistant-de-premier-lancement-getting-started))
 - **`USER INTERFACE`** — `UI SCALE`, `SKIN`, `INFO MESSAGE`, `CONTEXTUAL HELP`. Si l’interface VST3 paraît floue dans Ableton Live sous Windows, voyez plutôt Auto-Scale Plugin Window de Live ([Ableton Live](#ableton-live))
-- **`MIDI & DEVICE`** — ports `SYNTH FROM` / `SYNTH TO` (`KEYBOARD FROM` en application autonome), badge `DEVICE`, `EPROM TYPE` ; `HARDWARE LATENCY` en plugin seulement
+- **`MIDI & DEVICE`** — ports `SYNTH FROM` / `SYNTH TO` (`KEYBOARD FROM` en application autonome), badge `DEVICE`, `EPROM TYPE` ; `HARDWARE LATENCY` dans la version plugin seulement
 - **`AUDIO`** — **application autonome seulement** : interface / `DRIVER TYPE`, entrées / sorties, canaux d’écoute du retour audio (libellés `SYNTH FROM`), fréquence d’échantillonnage, buffer… (ASIO sous Windows ou JACK sous Linux peuvent apparaître selon votre machine)
 
 Autres réglages utiles : affichage des noms (`MATRIX-1000 PATCHES`, `COMPUTER PATCHES`), avertissement de patch non sauvé (`UNSAVED STATE`), modèles `INIT` patch / Master (`SAVE AS INIT` / `DELETE`), et utilitaires Master (`LOAD` / `SAVE AS` / `INIT`). Préférez ces boutons Settings plutôt que d’éditer à la main les fichiers modèles dans le Finder.
@@ -610,12 +620,12 @@ Autres réglages utiles : affichage des noms (`MATRIX-1000 PATCHES`, `COMPUTER P
 > **Capture d’écran — À placer ici**  
 > *Légende :* Onglets Settings (`GETTING STARTED`, `USER INTERFACE`, `MIDI & DEVICE`…) et menu du logo (`UI SCALE`, `SKIN`, six variantes de base + `TONES`).
 
-## 16. Utiliser l’application autonome et le plugin
+## 16. Utiliser l’application autonome et la version plugin
 
-| Fonction | Application autonome | Plugin dans le DAW |
+| Fonction | Application autonome | Version plugin dans le DAW |
 |----------|----------------------|--------------------|
 | Assistant `GETTING STARTED` | Inclut l’étape Audio | Pas d’étape Audio ; notes via le DAW |
-| `KEYBOARD FROM` | Choix d’un port MIDI (ou `SKIP`) | Fixé à `HOST` ([exemples](#clavier-maître-via-le-daw-plugin)) |
+| `KEYBOARD FROM` | Choix d’un port MIDI (ou `SKIP`) | Fixé à `HOST` ([exemples](#daw-et-clavier-maître)) |
 | Écoute du synthé | Settings → `AUDIO` + monitoring dans l’app | Piste audio du DAW / interface |
 | `INPUT GAIN` / monitoring bandeau | Visibles | Masqués |
 | `HARDWARE LATENCY` | Masqué | Visible (Settings → `MIDI & DEVICE`) |
@@ -625,7 +635,7 @@ Dans les deux cas, le **son** reste celui du synthé : le Matrix-Control pilote 
 
 ### Ce qui est mémorisé d’une session à l’autre
 
-En général **conservé** : ports MIDI, apparence, taille d’interface, progression `GETTING STARTED`, latence (plugin), dossier des patches, réglages du Mutator, préférences Settings.
+En général **conservé** : ports MIDI, apparence, taille d’interface, progression `GETTING STARTED`, latence (version plugin), dossier des patches, réglages du Mutator, préférences Settings.
 
 En général **non** conservé tel quel : le patch en cours d’édition (le logiciel se resynchronise avec le synthé quand les ports reviennent), l’historique du Mutator, l’état Compare.
 
@@ -641,12 +651,12 @@ En général **non** conservé tel quel : le patch en cours d’édition (le log
 | Tout `BANK UTILITY` inutilisable, y compris `IMPORT` / `EXPORT` | Aucun appareil n’est détecté, ou un transfert de banque est déjà en cours |
 | Compare empêche toute édition | Cliquer à nouveau sur `C` dans le Mutator |
 | Plugin invisible dans le DAW | Rescanner les plugins ; vérifier le format (AU/VST3) et le dossier indiqué avec le téléchargement |
-| Pas de notes en plugin | Router le clavier maître vers la piste Matrix-Control dans le DAW ([exemples](#clavier-maître-via-le-daw-plugin)) ; `KEYBOARD FROM` reste sur `HOST` |
+| Pas de notes dans la version plugin | Router le clavier maître vers la piste Matrix-Control dans le DAW ([exemples](#daw-et-clavier-maître)) ; `KEYBOARD FROM` reste sur `HOST` |
 | Assistant `GETTING STARTED` ne s’ouvre plus | Dans Settings → `GETTING STARTED` → `SETUP WIZARD`, choisir `SHOW WHEN INCOMPLETE` ou cliquer `RUN SETUP AGAIN` |
 | Pas de son en application autonome | Vérifier Settings → `AUDIO` (`DRIVER TYPE` / interface, entrée, canaux d’écoute `SYNTH FROM`) et le câblage vers l’interface audio |
 | Interface VST3 floue dans Ableton Live (Windows) | Désactiver **Auto-Scale Plugin Window** pour le Matrix-Control, recharger le device ; comparer avec l’application autonome (voir [Ableton Live](#ableton-live)) |
 | Deux instances entrent en conflit (détection / édition instable ou incohérente) | Ne pas partager les mêmes ports : une paire `SYNTH FROM` / `SYNTH TO` distincte par instance (et par machine si vous en avez plusieurs) — voir [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi) |
-| Audio en retard dans le DAW | Ajuster `HARDWARE LATENCY` dans Settings → `MIDI & DEVICE` (plugin) ; et la taille de buffer du DAW / de l’interface audio |
+| Audio en retard dans le DAW | Ajuster `HARDWARE LATENCY` dans Settings → `MIDI & DEVICE` (version plugin) ; et la taille de buffer du DAW / de l’interface audio |
 
 ## Lexique
 
@@ -654,7 +664,7 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 
 | Terme | Définition |
 |-------|------------|
-| **Afficheur** | Région graphique ou panneau d’affichage : enveloppes et Track Generator (éditables à la souris) ; `PATCH NAME` (renommable par double-clic quand l’édition est autorisée — voir [section 8](#nom-du-patch-patch-name)). |
+| **Afficheur** | Région graphique ou panneau d’affichage : enveloppes et Track Generator (éditables à la souris) ; `PATCH NAME` (renommable par double-clic quand l’édition est autorisée — voir [section 8](#patch-name)). |
 | **Application autonome** | Logiciel Matrix-Control sans DAW (nommé Standalone une seule fois en introduction). |
 | **Standalone** | Voir *Application autonome*. |
 | **ASIO** | Sous Windows, type de pilote audio souvent utilisé en MAO (latence en général plus basse). Peut apparaître dans Settings → `AUDIO` → `DRIVER TYPE` en application autonome, selon votre installation. |
@@ -681,8 +691,8 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 | **Mutator** | Outil qui crée des variations aléatoires contrôlées d’un patch. |
 | **Panneau** | Grande région de la fenêtre principale : `HEADER` (bandeau du haut), `BODY` (trois colonnes du centre), `FOOTER` (bandeau du bas). |
 | **Patch** | Ensemble des réglages qui définissent un timbre mémorisé (vocabulaire Oberheim). |
-| **`PATCH NAME`** | Afficheur du nom de patch (8 caractères). Renommable par double-clic lorsque le contexte l’autorise (voir [section 8](#nom-du-patch-patch-name)). |
-| **Plugin** | Logiciel qui s’ouvre *dans* un DAW. |
+| **`PATCH NAME`** | Afficheur du nom de patch (8 caractères). Renommable par double-clic lorsque le contexte l’autorise (voir [section 8](#patch-name)). |
+| **Plugin** / **version plugin** | Le Matrix-Control ouvert *dans* un DAW (par opposition à l’application autonome). |
 | **Portamento** | Glissando de hauteur entre deux notes. |
 | **Presse-papiers** | Mémoire temporaire Copy / Paste *interne* au Matrix-Control (modules ou patches). |
 | **Ramp** | Montée progressive utilisable comme source de modulation. |

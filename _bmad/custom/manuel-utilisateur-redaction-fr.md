@@ -78,10 +78,12 @@ Référence de style pour l’intro d’installation (à conserver / imiter) :
 | **un / le DAW** | une / la DAW |
 | **interface audio** | carte son |
 | **application autonome** — introduire une seule fois **application autonome (Standalone)** en début de manuel, puis uniquement **application autonome** | répéter `Standalone` dans le corps du manuel |
-| Couple des deux formats : toujours **application autonome** puis **plugin** | « plugin et Standalone », « plugin ou application autonome » en tête |
+| Couple des deux formats : toujours **application autonome** puis **version plugin** (ou **version plugin du Matrix-Control** si le contexte l’exige) | « En plugin », « dans le plugin » seuls ; « plugin et Standalone » ; « plugin ou application autonome » en tête |
 | **commutateur** (Mutator modules) | « case » |
 | **bus de modulation** | « ligne » de modulation |
-| Titres de section : **verbe d’action** quand c’est naturel, sinon formulation claire (ex. *Qu’est-ce que…*, *Équipements nécessaires…*, *Guide de dépannage*) ; libellé GUI en **MAJUSCULES** entre parenthèses quand utile (ex. *Créer des variations de patch (PATCH MUTATOR)*) | Titres nominaux vagues (*Le Patch Mutator*) ; casse GUI incorrecte |
+| Titres de section : **verbe d’action** quand c’est naturel, sinon formulation claire ; **éviter** les parenthèses finales « d’appoint » | Titres du type *… (version plugin)*, *En haut (HEADER)*, *Parcourir (BROWSER)* |
+| Exception — H2 avec rappel GUI en **MAJUSCULES** entre parenthèses : uniquement les titres déjà validés (*GETTING STARTED*, *PATCH EDIT*, *MATRIX MODULATION*, *INTERNAL PATCHES*, *BANK UTILITY*, *COMPUTER PATCHES*, *PATCH MUTATOR*, *MASTER EDIT*, *SETTINGS*) | Étendre ce motif à d’autres H2 / H3 « pour coller un libellé » |
+| Sous-titres H3 de groupes / commandes GUI : préférer le **libellé seul** (`BROWSER`, `IMPORT`, `HEADER`…) ou un titre français **sans** parenthèses finales | Français + (`GUI`) en queue de titre |
 | Matrix-1000 : **non programmable en façade** (intérêt historique du Matrix-Control) ; Matrix-6/6R : programmables en façade | « Au lieu de tout manipuler depuis la façade » comme si cela valait pour tous les modèles |
 
 Conserver **Matrix-Control**, les noms de modèles, et les **citations exactes** des messages UI anglais (ex. *power-cycle the Matrix*).
@@ -128,7 +130,7 @@ Aligné sur la table des matières du manuel FR (ne pas renuméroter « pour le 
 13. Créer des variations de patch (`PATCH MUTATOR`)  
 14. Gérer les paramètres globaux du synthé (`MASTER EDIT`)  
 15. Sélectionner un Skin et ajuster la taille de la fenêtre (`SETTINGS`)  
-16. Utiliser l’application autonome et le plugin  
+16. Utiliser l’application autonome et la version plugin  
 17. Guide de dépannage  
 18. Lexique
 
