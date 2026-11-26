@@ -705,9 +705,10 @@ l'aveugle ».
 --------------------------------------------------------------------------------
 7.1. Choisir ou confirmer les ports MIDI
 --------------------------------------------------------------------------------
-[ ] Réglez ou vérifiez SYNTH FROM et SYNTH TO (bandeau FROM SYNTH /
-    TO SYNTH, ou SETTINGS → MIDI & DEVICE)
-[ ] Quand du MIDI circule, les LEDs à côté des listes clignotent
+[ ] Réglez ou vérifiez SYNTH FROM et SYNTH TO (SETTINGS → MIDI & DEVICE,
+    ou l’assistant GETTING STARTED — pas de listes de ports dans le HEADER)
+[ ] Quand du MIDI circule, les LEDs FROM SYNTH / TO SYNTH / FROM KEYBOARD
+    du HEADER clignotent
 [ ] En bas à droite, le badge DEVICE affiche Matrix-1000, Matrix-6, etc.
     (un Matrix-6R peut apparaître comme Matrix-6 : notez-le si c'est le cas)
 [ ] Si NOT CONNECTED : suivez le message en bas de fenêtre

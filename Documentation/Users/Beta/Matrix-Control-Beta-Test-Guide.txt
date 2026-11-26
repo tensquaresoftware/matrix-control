@@ -685,9 +685,10 @@ intentional, to avoid sending changes "blind".
 --------------------------------------------------------------------------------
 7.1. Choose or confirm MIDI ports
 --------------------------------------------------------------------------------
-[ ] Set or check SYNTH FROM and SYNTH TO (FROM SYNTH / TO SYNTH strip,
-    or SETTINGS → MIDI & DEVICE)
-[ ] When MIDI traffic flows, the LEDs next to the lists blink
+[ ] Set or check SYNTH FROM and SYNTH TO (SETTINGS → MIDI & DEVICE,
+    or the GETTING STARTED assistant — no port lists in the HEADER)
+[ ] When MIDI traffic flows, the HEADER LEDs FROM SYNTH / TO SYNTH /
+    FROM KEYBOARD blink
 [ ] Bottom right, the DEVICE badge shows Matrix-1000, Matrix-6, etc.
     (a Matrix-6R may appear as Matrix-6: note it if that happens)
 [ ] If NOT CONNECTED: follow the message at the bottom of the window
