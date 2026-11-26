@@ -55,7 +55,7 @@ context:
 
 - `Documentation/Users/Manuals/Matrix-Control-Manuel-Utilisateur.md` — §11 (~467–475), §12 bank I/O (~501–509), Lexique `Unlock` (~735); primary edit target
 - `_bmad/custom/manuel-utilisateur-redaction-fr.md` — FR manual redaction SSOT (tone, labels, lists, no invented behavior)
-- `Documentation/Users/Beta/Matrix-Control-Guide-de-tests-beta-FR.txt` — validated Bank Utility journeys (facts only; do not copy verbatim); beta “fully grey on 6/6R” is stronger than code — prefer code
+- `Documentation/Users/Beta/Matrix-Control-Guide-de-tests-beta.txt` — validated Bank Utility journeys (facts only; do not copy verbatim); beta “fully grey on 6/6R” is stronger than code — prefer code
 - `Source/GUI/Panels/.../BankUtilityPanel.{h,cpp}` — `setBankUtilityGrayed`, `refreshImportBankEnabled`, `refreshUtilityEnabled` (grey banks/COPY/PASTE; IMPORT/EXPORT stay)
 - `Source/Shared/Definitions/PluginDisplayNames.h` — `BankUtilityModule` help / dialog strings (`BankImportConfirm`, `BankPasteConfirm`, `BankExportOverwriteConfirm`)
 - `Source/Core/...` / PatchManager bank handlers — copy/paste/import/export limits; `DeviceMemoryLimits::{isRomBank,isPasteStoreAllowed,hasBankConcept}`

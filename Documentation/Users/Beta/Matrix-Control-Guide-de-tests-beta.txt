@@ -7,7 +7,7 @@ Email : tensquaresoftware@gmail.com
 Produit : Matrix-Control
 Version du produit : 1.0.0-alpha.8
 Version du guide : 1.0
-Date de révision : 24/11/2026
+Date de révision : 26/11/2026
 
 --------------------------------------------------------------------------------
 SOMMAIRE
@@ -200,7 +200,7 @@ Au moins un synthétiseur Oberheim compatible avec le Matrix-Control :
 1.4. Logiciels
 --------------------------------------------------------------------------------
 [ ] Le fichier ZIP du Matrix-Control fourni pour la bêta (il n'y a pas
-    d'installateur : vous copierez les fichiers à la main — la section 4
+    d'installeur : vous copierez les fichiers à la main — la section 4
     explique comment). Le ZIP contient aussi une documentation et un
     dossier de données de tests (Patches & Masters) — détail en section 4.1.
 [ ] Un éditeur de texte basique pour renseigner ce guide au fur et à mesure

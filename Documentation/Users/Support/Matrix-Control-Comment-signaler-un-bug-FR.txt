@@ -16,7 +16,7 @@ Ce texte sert pour la vie courante du produit : un bug, un comportement
 étrange ou une question précise, hors session de tests bêta structurée.
 
 Pendant une campagne de tests bêta, préférez le guide de tests rempli
-(Matrix-Control-Guide-de-tests-beta-FR.txt) : il contient déjà la fiche de
+(Matrix-Control-Guide-de-tests-beta.txt) : il contient déjà la fiche de
 session, les cases cochées et les notes. Joignez simplement ce fichier
 par email (voir la section « Envoyer vos résultats » du guide).
 
