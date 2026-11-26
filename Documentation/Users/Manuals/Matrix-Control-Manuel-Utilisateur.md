@@ -260,8 +260,6 @@ Deux flux MIDI coexistent :
 - **Jouer** — les notes (et autres messages de jeu tels que les contrôleurs continus ou « CC ») suivent l’armement de la piste Matrix-Control, comme pour un instrument virtuel classique
 - **Éditer** — la liaison `SYNTH FROM` / `SYNTH TO` avec le synthé reste **active en permanence**, que la piste soit armée ou non. Vous pouvez donc éditer à l’écran sans vous soucier de l’armement — très pratique au quotidien
 
-Pour l’écoute, réglez la piste audio pour entendre l’entrée en continu. Sous **Ableton Live**, choisissez **Monitor : In**. Dans les autres DAW, cherchez l’équivalent (écoute permanente de l’entrée / input monitoring). Si aucune option de ce type n’existe — ce qui serait étonnant —, maintenez la piste audio armée.
-
 #### Ableton Live
 
 1. Créez une piste **MIDI** (ou Instrument) et chargez le **Matrix-Control**
@@ -270,19 +268,9 @@ Pour l’écoute, réglez la piste audio pour entendre l’entrée en continu. S
 4. Créez une piste **audio** branchée sur la sortie du synthé via votre interface, et réglez **Monitor : In**
 5. Jouez quand la piste Matrix-Control est armée ; éditez à tout moment grâce à `SYNTH FROM` / `SYNTH TO`
 
-#### Reason
+#### Autres DAW
 
-1. Créez un device **Instrument** et chargez le **Matrix-Control** en VST3
-2. Armez-le pour le jeu en temps réel et choisissez votre clavier comme source MIDI
-3. Créez une piste / un device audio branché sur la sortie du synthé, avec une écoute d’entrée permanente si le logiciel le propose
-4. Jouez quand le device est armé ; l’édition via `SYNTH FROM` / `SYNTH TO` reste disponible en permanence
-
-#### Logic Pro
-
-1. Créez une piste **Instrument logiciel** et chargez le **Matrix-Control** (AU ou VST3)
-2. Choisissez votre clavier comme entrée et activez l’enregistrement / le monitoring de la piste pour jouer
-3. Créez une piste audio pour le retour du synthé, avec une écoute d’entrée permanente si le logiciel le propose
-4. Jouez quand la piste instrument est armée ; l’édition via `SYNTH FROM` / `SYNTH TO` reste disponible en permanence
+Dans **Logic Pro**, **Reason**, Bitwig, Cubase, Reaper, etc., le principe est le même : piste MIDI / instrument pour le Matrix-Control (armée pour jouer), piste audio séparée pour le retour du synthé, et édition toujours active via `SYNTH FROM` / `SYNTH TO`. Cherchez surtout l’équivalent de **Monitor : In** — l’écoute permanente de l’entrée (souvent appelée input monitoring). Si aucune option de ce type n’existe — ce qui serait étonnant —, maintenez la piste audio armée.
 
 > **Capture d’écran — À placer ici**  
 > *Légende :* Piste Matrix-Control + piste audio du synthé ; notes selon l’armement, édition MIDI toujours active.
