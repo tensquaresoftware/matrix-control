@@ -96,7 +96,7 @@ Utiliser de façon cohérente :
 
 | Terme | Désigne |
 |-------|---------|
-| **Panneau** | Grandes régions de la fenêtre principale : `HEADER`, `BODY`, `FOOTER` (schéma ASCII §2 du manuel). **Disposition chrome** (`HEADER` / `FOOTER` / Settings / assistant) : vérifier le panneau dans `Source/` (ex. `HeaderPanel`) et les libellés dans `PluginDisplayNames.h`. Le guide de tests bêta **n’est pas** la référence de layout — il peut être en retard. |
+| **Panneau** | Grandes régions de la fenêtre principale : `HEADER`, `BODY`, `FOOTER` (schéma ASCII §3 du manuel). **Disposition chrome** (`HEADER` / `FOOTER` / Settings / assistant) : vérifier le panneau dans `Source/` (ex. `HeaderPanel`) et les libellés dans `PluginDisplayNames.h`. Le guide de tests bêta **n’est pas** la référence de layout — il peut être en retard. |
 | **`HEADER` (état actuel)** | Logo + Undo/Redo + **LEDs** d’activité MIDI (`FROM SYNTH` / `TO SYNTH` / `FROM KEYBOARD`) +, en application autonome, `INPUT GAIN` / monitoring. Ports MIDI : `SETTINGS…` → `MIDI & DEVICE` et assistant `GETTING STARTED`. Dans le **manuel**, formuler positivement (voyants d’activité ; ports dans Settings) — pas de négations du type « ce ne sont pas des listes ». |
 | **`FOOTER` (état actuel)** | Messages / aide à gauche ; badge `DEVICE` à droite. Pas de sélecteurs MIDI. |
 | **Section** | Grands blocs dans le `BODY` : `PATCH EDIT`, `MATRIX MODULATION`, `PATCH MANAGER`, `MASTER EDIT` |
@@ -116,22 +116,23 @@ Contrôles GUI mentionnés dans le texte : toujours en **`backticks`** (`STORE`,
 Aligné sur la table des matières du manuel FR (ne pas renuméroter « pour le plaisir ») :
 
 1. Oberheim Matrix-1000, Matrix-6 et Matrix-6R (famille d’abord : points communs, écarts utiles)  
-2. Qu’est-ce que le Matrix-Control ? (inclut plan ASCII + légende `HEADER` / `BODY` / `FOOTER` ; transition : refonte du Matrix-1000 Editor → Matrix-1000 non programmable en façade, utile aussi Matrix-6/6R)  
-3. Équipements nécessaires pour utiliser le Matrix-Control  
-4. Installer et lancer le Matrix-Control  
-5. Assistant de premier lancement (`GETTING STARTED`)  
-6. Connecter le synthé et établir la communication MIDI  
-7. Éditer un patch (`PATCH EDIT`)  
-8. Éditer la matrice de modulation (`MATRIX MODULATION`)  
-9. Gérer les patches dans la mémoire du synthé (`INTERNAL PATCHES`) — inclure le focus de navigation Internal ↔ Computer  
-10. Gérer les banques du Matrix-1000 (`BANK UTILITY`)  
-11. Gérer les patches sur l’ordinateur (`COMPUTER PATCHES`) — pas de doublon `STORE` (déjà en §9)  
-12. Créer des variations de patch (`PATCH MUTATOR`)  
-13. Gérer les paramètres globaux du synthé (`MASTER EDIT`)  
-14. Sélectionner un Skin et ajuster la taille de la fenêtre (`SETTINGS`)  
-15. Utiliser l’application autonome et la version plugin  
-16. Guide de dépannage  
-17. Lexique
+2. Qu’est-ce que le Matrix-Control ? (découverte produit + capture d’ensemble ; transition : refonte du Matrix-1000 Editor → Matrix-1000 non programmable en façade, utile aussi Matrix-6/6R)  
+3. Se repérer dans la fenêtre principale (plan ASCII + légende `HEADER` / `BODY` / `FOOTER`)  
+4. Équipements nécessaires pour utiliser le Matrix-Control  
+5. Installer et lancer le Matrix-Control  
+6. Connecter le synthé et établir la communication MIDI (avant l’assistant : câblage idéal avant / pendant le premier lancement)  
+7. Assistant de premier lancement (`GETTING STARTED`)  
+8. Éditer un patch (`PATCH EDIT`)  
+9. Éditer la matrice de modulation (`MATRIX MODULATION`)  
+10. Gérer les patches dans la mémoire du synthé (`INTERNAL PATCHES`) — inclure le focus de navigation Internal ↔ Computer  
+11. Gérer les banques du Matrix-1000 (`BANK UTILITY`)  
+12. Gérer les patches sur l’ordinateur (`COMPUTER PATCHES`) — pas de doublon `STORE` (déjà en §10)  
+13. Créer des variations de patch (`PATCH MUTATOR`)  
+14. Gérer les paramètres globaux du synthé (`MASTER EDIT`)  
+15. Sélectionner un Skin et ajuster la taille de la fenêtre (`SETTINGS`)  
+16. Utiliser l’application autonome et la version plugin  
+17. Guide de dépannage  
+18. Lexique
 
 ### Ce qu’il ne faut plus faire
 
@@ -207,7 +208,7 @@ Format type — **image placée** (centrage + italique ; pas de préfixe « Lég
 - Condition utile : au moins un commutateur de module activé
 - Rappel de sauvegarde avant les gestes qui écrivent dans le synthé (`MUTATE`, etc.)
 
-### Prérequis (§2) et câblage (§6)
+### Prérequis (§4) et câblage (§6)
 
 - Inclure un **chemin audio** (sortie synthé → interface / table / enceintes) dès les prérequis — pas seulement le MIDI
 - Préciser **deux câbles MIDI** (deux sens) ; DAW **optionnel** si application autonome seule
