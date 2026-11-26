@@ -128,8 +128,8 @@ Si le plugin n’apparaît pas dans votre DAW, rescannez la liste des plugins et
 ### En application autonome
 
 1. Lancez l’application **Matrix-Control**
-2. Au premier lancement, l’assistant `GETTING STARTED` s’ouvre automatiquement et vous guide (apparence, taille de fenêtre, MIDI, clavier éventuel, écoute audio) — voir [section 5](#5-assistant-de-premier-lancement-getting-started)
-3. Vous pourrez ensuite ajuster le MIDI dans `SETTINGS…` → `MIDI & DEVICE` (ou depuis le bandeau supérieur), et l’écoute dans `SETTINGS…` → `AUDIO`
+2. Au premier lancement, l’assistant `GETTING STARTED` s’ouvre automatiquement et vous guide (réglages de l'apparence, taille de fenêtre, MIDI, clavier éventuel, écoute audio) — voir [section 5](#5-assistant-de-premier-lancement-getting-started)
+3. Vous pourrez ensuite ajuster le MIDI dans `SETTINGS…` → `MIDI & DEVICE`, et l’écoute dans `SETTINGS…` → `AUDIO`
 
 ### Dans un DAW
 
@@ -195,7 +195,7 @@ C’est l’étape la plus importante côté matériel. Idéalement, faites ce c
 
 ### Choisir les ports MIDI
 
-L’assistant `GETTING STARTED` propose déjà ces choix. Ensuite, vous les retrouvez dans `SETTINGS…` → `MIDI & DEVICE`, et dans le bandeau supérieur pour les ports.
+L’assistant `GETTING STARTED` propose déjà ces choix. Ensuite, vous les retrouvez uniquement dans `SETTINGS…` → `MIDI & DEVICE` (pas dans le bandeau du haut).
 
 | Libellé | Rôle |
 |---------|------|
@@ -203,7 +203,7 @@ L’assistant `GETTING STARTED` propose déjà ces choix. Ensuite, vous les retr
 | `SYNTH TO` | Port MIDI **vers** le synthé (branché sur son MIDI IN). Si rien n’est choisi : `NO OUTPUT` |
 | `KEYBOARD FROM` | En **application autonome** : port du clavier maître. En **plugin** : fixé à `HOST` (notes via le DAW) |
 
-Dans le bandeau, les mêmes sens apparaissent sous `FROM SYNTH`, `TO SYNTH` et `FROM KEYBOARD`. Les voyants à côté des listes clignotent quand des messages MIDI circulent.
+Dans le bandeau du haut (`HEADER`), les mêmes sens apparaissent sous forme de **voyants** `FROM SYNTH`, `TO SYNTH` et `FROM KEYBOARD` : ils clignotent quand des messages MIDI circulent. Ce ne sont **pas** des listes de ports — le choix des ports se fait seulement dans Settings (ou dans l’assistant).
 
 Le Matrix-Control mémorise les ports choisis et tente de les rouvrir au prochain lancement. Dès qu’ils sont ouverts, il demande au synthé de s’identifier. La liste `EPROM TYPE` suit en général le type reconnu ; un ` *` dans la liste ouverte marque la suggestion automatique.
 
@@ -284,7 +284,7 @@ Une fois le logiciel ouvert, la fenêtre s’organise ainsi :
 ### En haut (`HEADER`)
 
 - Logo `MATRIX-CONTROL` (clic → menu : `UI SCALE`, `SKIN`, `SETTINGS…`, `ABOUT…`)
-- Undo / Redo, et les listes `FROM SYNTH` / `TO SYNTH` / `FROM KEYBOARD` avec leurs voyants MIDI
+- Undo / Redo, et les voyants MIDI `FROM SYNTH` / `TO SYNTH` / `FROM KEYBOARD` (activité seulement — pas de choix de ports ici)
 - En application autonome seulement : `INPUT GAIN` et le monitoring du bandeau (l’interface d’écoute se règle dans `SETTINGS…` → `AUDIO`)
 
 ### Au centre (`BODY`) — trois colonnes
@@ -657,7 +657,7 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 | **Section** | Grand ensemble de l’interface (`PATCH EDIT`, `MATRIX MODULATION`, `PATCH MANAGER`, `MASTER EDIT`). |
 | **`SKIN`** | Apparence visuelle de l’interface (six variantes de base `BLACK/…` et `CREAM/…`, plus la famille `TONES/…` — menu logo et Settings → `USER INTERFACE`). |
 | **STORE** | Enregistrer le patch courant dans la mémoire du synthé. |
-| **SYNTH FROM / SYNTH TO** | Ports MIDI vers / depuis le synthé (Settings → `MIDI & DEVICE`, bandeau `FROM SYNTH` / `TO SYNTH`). Attention : `SYNTH FROM` désigne aussi les canaux d’écoute audio dans Settings → `AUDIO` (application autonome). |
+| **SYNTH FROM / SYNTH TO** | Ports MIDI vers / depuis le synthé (Settings → `MIDI & DEVICE` seulement). Dans le `HEADER`, `FROM SYNTH` / `TO SYNTH` sont des **voyants** d’activité, pas des listes. Attention : `SYNTH FROM` désigne aussi les canaux d’écoute audio dans Settings → `AUDIO` (application autonome). |
 | **SysEx** | Messages MIDI détaillés propres à une marque / un modèle, utilisés pour éditer le synthé en profondeur. |
 | **`.m1kp`** | Fichier de patch Matrix-Control (chargement via Computer Patches / glisser-déposer). La sauvegarde native reste un `.syx` ; le `.m1kp` d’origine n’est pas réécrit. |
 | **`.syx`** | Fichier qui contient un patch au format SysEx. |
