@@ -52,12 +52,12 @@ Sur le Matrix-1000, les banques **0** et **1** sont réinscriptibles (mémoire u
 
 Le **Matrix-Control** est un **éditeur MIDI** moderne conçu pour cette famille de synthétiseurs. Il s’agit d’une refonte complète du module Max for Live *Matrix-1000 Editor* proposé en décembre 2020. Le Matrix-Control a été pensé d’abord pour le **Matrix-1000**, car non programmable en façade. L’éditeur est également très utile aux possesseurs de **Matrix-6** et **Matrix-6R**, qui partagent pour l’essentiel la même architecture.
 
-Le Matrix-Control ne produit pas le son : celui-ci est toujours généré par votre synthé. L’éditeur agit comme une télécommande à l’écran — boutons, curseurs, menus et afficheurs — en échangeant des messages MIDI « System Exclusive » (SysEx) avec la machine. Le chemin audio (sortie du synthé vers votre écoute) se règle côté matériel ; le détail figure à la [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi).
+Le Matrix-Control ne produit pas de son : celui-ci est toujours généré par votre synthé. L’éditeur agit comme une télécommande à l’écran — boutons, curseurs, menus et afficheurs — en échangeant des messages MIDI « System Exclusive » (SysEx) avec la machine. Le chemin audio (sortie du synthé vers votre écoute) se règle côté matériel ; le détail figure à la [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi).
 
-Vous pouvez l’utiliser :
+Vous pouvez utiliser le Matrix-Control :
 
-- **En application autonome** (Standalone), sans DAW
-- **Dans un DAW** (Ableton Live, Logic Pro, Reason Studios, Bitwig Studio, Cubase, Reaper, GarageBand, etc.), comme instrument virtuel (plugin) qui communique avec le synthé
+- **En tant qu'application autonome** (Standalone), sans DAW
+- **En tant que plugin dans un DAW** (Ableton Live, Logic Pro, Reason Studios, Bitwig Studio, Cubase, Reaper, GarageBand, etc.), ouvert comme un instrument virtuel qui pilote le synthé en MIDI
 
 Dès que les connexions MIDI sont opérationnelles, le Matrix-Control demande au synthé de s’identifier. En bas à droite, le badge `DEVICE` affiche alors le type de machine détectée, ou `NOT CONNECTED` si la communication n’est pas encore établie.
 
@@ -67,7 +67,7 @@ Pour les crédits et les contacts : cliquez sur le logo `MATRIX-CONTROL` puis le
 
 ### Présentation de la fenêtre principale
 
-Dès l’ouverture, la fenêtre se découpe en trois panneaux — voici un plan simple pour nommer ce que vous voyez à l'écran, avant d’entrer dans le détail :
+La fenêtre principale du logiciel s'articule en trois panneaux — voici un plan simple pour nommer ce que vous voyez à l'écran, avant d’entrer dans le détail :
 
 ```
 +--------------------------------------------------------------------+
@@ -87,7 +87,9 @@ Dès l’ouverture, la fenêtre se découpe en trois panneaux — voici un plan 
 +--------------------------------------------------------------------+
 ```
 
-En haut, le `HEADER` ; au centre, le panneau principal `BODY` (structuré en trois colonnes d’édition) ; en bas, le `FOOTER` (messages / aide et badge `DEVICE`). La capture ci-dessous montre le rendu à l’écran ; le parcours détaillé de chaque zone est dans la [section 7](#7-se-repérer-dans-lécran-principal).
+En haut, le `HEADER` ; au centre, le panneau principal `BODY` (structuré en trois colonnes d’édition) ; en bas, le `FOOTER` (messages / aide et badge `DEVICE`).
+
+La capture ci-dessous montre le rendu à l’écran ; le parcours de chaque zone est détaillé dans la [section 7](#7-se-repérer-dans-lécran-principal).
 
 <div align="center">
 <img src="Screenshots/02-main-window-matrix-1000.png" alt="Fenêtre principale du Matrix-Control avec un Matrix-1000 détecté." />
@@ -116,7 +118,7 @@ En haut, le `HEADER` ; au centre, le panneau principal `BODY` (structuré en tro
 
 ### Logiciels
 
-- Le Matrix-Control (application autonome et / ou plugins fournis avec votre téléchargement)
+- Le Matrix-Control (application autonome et / ou plugins fournis lors du téléchargement)
 - **Soit** uniquement l’application autonome — un DAW n’est alors **pas** nécessaire
 - **Soit** un DAW (Ableton Live, Bitwig Studio, Logic Pro, Cubase, Reason, Reaper, GarageBand, etc.) si vous voulez utiliser le plugin VST3 ou AU
 
@@ -127,7 +129,7 @@ En haut, le `HEADER` ; au centre, le panneau principal `BODY` (structuré en tro
 
 ## 4. Installer et lancer le Matrix-Control
 
-Idéalement, réalisez le câblage MIDI et audio **avant** le premier lancement — voir [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi). Vous pourrez aussi le finaliser pendant l’assistant `GETTING STARTED`.
+Idéalement, effectuez le câblage MIDI et audio **avant** le premier lancement du logiciel — voir [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi). Vous pourrez aussi le finaliser pendant l’assistant `GETTING STARTED`.
 
 ### Télécharger et installer le logiciel
 
@@ -135,23 +137,23 @@ Le Matrix-Control se télécharge sous la forme d'un fichier ZIP comprenant une 
 
 - **Application autonome** — l’application Matrix-Control, à lancer comme n’importe quel autre logiciel
 - **Plugin VST3** (macOS, Windows, Linux) — à placer dans le dossier VST3 habituel de votre système
-- **Plugin AU** (macOS uniquement) — à placer dans le dossier des composants Audio Units (en général celui proposé par l’installeur ou indiqué dans les instructions du téléchargement)
+- **Plugin AU** (macOS uniquement) — à placer dans le dossier des composants Audio Units du Mac (en général celui proposé par l’installeur ou indiqué dans les instructions du téléchargement)
 
 Si la version plugin n’apparaît pas dans votre DAW, rescannez la liste des plugins et vérifiez que les fichiers ont bien été installés dans le dossier attendu (voir aussi les instructions fournies avec le téléchargement).
 
-### En application autonome
+### Application autonome
 
 1. Lancez l’application **Matrix-Control**
 2. Au premier lancement, l’assistant `GETTING STARTED` s’ouvre automatiquement et vous guide (réglages de l'apparence graphique, taille de fenêtre, ports MIDI, clavier maître éventuel, écoute audio) — voir [section 5](#5-assistant-de-premier-lancement-getting-started)
 3. Vous pourrez ensuite ajuster les réglages MIDI dans `SETTINGS…` → `MIDI & DEVICE`, et les réglages audio dans `SETTINGS…` → `AUDIO`
 
-### Dans un DAW
+### Plugin dans un DAW
 
 1. Créez une piste **MIDI / instrument**
 2. Chargez le **Matrix-Control** comme instrument virtuel
 3. Au premier lancement, l’assistant `GETTING STARTED` s’ouvre automatiquement pour vous guider (voir [section 5](#5-assistant-de-premier-lancement-getting-started))
 4. Assurez-vous que la piste peut envoyer et recevoir du MIDI vers / depuis votre interface (selon votre DAW)
-5. Pour l’écoute du synthé : une **piste audio** séparée — détail et exemples par DAW à la [section 6](#jouer-et-éditer-dans-un-daw)
+5. Pour l’écoute du synthé : créez une **piste audio** séparée — détail et exemples par DAW à la [section 6](#jouer-et-éditer-dans-un-daw)
 
 <div align="center">
 <img src="Screenshots/04-matrix-control-in-daw.png" alt="Le Matrix-Control chargé comme instrument dans un DAW." />
@@ -161,7 +163,7 @@ Si la version plugin n’apparaît pas dans votre DAW, rescannez la liste des pl
 
 ## 5. Assistant de premier lancement (GETTING STARTED)
 
-Au premier lancement, le Matrix-Control ouvre automatiquement l’assistant **`GETTING STARTED`**. Il est organisé en plusieurs étapes et vous aide à poser l’essentiel avant d’éditer : taille de la fenêtre (`UI SCALE`), apparence graphique (`SKIN`), ports MIDI vers / depuis le synthé, clavier maître éventuel, et — en application autonome — écoute audio. Rien n’est définitif : vous pourrez tout revoir ensuite dans `SETTINGS…`.
+Au premier lancement, le Matrix-Control ouvre automatiquement l’assistant **`GETTING STARTED`**. Il est organisé en plusieurs étapes et vous aide à poser l’essentiel avant d’éditer : taille de la fenêtre (`UI SCALE`), apparence graphique (`SKIN`), ports MIDI vers / depuis le synthé, clavier maître éventuel, et — en application autonome — chemin d'écoute audio. Rien n’est définitif : vous pourrez tout revoir ensuite dans `SETTINGS…`.
 
 <div align="center">
 <img src="Screenshots/05-getting-started-intro.png" alt="Fenêtre GETTING STARTED à l’étape d’introduction." />
@@ -171,25 +173,25 @@ Au premier lancement, le Matrix-Control ouvre automatiquement l’assistant **`G
 
 ### Étapes de configuration
 
-L’écran d’accueil de l'assistant propose un bouton `CONTINUE` pour démarrer les réglages (recommandé), et un bouton `CONFIGURE LATER` si vous préférez configurer plus tard. Puis l’assistant enchaîne :
+L’écran d’accueil de l'assistant propose un bouton `CONTINUE` pour démarrer les réglages (recommandé), et un bouton `CONFIGURE LATER` si vous préférez configurer plus tard. Avec `CONTINUE`, l’assistant enchaîne :
 
 | Étape | À l’écran | Ce que vous faites |
 |-------|-----------|--------------------|
 | 1 | `USER INTERFACE` | Choisir une taille de fenêtre (`UI SCALE`) et une apparence graphique (`SKIN`) |
 | 2 | `SYNTH COMMUNICATION` | Sélectionner les ports MIDI pour une communication bidirectionnelle avec le synthé (`SYNTH FROM` / `SYNTH TO`) |
 | 3 | `MIDI KEYBOARD` | Sélectionner un clavier maître MIDI (facultatif, détail ci-dessous) |
-| 4 | `AUDIO` | **Application autonome seulement** — choisir une interface audio et une entrée pour entendre le synthé |
+| 4 | `AUDIO` | **Application autonome seulement** — choisir une interface audio et une entrée pour récupérer le son provenant du synthé |
 
 Dans la version plugin, l’assistant s’arrête après l’étape clavier : le DAW gère déjà l’audio de la session (écoute du synthé : [section 6](#jouer-et-éditer-dans-un-daw)).
 
-Après l’introduction, naviguez avec `PREVIOUS` et `NEXT`, puis `FINISH` à la dernière étape. Vous pouvez avancer même si le synthé n’est pas encore reconnu : le câblage et les ports se finalisent à la [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi) et dans Settings.
+Après l’étape d'introduction, naviguez avec `PREVIOUS` et `NEXT`, puis `FINISH` à la dernière étape. Vous pouvez avancer même si le synthé n’est pas encore reconnu : le câblage et les ports se finalisent à la [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi) et dans Settings.
 
 ### Clavier maître
 
-- **Application autonome :** la liste `KEYBOARD FROM` sert à choisir le port MIDI d’un clavier maître. Si vous jouez sur le clavier d’un Matrix-6, ou si vous ne souhaitez pas utiliser de clavier maître, utilisez `SKIP`
+- **Application autonome :** la liste `KEYBOARD FROM` sert à choisir le port MIDI correspondant à votre clavier maître. Si vous possédez un Matrix-6 et que vous jouez directement sur son clavier, ou si vous ne souhaitez pas utiliser de clavier maître, utilisez `SKIP`
 - **Version plugin :** les notes MIDI proviennent du DAW (`KEYBOARD FROM` est fixé à `HOST`). Des exemples de branchement figurent plus loin — voir [Jouer et éditer dans un DAW](#jouer-et-éditer-dans-un-daw)
 
-### Plus tard, ou à nouveau
+### Terminer ou relancer la configuration
 
 `CONFIGURE LATER` ferme l’assistant : vous terminez la configuration dans `SETTINGS…` (ports MIDI, apparence, écoute audio en application autonome). Le Matrix-Control peut rappeler l’assistant **une fois** au prochain lancement ; ensuite il ne s’ouvre plus automatiquement.
 
@@ -201,9 +203,9 @@ C’est l’étape la plus importante côté matériel. Idéalement, faites ce c
 
 ### Câblage type
 
-Voici un exemple de branchement courant : le synthé échange le MIDI dans les **deux** sens avec une interface Audio/MIDI, renvoie son audio vers une entrée ligne de cette interface, et l’ordinateur dialogue en USB (DAW + Matrix-Control). Un clavier maître peut se brancher aussi en USB sur l’ordinateur — facultatif, surtout utile en application autonome.
+Voici un exemple de branchement courant : le synthé échange le MIDI dans les **deux** sens avec une interface audio/MIDI, et renvoie son audio vers une entrée ligne de cette interface. L’ordinateur (DAW + Matrix-Control) dialogue en USB avec l'interface audio/MIDI, et avec un éventuel clavier maître (facultatif) également connecté en USB à l’ordinateur.
 
-Les connecteurs et les boîtiers dépendent de votre installation ; le schéma proposé donne surtout des repères concernant le **sens** des liaisons à respecter.
+Les connecteurs et les boîtiers dépendent de votre installation ; le schéma proposé ci-dessous donne surtout des repères concernant le **sens** des liaisons à respecter.
 
 <div align="center">
 <img src="Screenshots/06-midi-audio-cabling.png" alt="Schéma de câblage MIDI et audio entre un Matrix, une interface Audio/MIDI, un ordinateur et un clavier maître." />
@@ -216,12 +218,12 @@ Dans l’ordre, côté matériel :
 1. **MIDI OUT** de l’interface / de l’ordinateur → **MIDI IN** du synthé
 2. **MIDI OUT** du synthé → **MIDI IN** de l’interface / de l’ordinateur (les **deux** sens sont obligatoires)
 3. **Sortie audio** du synthé → entrée de votre interface audio, table de mixage ou enceintes
-4. Allumez le synthé (et votre interface MIDI / audio si besoin)
-5. Vérifiez que le canal MIDI du synthé est cohérent avec celui que vous utiliserez (sur Matrix-1000, vous pourrez aussi le régler dans `MASTER EDIT` → `MIDI` → `CHANNEL`)
+4. Allumez le synthé et votre interface audio/MIDI
+5. Vérifiez que le canal MIDI du synthé soit cohérent avec celui que vous utiliserez (sur Matrix-1000, vous pourrez aussi le régler dans `MASTER EDIT` → `MIDI` → `CHANNEL`)
 
 ### Sélection des ports MIDI
 
-L’assistant `GETTING STARTED` propose déjà ces choix. Ensuite, vous les retrouvez dans `SETTINGS…` → `MIDI & DEVICE`.
+L’assistant `GETTING STARTED` propose déjà ces choix. Vous les retrouvez ensuite dans `SETTINGS…` → `MIDI & DEVICE`.
 
 | Libellé | Rôle |
 |---------|------|
@@ -231,15 +233,15 @@ L’assistant `GETTING STARTED` propose déjà ces choix. Ensuite, vous les retr
 
 ### Témoins d'activité MIDI
 
-Dans le bandeau du haut (`HEADER`), le groupe `MIDI` comporte des **LEDs** `FROM SYNTH`, `TO SYNTH` et `FROM KEYBOARD` qui clignotent lorsque des messages MIDI circulent. Les mêmes voyants se retrouvent dans `SETTINGS…` → `MIDI & DEVICE` : ils aident à sélectionner les bons ports. Quand le Matrix-Control interroge le synthé à intervalle régulier et que celui-ci répond, ou lorsque vous jouez sur le clavier MIDI, le clignotement confirme que les ports choisis correspondent au matériel branché.
+Dans le bandeau du haut (`HEADER`), le groupe `MIDI` comporte des **LEDs** `FROM SYNTH`, `TO SYNTH` et `FROM KEYBOARD` qui clignotent lorsque des messages MIDI circulent. Les mêmes voyants se retrouvent dans `SETTINGS…` → `MIDI & DEVICE` : ils aident à sélectionner les bons ports. Quand le Matrix-Control interroge le synthé à intervalle régulier et que celui-ci répond, ou lorsque vous jouez sur le clavier MIDI, le clignotement des LEDs confirme que les ports choisis correspondent au matériel branché.
 
 ### Persistance des ports MIDI
 
-Le Matrix-Control mémorise les ports choisis et tente de les rouvrir au prochain lancement. Dès qu’ils sont ouverts, il demande au synthé de s’identifier. La liste `EPROM TYPE` suit en général le type reconnu ; un ` *` dans la liste ouverte marque la suggestion automatique.
+Le Matrix-Control mémorise les ports choisis et tente de les rouvrir au prochain lancement. Dès qu’ils sont ouverts, il demande au synthé de s’identifier : le badge `DEVICE` (bas à droite) affiche alors le modèle détecté. Le type de mémoire (`EPROM TYPE`) se règle dans Settings — voir [SETTINGS](#settings).
 
 ### Plusieurs instances
 
-Si vous possédez plusieurs machines — par exemple un **Matrix-1000** et un **Matrix-6R**, ou deux **Matrix-1000** — vous pouvez ouvrir **une instance du Matrix-Control par synthé**. Chaque instance doit alors gérer sa propre paire de ports `SYNTH FROM` / `SYNTH TO`, branchée sur **sa** machine. Deux synthés = deux jeux de ports distincts.
+Si vous possédez plusieurs machines — par exemple un **Matrix-1000** et un **Matrix-6R**, ou deux **Matrix-1000** — vous pouvez ouvrir **plusieurs instances du Matrix-Control, une par synthé**. Chaque instance doit alors gérer sa propre paire de ports `SYNTH FROM` / `SYNTH TO`, branchée sur **sa** machine. Deux synthés = deux jeux de ports distincts.
 
 ### Synthé non détecté
 
@@ -247,7 +249,7 @@ Si aucun appareil n’est reconnu, le bas de fenêtre affiche un message du type
 
 > *No synth detected - check MIDI cables, Settings > MIDI & DEVICE, and power-cycle your Matrix.*
 
-Les sections d’édition restent alors verrouillées. C’est voulu : le Matrix-Control n’envoie pas de modifications tant que le synthé n’est pas détecté.
+Les sections d’édition restent alors verrouillées (zone grisée dans la fenêtre principale). C’est voulu : le Matrix-Control n’envoie pas de modifications tant que le synthé n’est pas détecté.
 
 ### Jouer et éditer dans un DAW
 
@@ -267,8 +269,6 @@ Pour l’écoute, réglez la piste audio pour entendre l’entrée en continu. S
 3. Choisissez votre clavier maître comme entrée MIDI, ou laissez « All Ins » si c’est votre unique clavier
 4. Créez une piste **audio** branchée sur la sortie du synthé via votre interface, et réglez **Monitor : In**
 5. Jouez quand la piste Matrix-Control est armée ; éditez à tout moment grâce à `SYNTH FROM` / `SYNTH TO`
-
-**Image floue sous Windows (VST3).** Si l’interface paraît floue dans Live, désactivez **Auto-Scale Plugin Window** (clic droit sur la barre du device **en bas**, dans la vue Device), puis rechargez le device. Le réglage `UI SCALE` du Matrix-Control est indépendant. L’application autonome reste en général nette sur la même machine. (Rappel aussi en [SETTINGS](#settings) et [Dépannage](#17-guide-de-dépannage).)
 
 #### Reason
 
@@ -606,9 +606,11 @@ Les raccourcis 1–6 suivent l’ordre de la liste `SKIN` dans Settings. La fami
 Les préférences sont regroupées par onglets.
 
 - **`GETTING STARTED`** — ligne `SETUP WIZARD` : `SHOW WHEN INCOMPLETE` (défaut), `NEVER SHOW AT LAUNCH`, ou `RUN SETUP AGAIN` ([section 5](#5-assistant-de-premier-lancement-getting-started))
-- **`USER INTERFACE`** — `UI SCALE`, `SKIN`, `INFO MESSAGE`, `CONTEXTUAL HELP`. Si l’interface VST3 paraît floue dans Ableton Live sous Windows, voyez plutôt Auto-Scale Plugin Window de Live ([Ableton Live](#ableton-live))
+- **`USER INTERFACE`** — `UI SCALE`, `SKIN`, `INFO MESSAGE`, `CONTEXTUAL HELP`
 - **`MIDI & DEVICE`** — ports `SYNTH FROM` / `SYNTH TO` (`KEYBOARD FROM` en application autonome), badge `DEVICE`, `EPROM TYPE` ; `HARDWARE LATENCY` dans la version plugin seulement
 - **`AUDIO`** — **application autonome seulement** : interface / `DRIVER TYPE`, entrées / sorties, canaux d’écoute du retour audio (libellés `SYNTH FROM`), fréquence d’échantillonnage, buffer… (ASIO sous Windows ou JACK sous Linux peuvent apparaître selon votre machine)
+
+Dans `MIDI & DEVICE`, la liste **`EPROM TYPE`** indique quelle mémoire / firmware équipe votre Matrix — d’usine (`FACTORY`) ou alternative (`GLIGLI`, `TAUNTEK`, `UNTERGEEK`…). Quand le synthé est reconnu, le Matrix-Control propose en général la valeur adaptée. Si vous ouvrez la liste, une étoile ` *` marque cette suggestion : vous pouvez la confirmer ou en choisir une autre.
 
 Autres réglages utiles : affichage des noms (`MATRIX-1000 PATCHES`, `COMPUTER PATCHES`), avertissement de patch non sauvé (`UNSAVED STATE`), modèles `INIT` patch / Master (`SAVE AS INIT` / `DELETE`), et utilitaires Master (`LOAD` / `SAVE AS` / `INIT`). Préférez ces boutons Settings plutôt que d’éditer à la main les fichiers modèles dans le Finder.
 
@@ -650,7 +652,7 @@ En général **non** conservé tel quel : le patch en cours d’édition (le log
 | Pas de notes dans la version plugin | Armer la piste Matrix-Control et router le clavier maître vers elle ([exemples](#jouer-et-éditer-dans-un-daw)) ; `KEYBOARD FROM` reste sur `HOST` |
 | Assistant `GETTING STARTED` ne s’ouvre plus | Dans Settings → `GETTING STARTED` → `SETUP WIZARD`, choisir `SHOW WHEN INCOMPLETE` ou cliquer `RUN SETUP AGAIN` |
 | Pas de son en application autonome | Vérifier Settings → `AUDIO` (`DRIVER TYPE` / interface, entrée, canaux d’écoute `SYNTH FROM`) et le câblage vers l’interface audio |
-| Interface VST3 floue dans Ableton Live (Windows) | Désactiver **Auto-Scale Plugin Window** pour le Matrix-Control, recharger le device ; comparer avec l’application autonome (voir [Ableton Live](#ableton-live)) |
+| Interface VST3 floue dans Ableton Live (Windows) | Désactiver **Auto-Scale Plugin Window** (clic droit sur la barre du device **en bas**, dans la vue Device), puis recharger le device. Le réglage `UI SCALE` du Matrix-Control est indépendant ; l’application autonome reste en général nette sur la même machine |
 | Deux instances entrent en conflit (détection / édition instable ou incohérente) | Ne pas partager les mêmes ports : une paire `SYNTH FROM` / `SYNTH TO` distincte par instance (et par machine si vous en avez plusieurs) — voir [section 6](#6-connecter-le-synthé-et-établir-la-communication-midi) |
 | Audio en retard dans le DAW | Ajuster `HARDWARE LATENCY` dans Settings → `MIDI & DEVICE` (version plugin) ; et la taille de buffer du DAW / de l’interface audio |
 
