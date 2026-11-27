@@ -79,7 +79,13 @@ Référence de style pour l’intro d’installation (à conserver / imiter) :
 | **interface audio** | carte son |
 | **application autonome** — introduire une seule fois **application autonome (Standalone)** en début de manuel, puis uniquement **application autonome** | répéter `Standalone` dans le corps du manuel |
 | Couple des deux formats : toujours **application autonome** puis **version plugin** (ou **version plugin du Matrix-Control** si le contexte l’exige) | « En plugin », « dans le plugin » seuls ; « plugin et Standalone » ; « plugin ou application autonome » en tête |
-| **commutateur** (Mutator modules) | « case » |
+| **commutateur** (modules du `PATCH MUTATOR`) | « case » |
+| **`MATRIX MODULATION`** / **Matrix Modulation** (Oberheim) ; **matrice de modulation** en français | « Matrix Mod » |
+| **`PATCH MUTATOR`** | « Mutator » seul |
+| **Track Generator** | « Track Gen. » |
+| **`SETTINGS…`** | « Settings » sans libellé UI (sauf citation exacte d’un message anglais) |
+| **`INTERNAL PATCHES`** / **`COMPUTER PATCHES`** | « Internal Patches » / « Computer Patches » en Title Case hors backticks |
+| Affirmation directe (« changez via… », « le Matrix-Control propose… ») | Hedges flous : « surtout », « en général », « idéalement », « dans la mesure du possible », « un peu » — ils laissent croire à une autre voie non dite |
 | **bus de modulation** | « ligne » de modulation |
 | Titres de section : **verbe d’action** quand c’est naturel, sinon formulation claire ; **éviter** les parenthèses finales « d’appoint » | Titres du type *… (version plugin)*, *En haut (HEADER)*, *Parcourir (BROWSER)* |
 | Exception — H2 avec rappel GUI en **MAJUSCULES** entre parenthèses : uniquement les titres déjà validés (*GETTING STARTED*, *PATCH EDIT*, *MATRIX MODULATION*, *INTERNAL PATCHES*, *BANK UTILITY*, *COMPUTER PATCHES*, *PATCH MUTATOR*, *MASTER EDIT*, *SETTINGS*) | Étendre ce motif à d’autres H2 / H3 « pour coller un libellé » |
