@@ -24,10 +24,10 @@ context: []
 - Stale hits fixed:
   - `PluginDisplayNames.h` `kDeviceDumpFailedFooter` — `EDITOR MIDI FROM` → `MIDI FROM`
   - `PluginDisplayNames.h` `kDeviceLockGuidance` — `Editor MIDI From` → `MIDI From` (match `kUnsupportedMatrixDeviceFooter` title case)
-  - `Documentation/User/manuel-utilisateur.md` troubleshooting row — `` `EDITOR MIDI FROM` `` → `` `MIDI FROM` ``
+  - `Documentation/Users/manuel-utilisateur.md` troubleshooting row — `` `EDITOR MIDI FROM` `` → `` `MIDI FROM` ``
 - Review patch: synced the §5 blockquote under “Tant que le synthé n’est pas détecté” to the live `kDeviceLockGuidance` sentence (pre-existing paraphrase drift exposed while editing that string).
 - Out of scope: `_bmad-output/**` historical stories/UAT; C++ identifier names (`kEditorMidiFromLabel`, layout width symbols).
-- Grep: no remaining `EDITOR MIDI` / `Editor MIDI` under `Source/` or `Documentation/User/`.
+- Grep: no remaining `EDITOR MIDI` / `Editor MIDI` under `Source/` or `Documentation/Users/`.
 - Casing: ALL-CAPS when naming the header control; title-case in sentence-style footer prose (same split as existing footers).
 
 ## Review Triage Log

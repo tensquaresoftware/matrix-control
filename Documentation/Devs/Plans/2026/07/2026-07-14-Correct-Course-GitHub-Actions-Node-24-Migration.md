@@ -96,7 +96,7 @@ GitHub Actions began defaulting JavaScript actions to **Node.js 24** on hosted r
 | `CONTRIBUTING.md` | New § **GitHub Actions maintenance** (pins, upgrade policy, third-party note) | Done |
 | `_bmad-output/project-context.md` | One-line pointer to CONTRIBUTING § GitHub Actions maintenance | Done |
 | `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md` | **D-047-T** | Done |
-| This plan | Archived under `Documentation/Development/Plans/2026/07/` | Done |
+| This plan | Archived under `Documentation/Devs/Plans/2026/07/` | Done |
 
 ### 5.3 Verification
 

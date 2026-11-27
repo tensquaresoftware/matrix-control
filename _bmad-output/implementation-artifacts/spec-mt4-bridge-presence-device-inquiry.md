@@ -10,7 +10,7 @@ baseline_commit: e2126ad
 review_loop_iteration: 0
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/spec-device-unresponsive-presence-sysex-brake.md'
-  - '{project-root}/Documentation/Development/windows-midi-multi-client.md'
+  - '{project-root}/Documentation/Devs/windows-midi-multi-client.md'
 ---
 
 <frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">

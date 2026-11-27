@@ -8,7 +8,7 @@ review_loop_iteration: 0
 baseline_commit: 'da4e11bfae0e94a591d557b7651361ecc26f6f41'
 context:
   - '{project-root}/Source/GUI/Settings/SettingsPanel.h'
-  - '{project-root}/Documentation/User/manuel-utilisateur.md'
+  - '{project-root}/Documentation/Users/manuel-utilisateur.md'
 ---
 
 <frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">
@@ -32,7 +32,7 @@ context:
 - `Source/GUI/Settings/SettingsPanel.h` / `.cpp` / `SettingsPanelSetup.cpp` — remove KEYBOARD widgets, layout, looks, help binds; `kDesignHeight` 633 → 456
 - `Source/Shared/Definitions/PluginDisplayNames.h` — remove Settings KEYBOARD labels + contextual help
 - `Source/GUI/Helpers/EditorChromeShortcuts.h` — remove `uiScaleGroup` / `skinGroup`
-- `Documentation/User/manuel-utilisateur.md` — remove Settings KEYBOARD references
+- `Documentation/Users/manuel-utilisateur.md` — remove Settings KEYBOARD references
 - `_bmad-output/implementation-artifacts/deferred-work.md` — mark KEYBOARD fixed-height deferral resolved
 
 ### Verification

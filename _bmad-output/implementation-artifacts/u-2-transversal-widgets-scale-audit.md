@@ -305,7 +305,7 @@ ScaledDrawing::systemDisplayScaleForComponent(*this);
 ### Project context reference
 
 - GUI scaling rules: `_bmad-output/project-context.md` § GUI & UI Scale Rules
-- Detailed strategy: `Documentation/Development/GUI/GUI-Scaling-Strategy.md`
+- Detailed strategy: `Documentation/Devs/GUI/GUI-Scaling-Strategy.md`
 - Epic canonical spec: `planning-artifacts/epic-ui-scale-audit-pixel-perfect-layout.md` § Story U-2
 
 ## Dev Agent Record

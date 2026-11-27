@@ -26,14 +26,14 @@ Source complète : `CONVENTIONS.md` §5–§6.2, §9. Constitution BMad : `_bmad
 - **Versionné** : `_bmad/` (config installer), `_bmad/custom/config.toml` (politique d’équipe), `_bmad-output/` (`project-context.md`, stories, `sprint-status.yaml`)
 - **Local / gitignored** : `.agents/` (cache skills Cursor, régénéré par l’installer BMad), `_bmad/custom/config.user.toml` (override perso)
 - **Pas de skills versionnés** dans le dépôt — après clone, relancer l’installer BMad (cible Cursor) pour recréer `.agents/`
-- Plans archivés : `Documentation/Development/Plans/<année>/<mois>/` (nom `YYYY-MM-DD-Titre-En-Anglais.md`)
+- Plans archivés : `Documentation/Devs/Plans/<année>/<mois>/` (nom `YYYY-MM-DD-Titre-En-Anglais.md`)
 
 ## Fichiers clés (lire avant d'implémenter)
 
 - `CONVENTIONS.md` — standards complets (autoritaire pour litiges de style) ; §3 = porte qualité chiffrée
 - `Scripts/quality/lint_touched.py` — analyseur sur fichiers C++ touchés sous `Source/`, `Tests/`, et **`Tools/SkinDesigner/`** (Skin Designer inclus dans la porte Clean Code ; critère de fin de tâche)
 - `.cursor/rules/clean-code.mdc` — guidance légère (pas always-on)
-- `Documentation/Development/software-development-quality-principles.md` — complete design principles reference
+- `Documentation/Devs/software-development-quality-principles.md` — complete design principles reference
 - `Source/Shared/Definitions/PluginDescriptors.h`
 - `Source/GUI/Factories/WidgetFactory.h`
 - `Source/GUI/Layout/ScaledLayout.h`

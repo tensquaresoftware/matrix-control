@@ -16,7 +16,7 @@ This text is for day-to-day product use: a bug, odd behavior or a specific
 question, outside a structured beta test session.
 
 During a beta test campaign, prefer the filled test guide
-(Matrix-Control-Beta-Test-Guide-EN.txt): it already contains the session
+(Matrix-Control-Beta-Test-Guide.txt): it already contains the session
 sheet, checked boxes and notes. Simply attach that file by email (see the
 "Send your results" section of the guide).
 

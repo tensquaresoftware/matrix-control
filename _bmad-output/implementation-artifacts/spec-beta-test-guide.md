@@ -6,7 +6,7 @@ status: 'done'
 route: 'oneshot'
 review_loop_iteration: 0
 context:
-  - '{project-root}/Documentation/User/Matrix-Control-Manuel-Utilisateur.md'
+  - '{project-root}/Documentation/Users/Matrix-Control-Manuel-Utilisateur.md'
   - '{project-root}/Scripts/release/templates/RELEASE_NOTES.template.md'
   - '{project-root}/CONTRIBUTING.md'
   - '{project-root}/_bmad-output/implementation-artifacts/deferred-work.md'
@@ -19,14 +19,14 @@ context:
 
 **Problem:** Matrix-Control has no actionable beta test guide. Guillaume needs multi-OS smoke scenarios next week, and external beta testers will later receive the same guide in the release ZIP with the docs.
 
-**Approach:** Author two plain `.txt` manuals (French first as reference, then English equivalent) under `Documentation/User/beta/`, structured as checkable test scenarios (preconditions, steps, expected result, failure notes) covering install friction, core panels, Standalone vs plugin, known limitations, bug reporting, plus short smoke and long full checklists.
+**Approach:** Author two plain `.txt` manuals (French first as reference, then English equivalent) under `Documentation/Users/beta/`, structured as checkable test scenarios (preconditions, steps, expected result, failure notes) covering install friction, core panels, Standalone vs plugin, known limitations, bug reporting, plus short smoke and long full checklists.
 
 </frozen-after-approval>
 
 ## Implementation Notes
 
 Agent decisions (user would not need to renegotiate these):
-- Paths: guides in `Documentation/User/Beta/` (`Matrix-Control-Guide-de-tests-beta-FR.txt` FR SSOT + `Matrix-Control-Beta-Test-Guide-EN.txt` parity); bug-report companions in `Documentation/User/Support/` (`Matrix-Control-Comment-signaler-un-bug-FR.txt` + `Matrix-Control-How-to-report-a-bug-EN.txt`); archives `…-remaniee-Cursor.txt` + `…-remaniee-Guillaume.txt`
+- Paths: guides in `Documentation/Users/Beta/` (`Matrix-Control-Guide-de-tests-beta.txt` FR SSOT + `Matrix-Control-Beta-Test-Guide.txt` parity); bug-report companions in `Documentation/Users/Support/` (`Matrix-Control-Comment-signaler-un-bug.txt` + `Matrix-Control-How-to-report-a-bug.txt`); archives `…-remaniee-Cursor.txt` + `…-remaniee-Guillaume.txt`
 - Format: working Markdown + delivery TXT — UPPERCASE top titles in TXT, `1.` / `1.1.` numbering, ASCII separators, `[ ]` / `[x]` checkboxes; UI labels stay English; PDF out of scope
 - Keep product UI labels in English in both languages (GETTING STARTED, PATCH EDIT, BANK UTILITY, …)
 - ASIO: cover Standalone audio with and without ASIO; never present ASIO as guaranteed for first public beta

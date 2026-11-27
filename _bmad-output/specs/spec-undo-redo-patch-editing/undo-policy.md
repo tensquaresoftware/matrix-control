@@ -108,4 +108,4 @@ Treat as new baseline — stack cleared, no redo into pre-checkpoint state:
 
 ## User manual
 
-Update `Documentation/User/manuel-utilisateur.md` §7: document undo/redo shortcuts, grouping (slide vs arrows), checkpoint clears, and Mutator distinction.
+Update `Documentation/Users/manuel-utilisateur.md` §7: document undo/redo shortcuts, grouping (slide vs arrows), checkpoint clears, and Mutator distinction.

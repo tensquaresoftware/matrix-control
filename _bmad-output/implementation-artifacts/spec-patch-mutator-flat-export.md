@@ -59,7 +59,7 @@ context:
 - `Source/GUI/Handlers/MutatorActionHandler.cpp` / `PluginProcessorGates.cpp` — picker + gates; **read-only**.
 - `Tests/Unit/PatchFileServiceMutatorExportTests.cpp` — asserts `Initial.syx` and `M00/M00.syx` / nested retries / gap dirs / session `Initial.syx`; rewrite expectations to flat paths + `INITIAL.syx`.
 - `Tests/Unit/PatchMutatorEngineExportTests.cpp` — session basename tests; update if they assert nested layout or `Initial.syx`.
-- `Documentation/User/manuel-utilisateur.md` (~439) — EXPORT row still mentions subfolders; update to flat list + `INITIAL.syx`.
+- `Documentation/Users/manuel-utilisateur.md` (~439) — EXPORT row still mentions subfolders; update to flat list + `INITIAL.syx`.
 - Historical FR-33 (`6-11-mutator-export-layout.md`, PRD addendum) — superseded by this spec for new behavior; do not mass-edit unless Ask First cleared.
 
 ## Tasks & Acceptance
@@ -68,7 +68,7 @@ context:
 - [x] `Source/Core/Services/PatchFileServiceMutatorExport.cpp` -- Write initial + all root/retry `.syx` into the layout root with no `Mxx/` directories; rename export file to `INITIAL.syx` -- Flat Open-friendly export.
 - [x] `Source/Core/Services/PatchFileService.h` -- Update export comments to describe flat session layout -- Avoid stale FR-33 nested guidance.
 - [x] `Tests/Unit/PatchFileServiceMutatorExportTests.cpp` (+ engine export tests if needed) -- Assert flat paths, gap files, `INITIAL.syx`, session flat layout -- Lock I/O matrix.
-- [x] `Documentation/User/manuel-utilisateur.md` -- Document flat EXPORT contents -- User-facing accuracy.
+- [x] `Documentation/Users/manuel-utilisateur.md` -- Document flat EXPORT contents -- User-facing accuracy.
 
 **Acceptance Criteria:**
 - Given a non-empty mutator history and a writable export destination, when EXPORT runs, then the layout root contains only flat `.syx` files named `INITIAL.syx` (if initial present), `Mxx.syx`, and `Mxx-Ryy.syx` with no mutation subdirectories.
@@ -128,4 +128,4 @@ Optional cleanup: rename `writeRootFolder` → something that no longer implies 
   [`PatchFileServiceMutatorExportTests.cpp:288`](../../Tests/Unit/PatchFileServiceMutatorExportTests.cpp#L288)
 
 - User manual EXPORT row names flat stems and Open reuse.
-  [`manuel-utilisateur.md:439`](../../Documentation/User/manuel-utilisateur.md#L439)
+  [`manuel-utilisateur.md:439`](../../Documentation/Users/manuel-utilisateur.md#L439)

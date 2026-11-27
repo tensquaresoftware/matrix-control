@@ -9,7 +9,7 @@ baseline_commit: 'b0a7daefd82c82c0e2d8232eef2694613dc7dd0b'
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/epic-gs-context.md'
   - '{project-root}/_bmad/custom/manuel-utilisateur-redaction-fr.md'
-  - '{project-root}/Documentation/Development/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md'
+  - '{project-root}/Documentation/Devs/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md'
   - '{project-root}/_bmad-output/specs/spec-getting-started/ui-copy.md'
   - '{project-root}/_bmad-output/implementation-artifacts/spec-gs-3-getting-started-steps-flags-plugin-standalone.md'
 ---
@@ -28,7 +28,7 @@ context:
 - Follow `_bmad/custom/manuel-utilisateur-redaction-fr.md` (tone, product vocabulary, no developer jargon, UI labels in English backticks, screenshot placeholders OK).
 - Cover first launch / GETTING STARTED: auto-open when incomplete, steps 0–4 by format (plugin ends at Keyboard; Standalone includes Audio), `CONFIGURE LATER` / one reminder then silence, Settings → User Interface Getting Started combo (`SHOW WHEN INCOMPLETE` / `NEVER AT LAUNCH`) and `RUN SETUP AGAIN`.
 - Cover master-keyboard via host for plugin use with detailed DAW examples in the manual only (wizard keeps the short pointer).
-- **Decision — Languages:** French only. Update `Documentation/User/manuel-utilisateur.md`; leave `user-manual.md` as “à venir” (no EN chapter in this story).
+- **Decision — Languages:** French only. Update `Documentation/Users/manuel-utilisateur.md`; leave `user-manual.md` as “à venir” (no EN chapter in this story).
 - **Decision — DAW example set:** Concrete master-keyboard → Matrix-Control track steps for **Ableton Live**, **Reason**, and **Logic Pro** (hosts Guillaume can verify). Other hosts may be named briefly as “same idea” without full walkthroughs.
 - Align §14 (and related) so UI Scale / Skin / Getting Started match GS-1 (Settings User Interface order; logo shortcuts remain).
 - Keep MIDI port / detection facts honest vs current UI; do not invent Device Setup as the current first-run path.
@@ -36,9 +36,9 @@ context:
 
 **Never:**
 - Put detailed DAW walkthroughs into wizard/code copy (`PluginDisplayNames` STEP 3 plugin text stays the short pointer unless a real doc URL is later approved).
-- Create or expand `Documentation/User/user-manual.md` in this story.
+- Create or expand `Documentation/Users/user-manual.md` in this story.
 - Rewrite the whole manual or reopen Epic GS product decisions (pastilles, mega-modal, etc.).
-- Copy developer docs (`Documentation/Development/…`) into the user journey.
+- Copy developer docs (`Documentation/Devs/…`) into the user journey.
 - Treat Audio Settings Matrix rebuild or code changes as part of this story.
 - Invent screenshot assets; placeholders with captions only.
 
@@ -56,14 +56,14 @@ context:
 
 ## Code Map
 
-- `Documentation/User/manuel-utilisateur.md` -- Primary deliverable: add/extend first-launch GETTING STARTED; DAW host-keyboard examples (Ableton Live, Reason, Logic Pro); refresh §14 Settings User Interface (Scale/Skin/Getting Started); light §4/§5/§15 cross-links so plugin notes and Standalone audio match wizard reality.
-- `Documentation/User/user-manual.md` -- Remains “à venir”; do not create in this story.
+- `Documentation/Users/manuel-utilisateur.md` -- Primary deliverable: add/extend first-launch GETTING STARTED; DAW host-keyboard examples (Ableton Live, Reason, Logic Pro); refresh §14 Settings User Interface (Scale/Skin/Getting Started); light §4/§5/§15 cross-links so plugin notes and Standalone audio match wizard reality.
+- `Documentation/Users/user-manual.md` -- Remains “à venir”; do not create in this story.
 - `_bmad/custom/manuel-utilisateur-redaction-fr.md` -- Authoring SSOT (read-only): FR unique target, tone, vocabulary, no Dev paths in user journey.
-- `Documentation/Development/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md` -- Frozen product journey + STEP 3 plugin pointer copy (read-only).
+- `Documentation/Devs/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md` -- Frozen product journey + STEP 3 plugin pointer copy (read-only).
 - `_bmad-output/specs/spec-getting-started/{ui-copy,journey-and-flags,acceptance-criteria}.md` -- Wizard copy and “manual-only DAW examples” constraint (read-only).
 - `Source/Shared/Definitions/PluginDisplayNames.h` -- `kBodyMidiKeyboardPlugin` points to user manual; do not expand with DAW steps in this story.
 - `_bmad-output/implementation-artifacts/spec-gs-3-*.md` -- Continuity: wizard owns onboarding; GS-4 is docs only.
-- `Documentation/Development/windows-midi-multi-client.md` -- Optional cross-link for Windows port exclusivity only; not a substitute for host-keyboard examples.
+- `Documentation/Devs/windows-midi-multi-client.md` -- Optional cross-link for Windows port exclusivity only; not a substitute for host-keyboard examples.
 
 **Reuse:** Existing §4 install/open, §5 MIDI ports, §15 plugin vs Standalone table as anchors; expand rather than duplicate full MIDI wiring.
 
@@ -72,9 +72,9 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [x] `Documentation/User/manuel-utilisateur.md` -- Add first-launch / GETTING STARTED guidance (TOC + section or clear subsections under install/open); document plugin vs Standalone step differences, Configure later, Settings Getting Started controls.
-- [x] `Documentation/User/manuel-utilisateur.md` -- Add master-keyboard via host / DAW routing examples for Ableton Live, Reason, and Logic Pro; cross-link from plugin Keyboard / §15.
-- [x] `Documentation/User/manuel-utilisateur.md` -- Refresh §14 (and any contradictory §4/§6 logo/Settings lines) for UI Scale, Skin, and Getting Started in Settings User Interface.
+- [x] `Documentation/Users/manuel-utilisateur.md` -- Add first-launch / GETTING STARTED guidance (TOC + section or clear subsections under install/open); document plugin vs Standalone step differences, Configure later, Settings Getting Started controls.
+- [x] `Documentation/Users/manuel-utilisateur.md` -- Add master-keyboard via host / DAW routing examples for Ableton Live, Reason, and Logic Pro; cross-link from plugin Keyboard / §15.
+- [x] `Documentation/Users/manuel-utilisateur.md` -- Refresh §14 (and any contradictory §4/§6 logo/Settings lines) for UI Scale, Skin, and Getting Started in Settings User Interface.
 - [x] Manual consistency pass -- Lexicon / troubleshooting touch-ups only if new terms or symptoms are introduced; leave EN `user-manual.md` as “à venir”; no wholesale rewrite.
 
 **Acceptance Criteria:**
@@ -85,7 +85,7 @@ context:
 
 ## Implementation Notes
 
-- Updated `Documentation/User/manuel-utilisateur.md`: new §5 GETTING STARTED, host-keyboard examples (Ableton Live / Reason / Logic Pro) under §6, §15 USER INTERFACE refresh, renumbered TOC 5→18; EN `user-manual.md` left “à venir”.
+- Updated `Documentation/Users/manuel-utilisateur.md`: new §5 GETTING STARTED, host-keyboard examples (Ableton Live / Reason / Logic Pro) under §6, §15 USER INTERFACE refresh, renumbered TOC 5→18; EN `user-manual.md` left “à venir”.
 - Parent-pass fix: removed developer wording “one-shot Device Setup” from §5 intro (redaction SSOT).
 - Matrix rows covered by manual content inspection (docs chore — no unit tests).
 - Build review patches (manuel only): resume-at-incomplete, SKIP completion, SYNTH FROM MIDI vs audio, CONFIGURE LATER intro-only, silence/Esc policy, Reason steps, lexicon order, DAW screenshot placeholder, §4 wording align, drop duplicate Windows note.
@@ -135,14 +135,14 @@ Code review (2026-10-09) — layers: blind-hunter, edge-case-hunter, verificatio
 1. **decision-needed:** none
 
 2. **patch** (applied 2026-10-09):
-- [x] [Review][Patch] Remove opaque « CONTINUE ou équivalent » — only `CONTINUE` leaves intro [`Documentation/User/manuel-utilisateur.md:147`]
-- [x] [Review][Patch] Reword Standalone `FINISH` so it does not claim audio must already be configured [`Documentation/User/manuel-utilisateur.md:180`]
-- [x] [Review][Patch] Document that `NEXT` / `SKIP` / `FINISH` mark the current step done for auto-open without validating ports / DEVICE [`Documentation/User/manuel-utilisateur.md:§5`]
-- [x] [Review][Patch] Clarify newly-applicable-step exception does not bypass `NEVER AT LAUNCH` [`Documentation/User/manuel-utilisateur.md:192`]
-- [x] [Review][Patch] §4 Standalone: header lists are MIDI (and gain/monitoring), not audio interface / listen channels [`Documentation/User/manuel-utilisateur.md:134`]
-- [x] [Review][Patch] Place `EPROM TYPE` and `HARDWARE LATENCY` under Settings → `DEVICE` (not MIDI) [`Documentation/User/manuel-utilisateur.md:221,630-632`]
-- [x] [Review][Patch] Restore Standalone `INPUT GAIN` / monitoring row in plugin vs Standalone table [`Documentation/User/manuel-utilisateur.md:652-660`]
-- [x] [Review][Patch] Reorder lexicon entry `SYNTH FROM / SYNTH TO` alphabetically [`Documentation/User/manuel-utilisateur.md:709`]
+- [x] [Review][Patch] Remove opaque « CONTINUE ou équivalent » — only `CONTINUE` leaves intro [`Documentation/Users/manuel-utilisateur.md:147`]
+- [x] [Review][Patch] Reword Standalone `FINISH` so it does not claim audio must already be configured [`Documentation/Users/manuel-utilisateur.md:180`]
+- [x] [Review][Patch] Document that `NEXT` / `SKIP` / `FINISH` mark the current step done for auto-open without validating ports / DEVICE [`Documentation/Users/manuel-utilisateur.md:§5`]
+- [x] [Review][Patch] Clarify newly-applicable-step exception does not bypass `NEVER AT LAUNCH` [`Documentation/Users/manuel-utilisateur.md:192`]
+- [x] [Review][Patch] §4 Standalone: header lists are MIDI (and gain/monitoring), not audio interface / listen channels [`Documentation/Users/manuel-utilisateur.md:134`]
+- [x] [Review][Patch] Place `EPROM TYPE` and `HARDWARE LATENCY` under Settings → `DEVICE` (not MIDI) [`Documentation/Users/manuel-utilisateur.md:221,630-632`]
+- [x] [Review][Patch] Restore Standalone `INPUT GAIN` / monitoring row in plugin vs Standalone table [`Documentation/Users/manuel-utilisateur.md:652-660`]
+- [x] [Review][Patch] Reorder lexicon entry `SYNTH FROM / SYNTH TO` alphabetically [`Documentation/Users/manuel-utilisateur.md:709`]
 
 3. **defer:** none
 

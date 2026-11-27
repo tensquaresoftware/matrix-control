@@ -8,7 +8,7 @@ baseline_commit: '86efaa6ab1b65ee2e76e3426db343c6b823b1767'
 review_loop_iteration: 0
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/guide-matrix-modal-design.md'
-  - '{project-root}/Documentation/Development/Plans/2026/10/2026-10-04-Unified-Settings-Window-And-Header.md'
+  - '{project-root}/Documentation/Devs/Plans/2026/10/2026-10-04-Unified-Settings-Window-And-Header.md'
 ---
 
 <frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">

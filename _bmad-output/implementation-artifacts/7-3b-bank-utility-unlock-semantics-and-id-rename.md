@@ -10,7 +10,7 @@ sources:
   - planning-artifacts/sprint-change-proposal-2026-06-19.md
   - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
   - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
-  - Documentation/Development/Plans/2026/06/2026-06-18-Correct-Course-Bank-Utility-UNLOCK-Handoff.md
+  - Documentation/Devs/Plans/2026/06/2026-06-18-Correct-Course-Bank-Utility-UNLOCK-Handoff.md
   - implementation-artifacts/7-3-patchmanageractionhandler-bank-and-internal.md
   - project-context.md
 created: 2026-06-19
@@ -21,7 +21,7 @@ updated: 2026-06-19
 
 Status: done
 
-> **ERRATA (2026-06-19 — Correct Course D-023-R2):** AC #1–3 (lock mirror, cross-bank navigation, `patchManagerBanksLocked` semantics) are **superseded** by Story **7-3c**. AC #4 (ID renames) remains valid. See `Documentation/Development/Plans/2026/06/2026-06-19-Correct-Course-Bank-Utility-Unlock-Simplify-Handoff.md` and `sprint-change-proposal-2026-06-19-bank-unlock-simplify.md`.
+> **ERRATA (2026-06-19 — Correct Course D-023-R2):** AC #1–3 (lock mirror, cross-bank navigation, `patchManagerBanksLocked` semantics) are **superseded** by Story **7-3c**. AC #4 (ID renames) remains valid. See `Documentation/Devs/Plans/2026/06/2026-06-19-Correct-Course-Bank-Utility-Unlock-Simplify-Handoff.md` and `sprint-change-proposal-2026-06-19-bank-unlock-simplify.md`.
 
 
 ## Story
@@ -292,7 +292,7 @@ Recent commits on mainline: 7.2 handler patterns (`a1e1bbc`), 7.1 dispatcher (`0
 
 - `project-context.md` — C++17, builds under `Builds/`, English source only, no GUI in Core.
 - `CONVENTIONS.md` — authoritative style.
-- Correct Course handoff: `Documentation/Development/Plans/2026/06/2026-06-18-Correct-Course-Bank-Utility-UNLOCK-Handoff.md`
+- Correct Course handoff: `Documentation/Devs/Plans/2026/06/2026-06-18-Correct-Course-Bank-Utility-UNLOCK-Handoff.md`
 - Sprint Change Proposal: `_bmad-output/planning-artifacts/sprint-change-proposal-2026-06-19.md`
 
 ### References

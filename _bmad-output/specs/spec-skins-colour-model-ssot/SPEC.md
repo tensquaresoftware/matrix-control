@@ -9,7 +9,7 @@ companions:
   - ../../project-context.md
 sources:
   - ../../forge/mode-dev-skins/forged-idea.md
-  - ../../../Documentation/Development/Plans/2026/10/2026-10-14-Matrix-Control-Skin-Studio-Brief.md
+  - ../../../Documentation/Devs/Plans/2026/10/2026-10-14-Matrix-Control-Skin-Studio-Brief.md
   - /Volumes/Guillaume/Dev/Projects/JUCE/Matrix-Control-Skin-Studio/_bmad-output/planning-artifacts/architecture/architecture-Matrix-Control-Skin-Studio-2026-10-15/ARCHITECTURE-SPINE.md
   - /Volumes/Guillaume/Dev/Projects/JUCE/Matrix-Control-Skin-Studio/_bmad-output/planning-artifacts/prds/prd-Matrix-Control-Skin-Studio-2026-10-15/prd.md
 ---

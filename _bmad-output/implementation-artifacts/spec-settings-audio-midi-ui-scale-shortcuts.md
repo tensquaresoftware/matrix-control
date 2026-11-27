@@ -8,7 +8,7 @@ review_loop_iteration: 0
 baseline_commit: 'b2fd720b04dd574db31e8d19b0334ba19ef9dbcf'
 context:
   - '{project-root}/Source/GUI/Helpers/EditorialUndoRedoShortcuts.h'
-  - '{project-root}/Documentation/User/manuel-utilisateur.md'
+  - '{project-root}/Documentation/Users/manuel-utilisateur.md'
 ---
 
 <frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">
@@ -37,7 +37,7 @@ context:
 - `Tests/Unit/EditorChromeShortcutTests.cpp` (new) + CMake registration
 - `PluginEditor` key routing (no TooltipWindow)
 - Logo / HeaderPanel / HeaderLogoPopupMenu / SettingsPanel / PluginDisplayNames / DesignPanels column width
-- `Documentation/User/manuel-utilisateur.md`
+- `Documentation/Users/manuel-utilisateur.md`
 
 ### Review patches
 - Compact right-aligned logo popup shortcuts (`⌘ +/-`, `⌘ 0`, spaced `⌘ ,` / `⌥ ⌘ ,`); columns back to 80
@@ -60,7 +60,7 @@ context:
 
 - [x] [Review][Decision] Unison deferred notes mixed into this chantier’s deferred-work edit — resolved: keep only Settings height deferral (strip Unison notes from this diff).
 - [x] [Review][Decision] Windows/Linux UI Scale shortcut strings still too long for menu/Settings columns — resolved: compact right-aligned hints (`⌘ +/-` on UI SCALE, `⌘ 0` on 100%, spaced `⌘ ,` / `⌥ ⌘ ,`); logo popup columns back to 80; logo tooltip removed.
-- [x] [Review][Patch] Align manual Windows zoom-in spelling with UI labels (`Ctrl+Plus`) [`Documentation/User/manuel-utilisateur.md:491`]
+- [x] [Review][Patch] Align manual Windows zoom-in spelling with UI labels (`Ctrl+Plus`) [`Documentation/Users/manuel-utilisateur.md:491`]
 - [x] [Review][Patch] Move logo tooltip text-field ignore note after Audio/MIDI lines — superseded: logo tooltip removed entirely.
 - [x] [Review][Patch] Extend unit tests: non-zero `textCharacter` for UI Scale peers (incl. Shift+`+`) [`Tests/Unit/EditorChromeShortcutTests.cpp`]
 - [x] [Review][Defer] No automated check that PluginEditor chrome actions fire [`Source/GUI/PluginEditor.cpp:229`] — deferred: CONVENTIONS forbid GUI component unit tests; classifier-only coverage matches editorial undo pattern; needs harness approach later

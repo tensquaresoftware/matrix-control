@@ -12,7 +12,7 @@ Copier-coller le bloc ci-dessous dans une **conversation Cursor fraîche**, puis
 Implémenter le **chantier 2** de l’UX « Dirty vs non sauvé » pour Matrix-Control.
 
 Référence produit (décisions figées) :
-`Documentation/Development/Plans/2026/08/2026-08-03-Dirty-Vs-Unsaved-Patch-UX.md`
+`Documentation/Devs/Plans/2026/08/2026-08-03-Dirty-Vs-Unsaved-Patch-UX.md`
 — surtout §0 décisions 5–6, §4.5, §5.2–5.3, §6 (chargement Computer Patches), §8 points 6–7.
 
 Base déjà sur `main` (chantier 1 livré) :

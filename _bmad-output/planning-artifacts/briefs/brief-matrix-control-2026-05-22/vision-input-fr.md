@@ -125,7 +125,7 @@ Cette nouvelle section complète le mode PATCH du synthé, elle comporte les mod
 - Un bouton CLEAR permet de purger intégralement la ComboBox HISTORY, celle-ci affiche ensuite à nouveau EMPTY
 - Un bouton EXPORT permet d'exporter toutes les patches mutés listés dans la ComboBox HISTORY, en générant un fichier .syx pour chacun d'entre eux. Une boite de dialogue permet à l'utilisateur d'indiquer le dossier de son choix pour l'export ainsi qu'un nom de base de fichier, qui sera automatiquement complété par le suffixe "Mxx" (les contraintes sur ce nom de base seront à définir, compte tenu des contraintes sur les noms de patches imposées par le Matrix-1000, je ne suis pas encore bien fixé sur ce point...)
 
-Note : Je ne suis pas encore totalement sûr du comportement final de ce module PATCH MUTATOR, ni de la pertinence ou complétude de ce que j'ai imaginé ici. Une session de brainstorming avait été lancée avec l'IA à ce sujet il y a quelques temps. Il faudra sans doute y revenir ensemble avant d'implémenter toutes les fonctionnalités de ce module un peu particulier (voir mon fichier /Volumes/Guillaume/Dev/SDKs/JUCE/Projects/Matrix-Control/Documentation/Development/GUI/Patch-Mutator-Brainstorming.md)
+Note : Je ne suis pas encore totalement sûr du comportement final de ce module PATCH MUTATOR, ni de la pertinence ou complétude de ce que j'ai imaginé ici. Une session de brainstorming avait été lancée avec l'IA à ce sujet il y a quelques temps. Il faudra sans doute y revenir ensemble avant d'implémenter toutes les fonctionnalités de ce module un peu particulier (voir mon fichier /Volumes/Guillaume/Dev/SDKs/JUCE/Projects/Matrix-Control/Documentation/Devs/GUI/Patch-Mutator-Brainstorming.md)
 
 II. Mode MASTER
 

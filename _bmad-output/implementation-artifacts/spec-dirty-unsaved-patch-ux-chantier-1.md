@@ -6,7 +6,7 @@ status: 'done'
 baseline_commit: '49b294a'
 review_loop_iteration: 0
 context:
-  - '{project-root}/Documentation/Development/Plans/2026/08/2026-08-03-Dirty-Vs-Unsaved-Patch-UX.md'
+  - '{project-root}/Documentation/Devs/Plans/2026/08/2026-08-03-Dirty-Vs-Unsaved-Patch-UX.md'
   - '{project-root}/_bmad-output/project-context.md'
 ---
 

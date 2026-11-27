@@ -52,7 +52,7 @@ Hardware-synth owner who used Matrix-1000 as preset box; tried other editors wit
 
 ### Open design items (parked)
 
-- PATCH MUTATOR final behavior — see `Documentation/Development/GUI/Patch-Mutator-Brainstorming.md` and Figma mockup (M00–M99, COMPARE, RETRY semantics).
+- PATCH MUTATOR final behavior — see `Documentation/Devs/GUI/Patch-Mutator-Brainstorming.md` and Figma mockup (M00–M99, COMPARE, RETRY semantics).
 - PATCH NAME edit: double-click vs EDIT button.
 - BANK LOCK vs UNLOCK button label (prefer LOCK to match hardware).
 - Audio/MIDI single-track vs dual-track DAW workflow — unresolved.

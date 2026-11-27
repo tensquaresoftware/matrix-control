@@ -76,7 +76,7 @@ context:
 - `Tests/Unit/MatrixModBusReorderServiceTests.cpp:289-327` — `ProcessorPathHarness.swapMatrixModBusContents` mirror for undo proof.
 - `Tests/Unit/UndoManagerApvtsSpikeTests.cpp:83-97` — reference `beginNewTransaction` + gesture simulation.
 - `Tests/Unit/UndoManagerModuleBulkTestSupport.h` — harness patterns for UndoManager + SysEx queue assertions.
-- `Documentation/User/manuel-utilisateur.md:236` — replace no-undo paragraph; document shortcuts and grouping.
+- `Documentation/Users/manuel-utilisateur.md:236` — replace no-undo paragraph; document shortcuts and grouping.
 - `_bmad-output/specs/spec-undo-redo-patch-editing/keyboard-shortcuts.md` — canonical focus rules.
 - `_bmad-output/specs/spec-undo-redo-patch-editing/undo-policy.md:20-23,92` — arrow grouping + Matrix Mod reorder matrix.
 
@@ -92,7 +92,7 @@ context:
 - [x] `Tests/Unit/UndoManagerMatrixModReorderTests.cpp` — reorder swap + single undo/redo + SysEx after undo — CAP-4/CAP-5 without GUI.
 - [x] `Tests/Unit/UndoManagerSliderArrowTests.cpp` — simulated arrow session grouping — CAP-4 arrows without GUI.
 - [x] `Tests/CMakeLists.txt` — register new test files.
-- [x] `Documentation/User/manuel-utilisateur.md` — §7 undo/redo shortcuts and grouping — SPEC constraint.
+- [x] `Documentation/Users/manuel-utilisateur.md` — §7 undo/redo shortcuts and grouping — SPEC constraint.
 - [x] `python3 Scripts/quality/lint_touched.py` — zero findings on touched C++.
 
 **Acceptance Criteria:**
@@ -132,4 +132,4 @@ context:
 
 - [x] [Review][Defer] Envelope/TrackGenerator binding `getUndoManager()` → `apvts_.undoManager` — minor supporting fix outside listed tasks; no behavior change intended for 12-4. [`EnvelopeDisplayApvtsBinding.cpp`, `TrackGeneratorDisplayApvtsBinding.cpp`] — deferred, out-of-scope cleanup
 
-- [x] [Review][Defer] Manual §7 omits undo-policy extras (checkpoint clears, stack depth, dirty state) — AC6 satisfied; fuller manual alignment deferred to story 12-5 stack-clear work. [`Documentation/User/manuel-utilisateur.md`] — deferred, story 12-5 scope
+- [x] [Review][Defer] Manual §7 omits undo-policy extras (checkpoint clears, stack depth, dirty state) — AC6 satisfied; fuller manual alignment deferred to story 12-5 stack-clear work. [`Documentation/Users/manuel-utilisateur.md`] — deferred, story 12-5 scope

@@ -4,7 +4,7 @@
 **Date:** 2026-10-08  
 **Author:** Correct Course workflow (Incremental — Guillaume)  
 **Change signal:** Align sprint / deferred / epics-stories with product chantier **GETTING STARTED** (multi-step first-run assistant), replacing Device Setup one-shot and vague « First-run setup assistant » scope  
-**Product SSOT:** `Documentation/Development/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md`  
+**Product SSOT:** `Documentation/Devs/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md`  
 **Scope classification:** **Moderate** — backlog reorganization (new Epic GS + stories), tracking/docs updates; no code in this Correct Course; no rollback of shipped epics
 
 ---

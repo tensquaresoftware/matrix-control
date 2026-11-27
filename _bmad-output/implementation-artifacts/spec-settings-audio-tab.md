@@ -7,7 +7,7 @@ route: 'dispatch'
 baseline_commit: '7e01242659a0c37215fcf33697900117265d9a95'
 review_loop_iteration: 0
 context:
-  - '{project-root}/Documentation/Development/Plans/2026/10/2026-10-04-Unified-Settings-Window-And-Header.md'
+  - '{project-root}/Documentation/Devs/Plans/2026/10/2026-10-04-Unified-Settings-Window-And-Header.md'
   - '{project-root}/_bmad-output/implementation-artifacts/spec-settings-tabs-shell.md'
   - '{project-root}/_bmad-output/implementation-artifacts/guide-matrix-modal-design.md'
 ---
@@ -157,7 +157,7 @@ Header AUDIO cartouche: filled left badge "AUDIO", hairlines top/bottom continui
 - [x] [Review][Patch] Logo Settings help copy omits standalone AUDIO wiring [`Source/Shared/Definitions/PluginDisplayNames.h:52`]
 - [x] [Review][Patch] No unit test that channel-pair apply clears `useDefault*Channels` [`Tests/Unit/SettingsTabsShellTests.cpp`]
 - [x] [Review][Patch] ASIO link verified only as free helpers, not on apply-path resolution [`Tests/Unit/SettingsTabsShellTests.cpp`]
-- [x] [Review][Defer] User manual still documents Audio/MIDI door / AUDIO FROM / Alt+logo [`Documentation/User/manuel-utilisateur.md`] — deferred: docs pass outside this delivery cutover
+- [x] [Review][Defer] User manual still documents Audio/MIDI door / AUDIO FROM / Alt+logo [`Documentation/Users/manuel-utilisateur.md`] — deferred: docs pass outside this delivery cutover
 - [x] [Review][Defer] `headerAudioProductCopy` only asserts display-name constants [`Tests/Unit/SettingsTabsShellTests.cpp`] — deferred: already recorded; GUI menu structure stays smoke/manual
 
 Rejected:

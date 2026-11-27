@@ -288,7 +288,7 @@ Register: `static ClipboardPasteEnabledResolverTests clipboardPasteEnabledResolv
 
 - `_bmad-output/project-context.md` — Core/GUI boundary, test pyramid, English source
 - `CONVENTIONS.md` §8.5 — AAA tests
-- `Documentation/Development/software-development-quality-principles.md`
+- `Documentation/Devs/software-development-quality-principles.md`
 
 ### References
 

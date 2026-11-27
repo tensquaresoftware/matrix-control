@@ -14,7 +14,7 @@ Copier-coller le bloc ci-dessous dans une **conversation Cursor fraîche**, puis
 Implémenter le **chantier 3** de l’UX « Dirty vs non sauvé » pour Matrix-Control : avertir à la **fermeture** du plugin / de la session DAW si le patch courant est encore à risque.
 
 Référence produit (décisions figées) :
-`Documentation/Development/Plans/2026/08/2026-08-03-Dirty-Vs-Unsaved-Patch-UX.md`
+`Documentation/Devs/Plans/2026/08/2026-08-03-Dirty-Vs-Unsaved-Patch-UX.md`
 — surtout §0 décision 9, §5.4, §8 point 8.
 
 Travaux déjà faits :

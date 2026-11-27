@@ -34,4 +34,4 @@ The footer is three bands aligned with the three body columns (`FooterPanel`: `l
 
 - `_bmad-output/brainstorming/brainstorm-patch-mutator-playable-calibration-2026-08-26/intention-patch-mutator-jouable.md`  
 - `Source/GUI/Panels/MainComponent/FooterPanel/FooterPanel.cpp`  
-- `Documentation/User/manuel-utilisateur.md` § vue d’ensemble « En bas »
+- `Documentation/Users/manuel-utilisateur.md` § vue d’ensemble « En bas »

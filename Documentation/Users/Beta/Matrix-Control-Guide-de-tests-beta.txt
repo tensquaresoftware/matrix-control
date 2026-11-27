@@ -7,7 +7,7 @@ Email : tensquaresoftware@gmail.com
 Produit : Matrix-Control
 Version du produit : 1.0.0-alpha.8
 Version du guide : 1.0
-Date de révision : 24/11/2026
+Date de révision : 26/11/2026
 
 --------------------------------------------------------------------------------
 SOMMAIRE
@@ -200,7 +200,7 @@ Au moins un synthétiseur Oberheim compatible avec le Matrix-Control :
 1.4. Logiciels
 --------------------------------------------------------------------------------
 [ ] Le fichier ZIP du Matrix-Control fourni pour la bêta (il n'y a pas
-    d'installateur : vous copierez les fichiers à la main — la section 4
+    d'installeur : vous copierez les fichiers à la main — la section 4
     explique comment). Le ZIP contient aussi une documentation et un
     dossier de données de tests (Patches & Masters) — détail en section 4.1.
 [ ] Un éditeur de texte basique pour renseigner ce guide au fur et à mesure
@@ -365,7 +365,7 @@ Selon votre système, vous devriez trouver au moins :
 [ ] Le plugin VST3
 [ ] Sur macOS seulement : le plugin AU
 [ ] Un dossier Documentation/ (ce guide de tests ; Matrix-Control-Comment-
-    signaler-un-bug-FR.txt pour les bugs hors campagne ; éventuellement un
+    signaler-un-bug.txt pour les bugs hors campagne ; éventuellement un
     manuel)
 [ ] Un dossier Test-Data/ avec des fichiers de test prêts à l'emploi :
       Test-Data/Patches/syx/     — patches .syx (+ invalid-*.syx)
@@ -705,9 +705,10 @@ l'aveugle ».
 --------------------------------------------------------------------------------
 7.1. Choisir ou confirmer les ports MIDI
 --------------------------------------------------------------------------------
-[ ] Réglez ou vérifiez SYNTH FROM et SYNTH TO (bandeau FROM SYNTH /
-    TO SYNTH, ou SETTINGS → MIDI & DEVICE)
-[ ] Quand du MIDI circule, les LEDs à côté des listes clignotent
+[ ] Réglez ou vérifiez SYNTH FROM et SYNTH TO (SETTINGS → MIDI & DEVICE,
+    ou l’assistant GETTING STARTED — pas de listes de ports dans le HEADER)
+[ ] Quand du MIDI circule, les LEDs FROM SYNTH / TO SYNTH / FROM KEYBOARD
+    du HEADER clignotent
 [ ] En bas à droite, le badge DEVICE affiche Matrix-1000, Matrix-6, etc.
     (un Matrix-6R peut apparaître comme Matrix-6 : notez-le si c'est le cas)
 [ ] Si NOT CONNECTED : suivez le message en bas de fenêtre
@@ -1683,7 +1684,7 @@ ne peut pas tirer parti de votre session.
    L'email avec le .txt joint reste la voie la plus simple.
 
 Pour un bug ou une question hors campagne de tests bêta, utilisez plutôt
-le document Matrix-Control-Comment-signaler-un-bug-FR.txt (fourni dans
+le document Matrix-Control-Comment-signaler-un-bug.txt (fourni dans
 Documentation/ du ZIP de la bêta).
 
 Inutile d'envoyer mots de passe, licences, ou une copie entière du disque.

@@ -9,7 +9,7 @@ context:
   - '{project-root}/_bmad-output/specs/spec-skin-designer-zones-panel/SPEC.md'
   - '{project-root}/_bmad-output/specs/spec-skin-designer-zones-panel/zone-registry-contract.md'
   - '{project-root}/_bmad-output/specs/spec-skin-designer-zones-panel/io-and-live-bridge.md'
-  - '{project-root}/Documentation/Development/Plans/2026/11/2026-11-13-Skin-Designer-Zones-Panel-Vision.md'
+  - '{project-root}/Documentation/Devs/Plans/2026/11/2026-11-13-Skin-Designer-Zones-Panel-Vision.md'
   - '{project-root}/_bmad/custom/ascii-display-strings.md'
 baseline_commit: '4ecb48f7'
 ---

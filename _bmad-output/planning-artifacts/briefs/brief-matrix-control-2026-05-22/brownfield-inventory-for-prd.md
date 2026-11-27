@@ -288,7 +288,7 @@ Matrix-Control today is a **visually mature Matrix-1000 editor shell** with a **
 
 1. **This document** — mark keep/rework decisions in margin  
 2. **`brief.md` v0.3** — product intent  
-3. **`Documentation/Development/Specifications/Functional-Specification.md`** — treat as **draft** to reconcile  
+3. **`Documentation/Devs/Specifications/Functional-Specification.md`** — treat as **draft** to reconcile  
 
 ---
 

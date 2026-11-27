@@ -5,7 +5,7 @@ companions:
   - io-and-live-bridge.md
   - ../../implementation-artifacts/spec-zones-skins-black-duo-cream.md
   - ../spec-skin-editor/thin-bridge.md
-  - ../../../Documentation/Development/Plans/2026/11/2026-11-13-Skin-Designer-Zones-Panel-Vision.md
+  - ../../../Documentation/Devs/Plans/2026/11/2026-11-13-Skin-Designer-Zones-Panel-Vision.md
 sources: []
 ---
 

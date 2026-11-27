@@ -187,7 +187,7 @@ It runs the same `lint_touched.py` logic as CI **plus** the
 - **Boy Scout** limited to the modified zone
 - **CQS** when natural — do not force it onto JUCE APIs that read and write together
 
-> Full acronym reference: `Documentation/Development/software-development-quality-principles.md`
+> Full acronym reference: `Documentation/Devs/software-development-quality-principles.md`
 
 ### 4.3 Golden rule
 
@@ -436,7 +436,7 @@ Prefer inline methods in header only if they are short (< 5 lines)
 
 ### 6.16 Design principles (agent priorities)
 
-> Full human reference: `Documentation/Development/software-development-quality-principles.md`
+> Full human reference: `Documentation/Devs/software-development-quality-principles.md`
 > These principles complement SOLID and Clean Code — they resolve tensions between purity and pragmatism.
 
 #### Simplicity & change (apply when designing)
@@ -843,12 +843,12 @@ Prefer many fast unit tests over a few slow integration tests.
 
 When I create Markdown files for refactoring plans, optimizations, or other planned operations, I store them **directly** in:
 
-`Documentation/Development/Plans/`
+`Documentation/Devs/Plans/`
 
-The **Plans** folder must be **compartmentalized into subfolders by year**: `2025`, `2026`, etc. Inside each year, create **subfolders by month**: `01`, `02`, `03`, …, `12`. Each plan file is placed in the year then month subfolder corresponding to the plan date (e.g. a plan dated 2026-02-23 → `Documentation/Development/Plans/2026/02/`).
+The **Plans** folder must be **compartmentalized into subfolders by year**: `2025`, `2026`, etc. Inside each year, create **subfolders by month**: `01`, `02`, `03`, …, `12`. Each plan file is placed in the year then month subfolder corresponding to the plan date (e.g. a plan dated 2026-02-23 → `Documentation/Devs/Plans/2026/02/`).
 
 **⚠️ Important procedure:**
-- Any plan or design document I produce must be saved under `Documentation/Development/Plans/<year>/<month>/` with the naming convention below
+- Any plan or design document I produce must be saved under `Documentation/Devs/Plans/<year>/<month>/` with the naming convention below
 - Keep the archived plan up to date: when all of its TODOs are marked `completed`, update the saved file so it reflects the final state
 
 ### 9.2 Naming convention
@@ -860,7 +860,7 @@ The **Plans** folder must be **compartmentalized into subfolders by year**: `202
 - **No stop words** (de, la, l', the, of, etc.)
 - **Explicit names** reflecting the document content
 
-**Example:** `Documentation/Development/Plans/2026/02/2026-02-03-Theme-To-Skin-Migration-Phase-Six-Summary.md`
+**Example:** `Documentation/Devs/Plans/2026/02/2026-02-03-Theme-To-Skin-Migration-Phase-Six-Summary.md`
 
 ---
 
