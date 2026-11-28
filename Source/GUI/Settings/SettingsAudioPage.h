@@ -18,7 +18,7 @@ namespace TSS
     class ISkin;
 }
 
-/** Standalone Settings AUDIO page: devices, channel pairs, SYNTH FROM, test tone. */
+/** Standalone Settings AUDIO page: devices, channel pairs, AUDIO FROM, test tone. */
 class SettingsAudioPage : public juce::Component,
                           private juce::Timer,
                           private juce::ChangeListener

@@ -1,5 +1,5 @@
 // Extracted from PluginEditor.cpp for modular maintenance.
-// Standalone SYNTH FROM refresh, audio device change listener, and
+// Standalone AUDIO FROM refresh, audio device change listener, and
 // APVTS property/redirect sync for MIDI ports and audio-from source id.
 
 #include "PluginEditor.h"

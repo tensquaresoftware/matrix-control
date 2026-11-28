@@ -152,7 +152,7 @@ private:
                                   "Matrix-Control - not in this window. See the user manual for host "
                                   "examples."));
         expectEquals(juce::String(GettingStartedWizard::bodyFor(Step::kAudio, false)),
-                     juce::String("Choose the audio interface, channels, and SYNTH FROM so you can hear "
+                     juce::String("Choose the audio interface, channels, and AUDIO FROM so you can hear "
                                   "your synth in Matrix-Control. These are the same audio settings as "
                                   "in Settings."));
 

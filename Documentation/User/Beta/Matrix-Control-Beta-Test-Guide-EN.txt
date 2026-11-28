@@ -5,9 +5,9 @@ Organisation: Ten Square Software
 Author: Guillaume DUPONT
 Email: tensquaresoftware@gmail.com
 Product: Matrix-Control
-Product version: 1.0.0-alpha.8
+Product version: 1.0.0-alpha.9
 Guide version: 1.0
-Revision date: 2026-11-24
+Revision date: 2026-11-28
 
 --------------------------------------------------------------------------------
 CONTENTS
@@ -665,8 +665,8 @@ This step is STEP 4 / AUDIO in the GETTING STARTED wizard
 (it does not appear in plugin mode).
 
 [ ] Choose your audio interface
-[ ] Choose the synth-return monitoring channels (SYNTH FROM in the
-    AUDIO tab — this is NOT the same "SYNTH FROM" as the MIDI port)
+[ ] Choose the synth-return monitoring channels (AUDIO FROM in the
+    AUDIO tab)
 [ ] FINISH closes the wizard
 
 [ ] Expected result: you complete GETTING STARTED through FINISH.

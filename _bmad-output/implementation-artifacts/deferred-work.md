@@ -3511,3 +3511,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-manual-fr-patch-name-skins.md`
   summary: Align `_bmad/custom/manuel-utilisateur-redaction-fr.md` so Afficheur / PATCH NAME no longer say read-only (otherwise later manual passes may reintroduce the old wording).
   evidence: Blind Hunter; redaction SSOT left intentionally out of this oneshot (single target file was the FR manual).
+
+## Deferred from: spec-audio-from-label.md (2026-11-28)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-from-label.md`
+  summary: Beta guide session/notes checklists still record MIDI SYNTH FROM/TO only and omit Standalone AUDIO FROM listen choice for reproduction notes.
+  evidence: Blind Hunter; optional enrichment outside rename oneshot.

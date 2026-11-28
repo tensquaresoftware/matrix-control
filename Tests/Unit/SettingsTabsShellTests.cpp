@@ -386,8 +386,8 @@ private:
                      juce::String("AUDIO"));
         expectEquals(juce::String(PluginDisplayNames::HeaderPanel::kInputGainLabel),
                      juce::String("INPUT GAIN"));
-        expectEquals(juce::String(PluginDisplayNames::Settings::kSynthFromLabel),
-                     juce::String("SYNTH FROM"));
+        expectEquals(juce::String(PluginDisplayNames::Settings::kAudioFromLabel),
+                     juce::String("AUDIO FROM"));
         expectEquals(juce::String(PluginDisplayNames::Settings::kInputChannelsLabel),
                      juce::String("INPUT CHANNELS"));
         expectEquals(juce::String(PluginDisplayNames::Settings::kOutputChannelsLabel),

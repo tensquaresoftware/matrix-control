@@ -49,7 +49,7 @@ project(Matrix-Control VERSION 1.0.0)
 
 string(TIMESTAMP MATRIX_CONTROL_BUILD_DATE "%Y-%m-%d" UTC)
 # FORCE: CMakeLists is SSOT for the prerelease label; without FORCE a stale cache keeps the old suffix.
-set(MATRIX_CONTROL_PRERELEASE_SUFFIX "alpha.8"
+set(MATRIX_CONTROL_PRERELEASE_SUFFIX "alpha.9"
     CACHE STRING "Pre-release suffix appended to version (empty string for release builds)" FORCE)
 
 # Windows ASIO (Steinberg): keep OFF until written licence countersignature is on file.
