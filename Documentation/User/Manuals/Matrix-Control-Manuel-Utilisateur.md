@@ -4,9 +4,9 @@ Auteur: Guillaume DUPONT
 Projet: Matrix-Control
 Titre: Matrix-Control — Manuel utilisateur
 Version: 1.0
-Version-Produit: 1.0.0-alpha.8
+Version-Produit: 1.0.0-alpha.9
 Created: 2026-07-20
-Updated: 2026-11-24
+Updated: 2026-11-28
 References:
   - Documentation/User/Manuals/ (EN user manual à venir)
   - CONTRIBUTING.md
@@ -176,7 +176,7 @@ En application autonome, l’assistant ajoute une quatrième étape :
 
 | Étape | Titre à l’écran | Ce que vous réglez |
 |-------|-----------------|--------------------|
-| 4 | `GETTING STARTED | STEP 4: AUDIO` | Interface / entrée audio pour écouter le synthé, et canaux d’écoute `SYNTH FROM` (Settings → `AUDIO` — distincts du port MIDI du même nom) |
+| 4 | `GETTING STARTED | STEP 4: AUDIO` | Interface / entrée audio pour écouter le synthé, et canaux d’écoute `AUDIO FROM` (Settings → `AUDIO`) |
 
 - À l’étape clavier : liste `KEYBOARD FROM` ; vous pouvez `SKIP` si vous jouez sur le clavier intégré d’un Matrix-6, ou si vous n’avez pas encore de clavier maître. `SKIP` marque l’étape clavier comme **terminée** pour l’ouverture automatique et les rappels, sans choisir de port
 - La dernière étape est l’Audio : `FINISH` ferme l’assistant et marque cette étape comme terminée pour l’ouverture automatique (même si l’écoute n’est pas encore parfaite)
@@ -223,8 +223,6 @@ C’est l’étape la plus importante. Tant que le synthé n’est pas reconnu, 
 Au premier lancement, l’assistant `GETTING STARTED` (étape `SYNTH COMMUNICATION`) vous propose déjà les ports et le type `EPROM TYPE`. Les ports, le badge `DEVICE` et `EPROM TYPE` se règlent aussi à tout moment dans `SETTINGS...` → onglet `MIDI & DEVICE`, ou depuis le bandeau supérieur pour les ports.
 
 Dans la liste déroulante `EPROM TYPE` (assistant et Settings → `MIDI & DEVICE`), la sélection suit automatiquement le type reconnu à l’identification du synthé. Un marqueur ` *` apparaît **uniquement dans la liste ouverte** à droite de cette suggestion (par ex. `TAUNTEK *`, ou `UNKNOWN *` si le firmware n’est pas reconnu). Une fois la liste refermée, le marqueur disparaît. Si vous changez la combo à la main puis reconnectez un autre synthé (ou d’autres ports), une nouvelle identification remet la suggestion à jour.
-
-**Attention au libellé `SYNTH FROM` :** il désigne deux choses selon l’endroit. Dans Settings → `MIDI & DEVICE` (et l’étape synthé de l’assistant), c’est le **port MIDI** qui arrive du synthé. Dans Settings → `AUDIO` (et l’étape Audio Standalone de l’assistant), ce sont les **canaux d’écoute** du retour audio du synthé.
 
 **Dans Settings → `MIDI & DEVICE` :**
 
@@ -716,7 +714,7 @@ Autres réglages utiles :
 | Réglage | Disponible ? | Détail |
 |---------|--------------|--------|
 | Onglet `MIDI & DEVICE` | Oui | Ports `SYNTH FROM` / `SYNTH TO` (`KEYBOARD FROM` en Standalone), badge `DEVICE` (modèle + version EPROM en lecture seule), `EPROM TYPE` ; `HARDWARE LATENCY` (**plugin seulement**, 0 à 200 ms) pour indiquer au DAW le retard du chemin matériel (synthé + câbles + interface audio) |
-| Onglet `AUDIO` | **Standalone seulement** | Interface / type de pilote (`DRIVER TYPE`), entrées / sorties, canaux d’écoute `SYNTH FROM` (audio — pas le port MIDI), fréquence d’échantillonnage, buffer… Selon votre système, la liste peut proposer par exemple **ASIO** sous Windows ou **JACK** sous Linux, en plus des pilotes audio habituels de la plateforme. Toutes les options ne sont pas présentes partout : ce qui apparaît dépend de l’ordinateur, des pilotes installés et de la version de Matrix-Control que vous utilisez |
+| Onglet `AUDIO` | **Standalone seulement** | Interface / type de pilote (`DRIVER TYPE`), entrées / sorties, canaux d’écoute `AUDIO FROM`, fréquence d’échantillonnage, buffer… Selon votre système, la liste peut proposer par exemple **ASIO** sous Windows ou **JACK** sous Linux, en plus des pilotes audio habituels de la plateforme. Toutes les options ne sont pas présentes partout : ce qui apparaît dépend de l’ordinateur, des pilotes installés et de la version de Matrix-Control que vous utilisez |
 | `MATRIX-1000 PATCHES` | Oui | `DISPLAY MUSICAL NAMES` / `DISPLAY HARDWARE NAMES` |
 | `COMPUTER PATCHES` | Oui | `DISPLAY SYSEX NAMES` / `DISPLAY FILE NAMES` / `ASK ONCE PER LOAD` |
 | `UNSAVED STATE` | Oui | `ALWAYS WARN` / `NEVER WARN` |
@@ -771,7 +769,7 @@ En général **non** conservé tel quel : le contenu du patch en cours d’édit
 | Plugin invisible dans le DAW | Rescanner les plugins ; vérifier le format (AU/VST3) et le dossier indiqué avec le téléchargement |
 | Pas de notes en plugin | Router le clavier maître vers la piste Matrix-Control dans le DAW ([exemples](#clavier-maître-via-le-daw-plugin)) ; `KEYBOARD FROM` reste sur `HOST` |
 | Assistant `GETTING STARTED` ne s’ouvre plus | Dans Settings → `GETTING STARTED` → `SETUP WIZARD`, choisir `SHOW WHEN INCOMPLETE` ou cliquer `RUN SETUP AGAIN` |
-| Pas de son en Standalone | Vérifier Settings → `AUDIO` (`DRIVER TYPE` / interface, entrée, canaux d’écoute `SYNTH FROM` — pas le port MIDI) et le câblage vers l’interface audio |
+| Pas de son en Standalone | Vérifier Settings → `AUDIO` (`DRIVER TYPE` / interface, entrée, canaux d’écoute `AUDIO FROM`) et le câblage vers l’interface audio |
 | Interface VST3 floue dans Ableton Live (Windows) | Désactiver **Auto-Scale Plugin Window** pour Matrix-Control, recharger le device ; comparer avec le Standalone (voir [Ableton Live](#ableton-live)) |
 | Deux instances se marchent sur les pieds (détection / édition bizarre) | Ne pas partager les mêmes ports : une paire `SYNTH FROM` / `SYNTH TO` distincte par instance (et par machine si vous en avez plusieurs) — voir [section 6](#6-brancher-le-synthé-et-établir-le-dialogue-midi) |
 | Audio en retard dans le DAW | Ajuster `HARDWARE LATENCY` dans Settings → `MIDI & DEVICE` (plugin) ; et la taille de buffer du DAW / de l’interface audio |
@@ -787,6 +785,7 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 | **Afficheur** | Région graphique ou panneau d’affichage : enveloppes et Track Generator (éditables à la souris) ; `PATCH NAME` (renommable par double-clic quand l’édition est autorisée — voir [section 8](#nom-du-patch-patch-name)). |
 | **ASIO** | Sous Windows, type de pilote audio souvent utilisé en MAO (latence en général plus basse). Peut apparaître dans Settings → `AUDIO` → `DRIVER TYPE` en Standalone, selon votre installation. |
 | **AU** | Format de plugin sur macOS (Audio Unit). |
+| **AUDIO FROM** | Canaux d’écoute du retour audio du synthé dans Settings → `AUDIO` (Standalone) et l’étape Audio de l’assistant. Distinct du port MIDI `SYNTH FROM`. |
 | **Banque (Bank)** | Sur le Matrix-1000 : regroupement de 100 patches. Il y a 10 banques (0–9). Le Matrix-6/6R n’a pas de banques. |
 | **BANK LOCK** | Dans `MASTER EDIT` → `MISC` : verrouille le changement de banque côté Matrix-1000. Ce n’est **pas** un bouton du module `BANK UTILITY`. |
 | **DRIVER TYPE** | Dans Settings → `AUDIO` (Standalone) : liste du type de pilote / interface audio (pilote système, ASIO, JACK… selon la plateforme). |
@@ -818,7 +817,7 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 | **`SKIN`** | Apparence visuelle de l’interface (six variantes de base `BLACK/…` et `CREAM/…`, plus la famille `TONES/…` — menu logo et Settings → `USER INTERFACE`). |
 | **Standalone** | Application autonome, sans DAW. |
 | **STORE** | Enregistrer le patch courant dans la mémoire du synthé. |
-| **SYNTH FROM / SYNTH TO** | **Ports MIDI** dans Settings → `MIDI & DEVICE` et l’étape synthé de l’assistant (ce qui arrive du synthé / part vers le synthé) ; bandeau `FROM SYNTH` / `TO SYNTH`. **Aussi** canaux d’écoute audio `SYNTH FROM` dans Settings → `AUDIO` / étape Audio Standalone — ne pas confondre avec le port MIDI. |
+| **SYNTH FROM / SYNTH TO** | **Ports MIDI** dans Settings → `MIDI & DEVICE` et l’étape synthé de l’assistant (ce qui arrive du synthé / part vers le synthé) ; bandeau `FROM SYNTH` / `TO SYNTH`. |
 | **SysEx** | Messages MIDI détaillés propres à une marque / un modèle, utilisés pour éditer le synthé en profondeur. |
 | **`.m1kp`** | Fichier de patch Matrix-Control (chargement via Computer Patches / glisser-déposer). La sauvegarde native reste un `.syx` ; le `.m1kp` d’origine n’est pas réécrit. |
 | **`.syx`** | Fichier qui contient un patch au format SysEx. |

@@ -43,7 +43,7 @@ namespace PluginDisplayNames
                 "AUDIO: Monitors the selected audio input level and sets INPUT GAIN (Standalone).";
             constexpr const char* kInputGain =
                 "AUDIO: INPUT GAIN sets monitoring level for the selected audio input. Choose the listen source in"
-                " SETTINGS > AUDIO > SYNTH FROM.";
+                " SETTINGS > AUDIO > AUDIO FROM.";
             constexpr const char* kUndo =
                 "EDIT: UNDO undoes the last PATCH or MASTER edit in this session.";
             constexpr const char* kRedo =
@@ -184,6 +184,7 @@ namespace PluginDisplayNames
         constexpr const char* kKeyboardFromLabel       = "KEYBOARD FROM";
         constexpr const char* kSynthFromLabel          = "SYNTH FROM";
         constexpr const char* kSynthToLabel            = "SYNTH TO";
+        constexpr const char* kAudioFromLabel          = "AUDIO FROM";
         constexpr const char* kPlayTestToneButton      = "PLAY TEST TONE";
         constexpr const char* kInfoMessageLabel        = "INFO MESSAGE";
         constexpr const char* kContextualHelpLabel     = "CONTEXTUAL HELP";
@@ -375,7 +376,7 @@ namespace PluginDisplayNames
                 "master keyboard on a DAW track (or MIDI input) to Matrix-Control - not in this "
                 "window. See the user manual for host examples.";
             constexpr const char* kBodyAudioFirstPass =
-                "Choose the audio interface, channels, and SYNTH FROM so you can hear your synth in "
+                "Choose the audio interface, channels, and AUDIO FROM so you can hear your synth in "
                 "Matrix-Control. These are the same audio settings as in Settings.";
             constexpr const char* kBodyAudioResume =
                 "MIDI is already set. One more step: finish audio routing so the standalone "

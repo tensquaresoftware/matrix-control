@@ -5,9 +5,9 @@ Organisation : Ten Square Software
 Auteur : Guillaume DUPONT
 Email : tensquaresoftware@gmail.com
 Produit : Matrix-Control
-Version du produit : 1.0.0-alpha.8
+Version du produit : 1.0.0-alpha.9
 Version du guide : 1.0
-Date de révision : 24/11/2026
+Date de révision : 28/11/2026
 
 --------------------------------------------------------------------------------
 SOMMAIRE
@@ -684,8 +684,8 @@ Cette étape correspond à STEP 4 / AUDIO dans l'assistant GETTING STARTED
 (elle n'apparaît pas en plugin).
 
 [ ] Choisissez votre interface audio
-[ ] Choisissez les canaux d'écoute du retour synthé (SYNTH FROM dans
-    l'onglet AUDIO — ce n'est PAS le même « SYNTH FROM » que le port MIDI)
+[ ] Choisissez les canaux d'écoute du retour synthé (AUDIO FROM dans
+    l'onglet AUDIO)
 [ ] FINISH ferme l'assistant
 
 [ ] Résultat attendu : vous terminez GETTING STARTED jusqu'à FINISH. Les

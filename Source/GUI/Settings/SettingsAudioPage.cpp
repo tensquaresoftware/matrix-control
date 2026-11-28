@@ -60,7 +60,7 @@ void SettingsAudioPage::buildWidgets()
     bufferSizeCombo_ = makeCombo(*skin_);
     inputChannelsLabel_ = makeLabel(*skin_, PluginDisplayNames::Settings::kInputChannelsLabel);
     inputChannelsCombo_ = makeCombo(*skin_);
-    synthFromLabel_ = makeLabel(*skin_, PluginDisplayNames::Settings::kSynthFromLabel);
+    synthFromLabel_ = makeLabel(*skin_, PluginDisplayNames::Settings::kAudioFromLabel);
     synthFromCombo_ = makeCombo(*skin_);
     synthFromCombo_->setUsesPortSentinelPopupChrome(true);
     synthFromCombo_->setUsesContentSizedPopupWidth(true);

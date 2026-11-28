@@ -24,7 +24,7 @@ namespace SettingsShellMetrics
     inline constexpr int kPeakWidth = 12;
     inline constexpr int kPeakGap = 8;
     inline constexpr int kSynthFromComboWidth = kControlColumnWidth - kPeakWidth - kPeakGap;
-    // AUDIO: 5 device rows + blank + INPUT CHANNELS + SYNTH FROM + blank + OUTPUT CHANNELS + PLAY TEST TONE.
+    // AUDIO: 5 device rows + blank + INPUT CHANNELS + AUDIO FROM + blank + OUTPUT CHANNELS + PLAY TEST TONE.
     inline constexpr int kTallestPageRows = 11;
     inline constexpr int kRuleThicknessUntil200 = 1;
     inline constexpr int kRuleThicknessAt200 = 2;
